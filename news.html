@@ -38,6 +38,23 @@
 
         article {
             margin-bottom: 2em;
+            display: flex;
+            align-items: center;
+        }
+
+        article img {
+            margin-right: 1em;
+            width: 100px; /* Adjust the width as needed */
+            height: 100px; /* Maintain aspect ratio */
+            cursor: pointer; /* Add pointer cursor on hover */
+        }
+
+        article img:hover {
+            border: 1px solid #333; /* Add border on hover */
+        }
+
+        article div {
+            flex-grow: 1;
         }
 
         footer {
@@ -61,19 +78,28 @@
         <a href="./index">Home</a>
         <a href="./about">About</a>
         <a href="./news">News</a>
-     
     </nav>
 
     <main>
         <article>
-            <h2><a href="./silentholocaust">The Silent Holocaust</a></h2>
-            <p>This articler delves into the contentious topic of abortion, drawing parallels to historical atrocities while presenting a viewpoint critical of the practice. The article concludes with a focus on recent events, including attempts to restrict abortion in certain states and allegations of election rigging in the context of abortion rights.</p>
+            <a href="./silentholocaust">
+                <img src="https://todaysparent.mblycdn.com/uploads/tp/2014/12/blanket-baby-article.jpg" alt="Thumbnail 1">
+            </a>
+            <div>
+                <h2><a href="./silentholocaust">The Silent Holocaust</a></h2>
+                <p>This article delves into the contentious topic of abortion, drawing parallels to historical atrocities while presenting a viewpoint critical of the practice. The article concludes with a focus on recent events, including attempts to restrict abortion in certain states and allegations of election rigging in the context of abortion rights.</p>
+            </div>
         </article>
 
         <article>
-            <h2><a href="#">Article 2</a></h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vel elit sit amet nunc varius fermentum.
-                Nulla facilisi. Sed vel dui et lacus dictum fringilla. Vestibulum ut fringilla leo.</p>
+            <a href="#">
+                <img src="https://example.com/thumbnail2.jpg" alt="Thumbnail 2">
+            </a>
+            <div>
+                <h2><a href="#">Article 2</a></h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vel elit sit amet nunc varius fermentum.
+                    Nulla facilisi. Sed vel dui et lacus dictum fringilla. Vestibulum ut fringilla leo.</p>
+            </div>
         </article>
 
         <!-- Add more articles as needed -->
