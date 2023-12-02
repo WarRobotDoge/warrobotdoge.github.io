@@ -46,8 +46,14 @@
             font-size: 2.5em; /* Adjust the size as needed */
         }
 
+        .article-text-container {
+            max-width: 600px; /* Adjust the max-width as needed for a tighter column */
+            margin: auto;
+            text-align: justify; /* Justify the text within the container */
+        }
+
         .article-text {
-            font-size: 1em; /* Adjust the size as needed */
+            font-size: 1.1em; /* Adjust the font size as needed for slightly smaller text */
             color: #000000; /* Black color */
             margin-bottom: 0.5em;
         }
@@ -78,7 +84,6 @@
             position: absolute;
             top: 10em; /* Adjusted top value */
             left: 20em; /* Adjusted left value */
-            
            
             display: flex;
             align-items: center;
@@ -142,7 +147,6 @@
         <article>
             <div class="round-share-button" onclick="toggleShareOptions()">
                 <img src="https://static.thenounproject.com/png/2137557-200.png" alt="Share Image">
-               
             </div>
             <h1><center>The Silent Holocaust</center></h1>
             <h2 class="article-sum"><center>Since 1972, millions have been slaughtered...</center></h2>
@@ -153,11 +157,12 @@
         <div class="separator-line"></div>
 
         <article>
-            <center>
+            <!-- Wrap the paragraphs in the article-text-container div -->
+            <div class="article-text-container">
                 <p class="article-text">During World War II...</p>
                 <p class="article-text">From 1997 to 2022...</p>
                 <p class="article-text">In 2004...</p>
-            </center>
+            </div>
         </article>
 
         <!-- Share Options -->
@@ -180,42 +185,55 @@
         }
 
         function shareOnFacebook() {
-             // Get the current page URL
-        var currentUrl = window.location.href;
+            // Get the text content under the class "article-sum"
+            var articleSumText = document.querySelector('.article-sum').textContent;
 
-        // Create the Facebook share URL with the current URL
-        var facebookShareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(currentUrl);
+            // Get the current page URL
+            var currentUrl = window.location.href;
 
-        // Open Facebook in a new window for sharing
-        window.open(facebookShareUrl);
+            // Combine the article text and current URL for the Facebook share
+            var facebookShareText = articleSumText + ' ' + currentUrl;
+
+            // Create the Facebook share URL with the combined text
+            var facebookShareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(currentUrl) + '&quote=' + encodeURIComponent(facebookShareText);
+
+            // Open Facebook in a new window for sharing
+            window.open(facebookShareUrl);
         }
 
         function shareOnTwitter() {
-          // Get the text content under the class "article-sum"
-        var articleSumText = document.querySelector('.article-sum').textContent;
+            // Get the text content under the class "article-sum"
+            var articleSumText = document.querySelector('.article-sum').textContent;
 
-        // Get the current page URL
-        var currentUrl = window.location.href;
+            // Get the current page URL
+            var currentUrl = window.location.href;
 
-        // Combine the article text and current URL for the tweet
-        var tweetText = articleSumText + ' ' + currentUrl;
+            // Combine the article text and current URL for the tweet
+            var tweetText = articleSumText + ' ' + currentUrl;
 
-        // Create the Twitter intent URL with the tweet text
-        var twitterIntentUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText);
+            // Create the Twitter intent URL with the tweet text
+            var twitterIntentUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText);
 
-        // Open Twitter in a new window and start composing a tweet
-        window.open(twitterIntentUrl);
+            // Open Twitter in a new window and start composing a tweet
+            window.open(twitterIntentUrl);
         }
+
         function shareOnEmail() {
-        // Get the current page URL
-        var currentUrl = window.location.href;
+            // Get the text content under the class "article-sum"
+            var articleSumText = document.querySelector('.article-sum').textContent;
 
-        // Create the mailto: link with the subject and body
-        var mailtoLink = 'mailto:?subject=Check%20out%20this%20article%20on%20WarRobotDoge%20News&body=I%20found%20this%20interesting%20article:%20"The%20Silent%20Holocaust"%0A' + encodeURIComponent(currentUrl);
+            // Get the current page URL
+            var currentUrl = window.location.href;
 
-        // Open the user's default email app
-        window.location.href = mailtoLink;
-    }
+            // Combine the article text and current URL for the email body
+            var emailBody = articleSumText + '\n\n' + 'Read more: ' + currentUrl;
+
+            // Create the mailto: link with the subject and body
+            var mailtoLink = 'mailto:?subject=Check%20out%20this%20article%20on%20WarRobotDoge%20News&body=' + encodeURIComponent(emailBody);
+
+            // Open the user's default email app
+            window.location.href = mailtoLink;
+        }
     </script>
 </body>
 
