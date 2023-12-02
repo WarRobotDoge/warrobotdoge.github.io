@@ -1,39 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" class="link-html" dir="ltr">
 
-<!doctype html>
-<html lang="en">
-  <head>
-<!-- about -->
+<head>
+    <title>WarRoboDoge - 404 Not Found</title>
+    <base href="https://warrobotdoge.com/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <style>
+        html,
+        body {
+            font-family: 'Montserrat', "Helvetica Neue", Arial, sans-serif !important;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
 
- <h1>404</h1>
-      <h2>This page does not exist.</h2>
+        .video-container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        video {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            z-index: 1;
+            color: #fff;
+        }
+
+        .header-image {
+            width: 200px; /* Adjust the width as needed */
+            height: auto; /* Maintain aspect ratio */
+            border-radius: 50%; /* Make the image round */
+        }
+
+        .link-title {
+            font-size: 3rem;
+        }
+
+        .link-subtitle {
+            font-size: 1.5rem;
+        }
+
+        hr {
+            border-color: #fff;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body class="link-body">
+    <div class="video-container">
+        <video autoplay muted loop playsinline>
+            <source src="https://bet3rd.com/uploads/background.mp4" type="video/mp4">
+        </video>
     </div>
+    <div class="container">
+        <img src="https://avatars.cloudflare.steamstatic.com/6149c730d91c807f4875708b1288d1ec0ae9c8e1_full.jpg" alt="404 Image" class="header-image">
 
-    <script
-      type="text/javascript"
-      src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"
-    ></script>
-
-    <script src="js/404.js"></script>
-  </body>
-</html>
-<style>
-.button {
-  background-color: #000000; /* Green */
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-}
-</style>
-            <div class="text">
-                <article>
-                    <p>Uh oh! Looks like you got lost. <br>Go back to the homepage if you dare!</p>
-                    <a href="https://warrobotdoge.com/" class="button">Home</a>
-                </article>
-            </div>
-
+     
+            <h3 class="link-title">404 Not Found</h3>
+            <p class="link-subtitle">The page you are looking for could not be found on WarRobotDoge.com.</p>
         </div>
-    </section>
+    </div>
+</body>
+
+</html>
+
