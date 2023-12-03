@@ -39,17 +39,12 @@
 
         article {
             margin-bottom: 2em;
+            text-align: center; /* Center the article content */
         }
 
         article h1 {
             font-style: italic;
             font-size: 2.5em; /* Adjust the size as needed */
-        }
-
-        .article-text-container {
-            max-width: 600px; /* Adjust the max-width as needed for a tighter column */
-            margin: auto;
-            text-align: justify; /* Justify the text within the container */
         }
 
         .article-text {
@@ -66,14 +61,15 @@
 
         .separator-line {
             border-top: 1px solid #ddd; /* Thin line color */
-            margin: 1em 0;
+            width: fit-content; /* Set the width to fit the content */
+            margin: 1em auto; /* Center the line and add margin */
         }
 
         .article-image {
             max-width: 100%;
             height: auto;
             display: block;
-            margin: 1em 0;
+            margin: 1em auto; /* Center the image and add margin */
         }
 
         .round-share-button {
@@ -84,7 +80,7 @@
             position: absolute;
             top: 10em; /* Adjusted top value */
             left: 20em; /* Adjusted left value */
-           
+
             display: flex;
             align-items: center;
             justify-content: center;
@@ -115,6 +111,18 @@
             padding: 0.5em;
             transition: background-color 0.3s;
         }
+        .article-image-text {
+    text-align: center; /* Center the text */
+    max-width: 600px; /* Set the maximum width to 600px */
+    margin: 0 auto; /* Center the text and add margin */
+    font-size: 0.9em; /* Adjust the font size as needed for smaller text */
+    color: #808080; /* Grey color */
+}
+        .separator-line {
+    border-top: 1px solid #ddd; /* Thin line color */
+    width: 600px; /* Set the width to 600px */
+    margin: 1em auto; /* Center the line and add margin */
+}
 
         .share-options a:hover {
             background-color: #f4f4f4;
@@ -149,20 +157,17 @@
                 <img src="https://static.thenounproject.com/png/2137557-200.png" alt="Share Image">
             </div>
             <h1><center>The Silent Holocaust</center></h1>
-            <h2 class="article-sum"><center>Since 1972, millions have been slaughtered...</center></h2>
+            <h2 class="article-sum"><center>Since 1973, millions have been slaughtered...</center></h2>
         </article>
         <div class="separator-line"></div>
         <center><img src="https://static01.nyt.com/images/2023/11/22/multimedia/22up-births1-qcbv/22up-births1-qcbv-superJumbo.jpg?quality=75&auto=webp" alt="Article Image" class="article-image" height="600" width="400"></center>
-        <p>The waiting room at Planned Parenthood in St. Louis, which was Missouri’s only abortion provider before Missouri banned abortion after Dobbs.Credit...</p>
-        <div class="separator-line"></div>
+      <p class="article-image-text">The waiting room at Planned Parenthood in St. Louis, which was Missouri’s only abortion provider before Missouri banned abortion after Dobbs. Jamie Kelter Davis for The New York Times</p>
+<div class="separator-line"></div>
 
         <article>
-            <!-- Wrap the paragraphs in the article-text-container div -->
-            <div class="article-text-container">
-                <p class="article-text">During World War II...</p>
-                <p class="article-text">From 1997 to 2022...</p>
-                <p class="article-text">In 2004...</p>
-            </div>
+            <p class="article-text">During World War II...</p>
+            <p class="article-text">From 1997 to 2022...</p>
+            <p class="article-text">In 2004...</p>
         </article>
 
         <!-- Share Options -->
