@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Commenting System</title>
+    <style>
+        #comments-container {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .comment {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #comment-input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        #submit-btn {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="comments-container">
+        <h2>Comments</h2>
+        <div id="comments-list"></div>
+        <textarea id="comment-input" placeholder="Type your comment here..."></textarea>
+        <button id="submit-btn" onclick="submitComment()">Submit Comment</button>
+    </div>
+
+    <script>
+        function submitComment() {
+            var commentInput = document.getElementById('comment-input');
+            var commentText = commentInput.value.trim();
+
+            if (commentText !== '') {
+                addComment(commentText);
+                commentInput.value = '';
+            }
+        }
+
+        function addComment(commentText) {
+            var commentsList = document.getElementById('comments-list');
+
+            var commentDiv = document.createElement('div');
+            commentDiv.className = 'comment';
+            commentDiv.textContent = commentText;
+
+            commentsList.appendChild(commentDiv);
+        }
+    </script>
+</body>
+
+</html>
