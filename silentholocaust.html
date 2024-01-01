@@ -293,54 +293,64 @@
         }
 
         function shareOnFacebook() {
-            // Get the text content under the class "article-sum"
-            var articleSumText = document.querySelector('.article-sum').textContent;
+        // Get the text content under the class "article-sum"
+        var articleSumText = document.querySelector('.article-sum').textContent;
 
-            // Get the current page URL
-            var currentUrl = window.location.href;
+        // Get the URL of the article's main image
+        var articleImageUrl = document.querySelector('.article-image').getAttribute('src');
 
-            // Combine the article text and current URL for the Facebook share
-            var facebookShareText = articleSumText + ' ' + currentUrl;
+        // Get the current page URL
+        var currentUrl = window.location.href;
 
-            // Create the Facebook share URL with the combined text
-            var facebookShareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(currentUrl) + '&quote=' + encodeURIComponent(facebookShareText);
+        // Combine the article text, image, and current URL for the Facebook share
+        var facebookShareText = articleSumText + ' ' + currentUrl;
+        var facebookShareImageUrl = '&picture=' + encodeURIComponent(articleImageUrl);
 
-            // Open Facebook in a new window for sharing
-            window.open(facebookShareUrl);
-        }
+        // Create the Facebook share URL with the combined text and image
+        var facebookShareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(currentUrl) + '&quote=' + encodeURIComponent(facebookShareText) + facebookShareImageUrl;
 
-        function shareOnTwitter() {
-            // Get the text content under the class "article-sum"
-            var articleSumText = document.querySelector('.article-sum').textContent;
+        // Open Facebook in a new window for sharing
+        window.open(facebookShareUrl);
+    }
 
-            // Get the current page URL
-            var currentUrl = window.location.href;
+    function shareOnTwitter() {
+        // Get the text content under the class "article-sum"
+        var articleSumText = document.querySelector('.article-sum').textContent;
 
-            // Combine the article text and current URL for the tweet
-            var tweetText = articleSumText + ' ' + currentUrl;
+        // Get the URL of the article's main image
+        var articleImageUrl = document.querySelector('.article-image').getAttribute('src');
 
-            // Create the Twitter intent URL with the tweet text
-            var twitterIntentUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText);
+        // Get the current page URL
+        var currentUrl = window.location.href;
 
-            // Open Twitter in a new window and start composing a tweet
-            window.open(twitterIntentUrl);
-        }
+        // Combine the article text, image, and current URL for the tweet
+        var tweetText = articleSumText + ' ' + currentUrl + ' ' + articleImageUrl;
 
-        function shareOnEmail() {
-            // Get the text content under the class "article-sum"
-            var articleSumText = document.querySelector('.article-sum').textContent;
+        // Create the Twitter intent URL with the tweet text
+        var twitterIntentUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText);
 
-            // Get the current page URL
-            var currentUrl = window.location.href;
+        // Open Twitter in a new window and start composing a tweet
+        window.open(twitterIntentUrl);
+    }
 
-            // Combine the article text and current URL for the email body
-            var emailBody = articleSumText + '\n\n' + 'Read more: ' + currentUrl;
+    function shareOnEmail() {
+        // Get the text content under the class "article-sum"
+        var articleSumText = document.querySelector('.article-sum').textContent;
 
-            // Create the mailto: link with the subject and body
-            var mailtoLink = 'mailto:?subject=Check%20out%20this%20article%20on%20WarRobotDoge%20News&body=' + encodeURIComponent(emailBody);
+        // Get the URL of the article's main image
+        var articleImageUrl = document.querySelector('.article-image').getAttribute('src');
 
-            // Open the user's default email app
-            window.location.href = mailtoLink;
+        // Get the current page URL
+        var currentUrl = window.location.href;
+
+        // Combine the article text, image, and current URL for the email body
+        var emailBody = articleSumText + '\n\n' + 'Read more: ' + currentUrl + '\n\n' + 'Main Image: ' + articleImageUrl;
+
+        // Create the mailto: link with the subject and body
+        var mailtoLink = 'mailto:?subject=Check%20out%20this%20article%20on%20WarRobotDoge%20News&body=' + encodeURIComponent(emailBody);
+
+        // Open the user's default email app
+        window.location.href = mailtoLink;
         }
     </script>
 </body>
