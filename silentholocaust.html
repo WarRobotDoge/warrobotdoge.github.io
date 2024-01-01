@@ -205,7 +205,7 @@
             <div class="round-share-button" onclick="toggleShareOptions()">
                 <img src="https://static.thenounproject.com/png/2137557-200.png" alt="Share Image">
             </div>
-            <h1><center>The Silent Holocaust</center></h1>
+            <h1 class="title"><center>The Silent Holocaust</center></h1>
             <h2 class="article-sum"><center>Since 1973, millions have been slaughtered...</center></h2>
         </article>
         <div class="separator-line"></div>
@@ -311,23 +311,42 @@
         window.open(facebookShareUrl);
     }
 
-    function shareOnTwitter() {
-        var articleSumText = document.querySelector('.article-sum').textContent;
-        var currentUrl = window.location.href;
+   function shareOnTwitter() {
+    // Get the article title from the element with the class "title"
+    var articleTitle = document.querySelector('.title').textContent;
 
-        // Get the URL of the article's main image (assuming it's an img tag with class "article-image")
-        var articleImage = document.querySelector('.article-image');
-        var articleImageUrl = articleImage ? articleImage.getAttribute('src') : '';
+    // Get the article summary from the element with the class "article-sum"
+    var articleSumText = document.querySelector('.article-sum').textContent;
 
-        // Combine the article text, image, and current URL for the tweet
-        var tweetText = articleSumText + ' ' + currentUrl + ' ' + articleImageUrl;
+    // Get the current page URL
+    var currentUrl = window.location.href;
 
-        // Create the Twitter intent URL with the tweet text
-        var twitterIntentUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText);
+    // Get the URL of the article's main image (assuming it's an img tag with class "article-image")
+    var articleImage = document.querySelector('.article-image');
+    var articleImageUrl = articleImage ? articleImage.getAttribute('src') : '';
 
-        // Open Twitter in a new window and start composing a tweet
-        window.open(twitterIntentUrl);
-    }
+    // Twitter Card meta tags
+    var twitterCardMetaTags = [
+        '<meta name="twitter:card" content="summary_large_image">',
+        '<meta name="twitter:site" content="@YourTwitterHandle">',
+        '<meta property="og:title" content="' + articleTitle + '">',
+        '<meta property="og:description" content="' + articleSumText + '">',
+        '<meta property="og:image" content="' + articleImageUrl + '">',
+        '<meta property="og:url" content="' + currentUrl + '">'
+    ].join('\n');
+
+    // Combine the article text, image, and current URL for the tweet
+    var tweetText = articleSumText + ' ' + currentUrl + ' ' + articleImageUrl;
+
+    // Create the Twitter intent URL with the tweet text
+    var twitterIntentUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText);
+
+    // Open Twitter in a new window and start composing a tweet
+    var twitterWindow = window.open(twitterIntentUrl);
+
+    // Append Twitter Card meta tags to the head of the Twitter window's document
+    twitterWindow.document.head.innerHTML += twitterCardMetaTags;
+   }
 
     function shareOnEmail() {
         var articleSumText = document.querySelector('.article-sum').textContent;
