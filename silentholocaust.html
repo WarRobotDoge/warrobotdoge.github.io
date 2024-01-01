@@ -300,7 +300,7 @@
         var articleImage = document.querySelector('.article-image');
         var articleImageUrl = articleImage ? articleImage.getAttribute('src') : '';
 
-        // Combine the article text, image, and current URL for the Facebook share
+        // Combine the article text and current URL for the Facebook share
         var facebookShareText = articleSumText + ' ' + currentUrl;
         var facebookShareImageUrl = '&picture=' + encodeURIComponent(articleImageUrl);
 
