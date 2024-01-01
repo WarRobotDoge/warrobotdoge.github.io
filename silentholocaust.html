@@ -312,42 +312,41 @@
     }
 
    function shareOnTwitter() {
-    // Get the article title from the element with the class "title"
-    var articleTitle = document.querySelector('.title').textContent;
+            // Get the article title from the element with the class "title"
+            var articleTitle = document.querySelector('.title').textContent;
 
-    // Get the article summary from the element with the class "article-sum"
-    var articleSumText = document.querySelector('.article-sum').textContent;
+            // Get the article summary from the element with the class "article-sum"
+            var articleSumText = document.querySelector('.article-sum').textContent;
 
-    // Get the current page URL
-    var currentUrl = window.location.href;
+            // Get the URL of the article's main image (assuming it's an img tag with class "article-image")
+            var articleImage = document.querySelector('.article-image');
+            var articleImageUrl = articleImage ? articleImage.getAttribute('src') : '';
 
-    // Get the URL of the article's main image (assuming it's an img tag with class "article-image")
-    var articleImage = document.querySelector('.article-image');
-    var articleImageUrl = articleImage ? articleImage.getAttribute('src') : '';
+            // Get the current page URL
+            var currentUrl = window.location.href;
 
-    // Twitter Card meta tags
-    var twitterCardMetaTags = [
-        '<meta name="twitter:card" content="summary_large_image">',
-        '<meta name="twitter:site" content="@YourTwitterHandle">',
-        '<meta property="og:title" content="' + articleTitle + '">',
-        '<meta property="og:description" content="' + articleSumText + '">',
-        '<meta property="og:image" content="' + articleImageUrl + '">',
-        '<meta property="og:url" content="' + currentUrl + '">'
-    ].join('\n');
+            // Twitter Card meta tags
+            var twitterCardMetaTags = [
+                '<meta name="twitter:card" content="summary_large_image">',
+                '<meta property="og:title" content="' + articleTitle + '">',
+                '<meta property="og:description" content="' + articleSumText + '">',
+                '<meta property="og:image" content="' + articleImageUrl + '">',
+                '<meta property="og:url" content="' + currentUrl + '">'
+            ].join('\n');
 
-    // Combine the article text, image, and current URL for the tweet
-    var tweetText = articleSumText + ' ' + currentUrl + ' ' + articleImageUrl;
+            // Combine the article text, image, and current URL for the tweet
+            var tweetText = articleSumText + ' ' + currentUrl;
 
-    // Create the Twitter intent URL with the tweet text
-    var twitterIntentUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText);
+            // Create the Twitter intent URL with the tweet text
+            var twitterIntentUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText);
 
-    // Open Twitter in a new window and start composing a tweet
-    var twitterWindow = window.open(twitterIntentUrl);
+            // Open Twitter in a new window and start composing a tweet
+            var twitterWindow = window.open(twitterIntentUrl);
 
-    // Append Twitter Card meta tags to the head of the Twitter window's document
-    twitterWindow.document.head.innerHTML += twitterCardMetaTags;
+            // Append Twitter Card meta tags to the head of the Twitter window's document
+            twitterWindow.document.head.innerHTML += twitterCardMetaTags;
    }
-
+       
     function shareOnEmail() {
         var articleSumText = document.querySelector('.article-sum').textContent;
         var currentUrl = window.location.href;
