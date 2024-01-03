@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" type="x-icon" href="WarRobotDoge.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WarRobotDoge News</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1em;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #555;
+            padding: 0.5em;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 1em;
+        }
+
+        main {
+            padding: 2em;
+            position: relative;
+        }
+
+        article {
+            margin-bottom: 2em;
+            text-align: center;
+        }
+
+        article h1 {
+            font-style: italic;
+            font-size: 2.5em;
+        }
+
+        .article-text {
+            font-size: 1.1em;
+            color: #000000;
+            margin-bottom: 0.5em;
+            text-align: left;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .article-sum {
+            font-size: 1em;
+            color: #808080;
+            margin-bottom: 0.5em;
+        }
+
+        .separator-line {
+            border-top: 1px solid #ddd;
+            width: 100%;
+            margin: 1em 0;
+        }
+
+        .recommendation-item a {
+            text-decoration: none;
+            color: #000;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .article-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 1em auto;
+        }
+
+        .round-share-button {
+            cursor: pointer;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            position: absolute;
+            top: 10em;
+            left: 20em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .round-share-button img {
+            width: 80%;
+            height: 80%;
+        }
+
+        .share-options {
+            display: none;
+            position: absolute;
+            top: 11.5em;
+            left: 22em;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 0.5em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .share-options a {
+            display: block;
+            text-decoration: none;
+            color: #333;
+            padding: 0.5em;
+            transition: background-color 0.3s;
+        }
+
+        .article-image-text {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 0.9em;
+            color: #808080;
+        }
+
+        .recommendation {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .recommendation-item {
+            flex: 0 0 calc(33.33% - 20px);
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .recommendation-item img {
+            width: 250px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .recommendation-item h3 {
+            color: #000;
+            transition: color 0.3s;
+        }
+
+        .recommendation-item:hover h3 {
+            color: #666;
+        }
+
+        .recommended-section {
+            text-align: left;
+        }
+
+        .recommended-heading {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 0.5em;
+        }
+
+        .recommended-line {
+            border-top: 1px solid #ddd;
+            width: 100%;
+            margin: 1em 0;
+        }
+
+        .author-info {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .author-image {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+        }
+}
+
+      
+       footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            border-top: 3px solid #000;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>WarRobotDoge News</h1>
+    </header>
+
+    <nav>
+        <a href="https://warrobotdoge.com">Home</a>
+        <a href="https://warrobotdoge.com/about">About</a>
+        <a href="https://warrobotdoge.com/news">News</a>
+    </nav>
+
+    <main>
+        <article>
+            <div class="round-share-button" onclick="toggleShareOptions()">
+                <img src="https://static.thenounproject.com/png/2137557-200.png" alt="Share Image">
+            </div>
+            <h1 class="title"><center>The Silent Holocaust</center></h1>
+            <h2 class="article-sum"><center>Since 1973, millions have been slaughtered...</center></h2>
+        </article>
+        <div class="separator-line"></div>
+        <center>
+            <img src="https://static01.nyt.com/images/2023/11/22/multimedia/22up-births1-qcbv/22up-births1-qcbv-superJumbo.jpg?quality=75&auto=webp"
+                alt="Article Image" class="article-image" height="600" width="400">
+        </center>
+        <p class="article-image-text">
+            The waiting room at Planned Parenthood in St. Louis, which was Missouri’s only abortion provider before Missouri
+            banned abortion after Dobbs. Jamie Kelter Davis for The New York Times
+        </p>
+
+        <!-- Add Author Image and Info -->
+        <div class="author-info">
+            <img src="https://avatars.cloudflare.steamstatic.com/6149c730d91c807f4875708b1288d1ec0ae9c8e1_full.jpg" alt="Author" class="author-image">
+            By WarRobotDoge | Dec 11, 2023
+        </div>
+        <!-- End Author Image and Info -->
+
+        <div class="separator-line"></div>
+
+        <article>
+            <p class="article-text">During World War II, over 6 million Jews were killed by the far-left German political party known as the Nazi Party-ran by Adolf Hitler. The Nazis targeted people because of their race and of their religion. This may not seem relevant to modern-day America- but it is. Millions of people are being slaughtered, ripped apart, and thrown away like trash, all in modern America! You may ask, “What is this?”, “I’ve never heard of it!”, or “How long has this been going on for?”. This massive wave of genocide has been going on since January 22, 1973- when the U.S. Supreme Court decided the infamous court case known as Roe v. Wade. This Supreme Court case struck down a Texas law that prevented abortion unless it was to save the life of the mother. The court ruled 7-2 in favor of Roe. This meant that the Texas law was overruled. The court decided that abortion could be legal through the first trimester because of the Fourteenth Amendment; “the right to privacy”. But in the second trimester, the state may impose regulations on abortion, and in the third trimester, once the fetus reaches viability, a state may regulate abortions or prohibit them entirely. This meant that a woman could now terminate her pregnancy because the state had no right to stop her! How fun!
+</p><br><p class="article-text">From 1973 to 1992, nearly 30 MILLION abortions were performed. Why 1992 you may ask. Well, in 1992, the infamous U.S. Supreme Court case known as Planned Parenthood v. Casey was decided. The court ruled 5-4 in favor of Planned Parenthood. This court ruling reaffirmed the Roe v. Wade decision. In the Planned Parenthood v. Casey ruling, it imposed a new standard to determine the validity of laws restricting abortions. The new standard asks whether a state abortion regulation has the purpose of imposing an "undue burden," which is defined as a "substantial obstacle in the path of a woman seeking an abortion before the fetus attains viability." Under this new standard, the only provision to fail the undue-burden test was the husband notification requirement. From 1993 to 2022, another 30 MILLION+ abortions were orchestrated. That is 60+ MILLION abortions, over TEN TIMES of what the Nazis did in World War II. From 1997 to 2022, there has been a rather significant decrease in abortions. Unfortunately, we will never know the exact amount of abortions performed due to the government not keeping track. The massive decrease in abortions may also be due to the data not including California- the state where most abortions take place. These facts make up the “Silent Holocaust”. Not many people know about it, nor would they care; how deplorable- the people in the most developed country in the world do not know of, AND SUPPORT the mass killing of unborn babies.</p><br><p class="article-text">You’re probably asking; “What’s wrong with abortion?”, “What IS abortion?”, “Isn’t abortion a part of women's rights?”. Let's get into that. An abortion is defined as “...the termination of a pregnancy by removal or expulsion of an embryo or fetus”, or simply “To abort a pregnancy”. Now why is this important? Why is this an issue? This is important because life begins at conception. 95% of scientists affirm that statement. Life. Begins. At. Conception. The left likes to make the argument that life begins at 20 weeks, some believe life starts at birth! That’s crazy! Just after 6 weeks, the heart starts to beat. Do non living things have hearts? I don’t think so…. The left also makes the argument that the fetus does not feel pain; which is in fact false (Obviously). The fetus starts to feel pain at 12 weeks. By 12 weeks, the fetus starts to beat 6 quarts of blood each day! That is equivalent to 1.5 gallons of milk. Yes, gallons. These facts (few of many) alone PROVE that life begins in the womb. But life shouldn’t end in the womb. Now for: “Isn’t abortion a woman’s right to choose?”, “Men don’t get a say in abortion!”, and “It’s my body, so it's my choice!”. First off, abortion is NOT a woman’s right to choose- No. Nobody has the right to choose. Some choices must be prohibited- and we all agree on that. The question is not if we should abort a pregnancy, but if we should kill innocent human life.</p><br><p class="article-text">Pro-Choice activists also argue that men do not deserve a say in the matter- FALSE. Men do get a say in the matter. The baby is half of the father and half of the mother. A “No” is stronger than a yes. Abortion affects the mental health of both men and women! Abortion is not a good thing- even pro-choicers agree on that. Here’s a good one!; “It’s my body, so it's my choice!”, funny. If it was her body, she would be the one being aborted! The fetus has a different heartbeat, blood type, and feelings! That argument is entirely selfish and is putting yourself before another human life. What has our society become? If my body is my choice, then the fetus deserves the right to choose too! It is human life after all. A lot of Pro-Life activists and Anti-Spousal-Support activists argue that if a woman gets to choose if they want an abortion, then a man should get the right to not pay child support. It is “My money, my choice!” after all. #ProChoiceMen, am I right?</p><br><p class="article-text">In 2004, Norma McCorvey (Jane Roe) attempted to appeal the 1973 Supreme Court decision of Roe v. Wade. But was denied in 2005. Norma McCorvey is the “Roe” in Roe v. Wade. Yes, the woman who started the Silent Holocaust, wanted to end it. Her appeal was denied. How ironic! Norma ended up becoming an evangelical Christian, who was baptized in a backyard swimming pool! She soon started advocating for making abortion illegal and also ended up voting for anti-abortion Republicans. She ended up saying that the court case was “The biggest mistake of my life”. Again, how ironic. She turned over a new leaf- not really; but that’s for another time. The point here is that Roe v. Wade has had some challenges; especially in Texas. In March 2021, the Texas Senate passed the Texas Heartbeat Act. This act banned abortion after fetal cardiac activity (6 weeks). This act was deemed unconstitutional by lower courts, but it survived the Supreme Court. The success was a huge blow to Roe v. Wade because it defied its viability rules, and it enabled the states to evade Roe v. Wade entirely! That’s not it though. On May 2, 2022, a draft of a majority opinion by Justice Alito Scalia was leaked to Politico. The draft was about the Dobbs decision. The left went nuts! Nobody ever thought that Roe would be overturned in a lifetime. But, with the help of Donald Trump, it shall be done.</p><br><p class="article-text">Since Roe was been overturned, roughly all the Trump states (except for Kansas, Penn, and Michigan) have banned or restricted abortion. Praise the Lord! Despite this, there have been state constitutional amendments to add abortion to the constitution of states. This is what happened in Michigan. A 6-week abortion ban was implemented in Ohio when Roe was overturned. Soon after, pro-choice groups have been trying to add a vote to add abortion to the state constitution. In response to this, the republican supermajority of the legislature tried to pass an amendment that would raise the criteria for passing future amendments to 60%. This was their sole attempt to stop the abortion amendment from passing. Their attempt failed. On November 7th, 2023, an election was held in Ohio to add abortion rights to the state constitution. It won with over 57% of the vote. If the previous amendment passed, this amendment would have been invalidated. This means abortion will be legal in Ohio; a deeply red state. This can’t be! How could this happen? What if I told you this election was rigged? Well- it was…</p><br>
+            <!-- ... (rest of the article content) ... -->
+        </article>
+
+        <!-- Separator Line and "Recommended for you" Section -->
+        <div class="recommended-line"></div>
+        <section class="recommended-section">
+            <div class="recommended-heading">Recommended for you</div>
+            <div class="recommendation">
+                <!-- Recommendation items will be dynamically added here -->
+            </div>
+        </section>
+        <!-- End Separator Line and "Recommended for you" Section -->
+
+        <!-- Share Options -->
+        <div class="share-options" id="shareOptions">
+            <a href="#" onclick="shareOnFacebook()">Share on Facebook</a>
+            <a href="#" onclick="shareOnTwitter()">Share on Twitter</a>
+            <a href="#" onclick="shareOnEmail()">Share via Email</a>
+        </div>
+        <!-- End Share Options -->
+    </main>
+
+    <div id="recommendation-container" class="recommendation"></div>
+
+    <script>
+        // Sample array of recommended pages with titles, URLs, and image URLs
+        var recommendations = [
+            { title: 'The Silent Holocaust', url: 'https://warrobotdoge.com/news/silentholocaust', imageUrl: 'https://www.verywellhealth.com/thmb/G3Cy3e_pnLupt1qbXBj3Im9XX7o=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-1288913695-230c3b035bce4442b29e1598a492022d.jpg' },
+            { title: 'Article 2', url: '/article2', imageUrl: 'path/to/article2-thumbnail.jpg' },
+            { title: 'Article 3', url: '/article3', imageUrl: 'path/to/article3-thumbnail.jpg' },
+            // Add more recommendations as needed
+        ];
+
+        // Function to display random recommendations with thumbnails
+        function displayRandomRecommendations() {
+            var recommendationContainer = document.getElementById('recommendation-container');
+
+            // Shuffle the recommendations array for randomness
+            recommendations = shuffleArray(recommendations);
+
+            // Display up to 3 recommendations
+            for (var i = 0; i < Math.min(recommendations.length, 3); i++) {
+                var recommendation = recommendations[i];
+
+                var recommendationElement = document.createElement('div');
+                recommendationElement.className = 'recommendation-item';
+
+                // Customize the format with an image thumbnail and a link to the article
+                recommendationElement.innerHTML = `
+                    <a href="${recommendation.url}">
+                        <img src="${recommendation.imageUrl}" alt="${recommendation.title} Thumbnail">
+                        <p>${recommendation.title}</p>
+                    </a>
+                `;
+
+                // Append each recommendation to the container
+                recommendationContainer.appendChild(recommendationElement);
+            }
+        }
+
+        // Function to shuffle an array (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Call the function to display random recommendations on page load
+        displayRandomRecommendations();
+
+        function toggleShareOptions() {
+            var shareOptions = document.getElementById('shareOptions');
+            shareOptions.style.display = (shareOptions.style.display === 'block' ? 'none' : 'block');
+        }
+
+        function shareOnFacebook() {
+            // Get the text content under the class "article-sum"
+            var articleSumText = document.querySelector('.article-sum').textContent;
+
+            // Get the current page URL
+            var currentUrl = window.location.href;
+
+            // Combine the article text and current URL for the Facebook share
+            var facebookShareText = articleSumText + ' ' + currentUrl;
+
+            // Create the Facebook share URL with the combined text
+            var facebookShareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(currentUrl) + '&quote=' + encodeURIComponent(facebookShareText);
+
+            // Open Facebook in a new window for sharing
+            window.open(facebookShareUrl);
+        }
+
+        function shareOnTwitter() {
+            // Get the text content under the class "article-sum"
+            var articleSumText = document.querySelector('.article-sum').textContent;
+
+            // Get the current page URL
+            var currentUrl = window.location.href;
+
+            // Combine the article text and current URL for the tweet
+            var tweetText = articleSumText + ' ' + currentUrl;
+
+            // Create the Twitter intent URL with the tweet text
+            var twitterIntentUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText);
+
+            // Open Twitter in a new window and start composing a tweet
+            window.open(twitterIntentUrl);
+        }
+
+        function shareOnEmail() {
+            // Get the text content under the class "article-sum"
+            var articleSumText = document.querySelector('.article-sum').textContent;
+
+            // Get the current page URL
+            var currentUrl = window.location.href;
+
+            // Combine the article text and current URL for the email body
+            var emailBody = articleSumText + '\n\n' + 'Read more: ' + currentUrl;
+
+            // Create the mailto: link with the subject and body
+            var mailtoLink = 'mailto:?subject=Check%20out%20this%20article%20on%20WarRobotDoge%20News&body=' + encodeURIComponent(emailBody);
+
+            // Open the user's default email app
+            window.location.href = mailtoLink;
+        }
+    </script>
+</body>
+
+</html>
