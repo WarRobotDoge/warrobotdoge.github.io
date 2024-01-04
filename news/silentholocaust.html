@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <link rel="shortcut icon" type="x-icon" href="WarRobotDoge.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta property="og:title" content="">
+    <meta property="og:description" content="">
+    <meta property="og:image" content="WarRobotDoge.png">
     <title>WarRobotDoge News</title>
     <style>
         body {
@@ -370,6 +373,14 @@
             // Open the user's default email app
             window.location.href = mailtoLink;
         }
+
+         var ogTitle = document.querySelector('.title').textContent;
+        document.querySelector('meta[property="og:title"]').content = ogTitle;
+
+        // Set Open Graph description dynamically based on the text in the "article-sum" class
+        var ogDescription = document.querySelector('.article-sum').textContent;
+        document.querySelector('meta[property="og:description"]').content = ogDescription;
+    
     </script>
 </body>
 
