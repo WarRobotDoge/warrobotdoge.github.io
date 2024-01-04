@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- ... (your existing head content) ... -->
+</head>
+
+<body>
+    <header>
+        <!-- ... (your existing header content) ... -->
+    </header>
+
+    <nav>
+        <!-- ... (your existing navigation content) ... -->
+    </nav>
+
+    <main>
+        <article>
+            <!-- ... (your existing article content) ... -->
+        </article>
+
+        <!-- Separator Line and "Recommended for you" Section -->
+        <div class="recommended-line"></div>
+        <section class="recommended-section">
+            <div class="recommended-heading">Recommended for you</div>
+            <div class="recommendation" id="recommendation-container">
+                <!-- Recommendation items will be dynamically added here -->
+            </div>
+        </section>
+        <!-- End Separator Line and "Recommended for you" Section -->
+
+        <!-- Share Options -->
+        <div class="share-options" id="shareOptions">
+            <!-- ... (your existing share options content) ... -->
+        </div>
+        <!-- End Share Options -->
+    </main>
+
+    <footer>
+        <!-- ... (your existing footer content) ... -->
+    </footer>
+
+    <script>
+        // ... (your existing JavaScript code) ...
+
+        // Function to fetch random articles from the base website
+        async function fetchRandomArticles() {
+            try {
+                const response = await fetch('https://warrobotdoge.com/news/');
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // Extract article information (title, image, and link)
+                const articles = doc.querySelectorAll('.recommendation-item');
+
+                return Array.from(articles).map((article) => {
+                    const title = article.querySelector('.article-title').textContent;
+                    const imageUrl = article.querySelector('.article-image').getAttribute('src');
+                    const link = article.querySelector('.article-link').getAttribute('href');
+
+                    return { title, imageUrl, link };
+                });
+            } catch (error) {
+                console.error('Error fetching random articles:', error);
+                return [];
+            }
+        }
+
+        // Function to display random recommendations with thumbnails
+        async function displayRandomRecommendations() {
+            var recommendationContainer = document.getElementById('recommendation-container');
+
+            // Fetch random articles
+            const randomArticles = await fetchRandomArticles();
+
+            // Display up to 3 recommendations
+            for (var i = 0; i < Math.min(randomArticles.length, 3); i++) {
+                var recommendation = randomArticles[i];
+
+                var recommendationElement = document.createElement('div');
+                recommendationElement.className = 'recommendation-item';
+
+                // Customize the format with an image thumbnail and a link to the article
+                recommendationElement.innerHTML = `
+                    <a href="${recommendation.link}" class="article-link">
+                        <img src="${recommendation.imageUrl}" alt="${recommendation.title}" class="article-image">
+                        <p class="article-title">${recommendation.title}</p>
+                    </a>
+                `;
+
+                // Append each recommendation to the container
+                recommendationContainer.appendChild(recommendationElement);
+            }
+        }
+
+        // Call the function to display random recommendations on page load
+        displayRandomRecommendations();
+
+        // ... (your existing JavaScript code) ...
+
+    </script>
+</body>
+
+</html>
