@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <link rel="shortcut icon" type="x-icon" href="WarRobotDoge.png">
+    <link rel="shortcut icon" type="image/x-icon" href="WarRobotDoge.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="WarRobotDoge News">
     <meta property="og:description" content="A New Year – The Same Patient Offer">
@@ -172,7 +171,7 @@
             color: #333;
             margin-bottom: 0.5em;
         }
-         
+
         .larger-text {
             font-size: 20px;
         }
@@ -194,10 +193,8 @@
             height: 25px;
             border-radius: 50%;
         }
-}
 
-      
-       footer {
+        footer {
             background-color: #333;
             color: white;
             text-align: center;
@@ -206,6 +203,44 @@
             bottom: 0;
             width: 100%;
             border-top: 3px solid #000;
+        }
+
+        /* Additional styles for image viewer */
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .image {
+            width: 250px;
+            height: 150px;
+            border-radius: 8px;
+        }
+
+        .image-title {
+            text-align: center;
+            color: #000;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-size: 1em;
+            display: block;
+            margin-block-start: 1em;
+            margin-block-end: 1em;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+            transition: color 0.3s;
+        }
+
+        .image-container:hover .image-title {
+            color: #666;
+        }
+
+        .image-link,
+        .title-link {
+            text-decoration: none;
+            color: inherit;
         }
     </style>
 </head>
@@ -248,6 +283,7 @@
 
         <div class="separator-line"></div>
 
+      
         <article>
             <p class="article-text"><span style="font-size: 25px;">Another Year- 2024</span><br>Friends- and friends not that I mourn over- It is another year. Millions have died before its coming and millions more have been born to see it come. As fast as the days go- years go just as well. And so again with the new year, we are reminded of our temporary stature as the count ticks. How different things were years ago and how different they can be years later. More importantly, how soon our years will no longer be; as for old age, or a more likely unexpected death. One man may be in the grave as another spills tears over him this year; though all will have their place in these two roles.<strong> As an end is certain for all things earthly</strong>- even the mountains are brought back to sand; and the castle towns of old are long in ruins, voices no longer heard within them.<br><br><i>(2 Peter 3:5-7) "For this they willingly are ignorant of, that by the word of God the heavens were of old, and the earth standing out of the water and in the water:  {6} Whereby the world that then was, being overflowed with water, perished:  {7} But the heavens and the earth, which are now, by the same word are kept in store, reserved unto fire against the day of judgment and perdition of ungodly men."
 </i><br><br>
@@ -282,113 +318,145 @@
             <a href="#" onclick="shareOnEmail()">Share via Email</a>
         </div>
         <!-- End Share Options -->
+
+<br>
+        <div id="image-container" class="image-container">
+            <!-- Image containers will be displayed here -->
+        </div>
+
     </main>
+    <script>
+   // Function to toggle the display of share options
+    function toggleShareOptions() {
+        var shareOptions = document.getElementById('shareOptions');
+        shareOptions.style.display = (shareOptions.style.display === 'none' || shareOptions.style.display === '') ? 'block' : 'none';
+    }
 
-    <div id="recommendation-container" class="recommendation"></div>
+    // Function to fetch and display random images with titles and links
+    async function fetchAndDisplayRandomImagesWithTitlesAndLinks() {
+        try {
+            const response = await fetch('https://warrobotdoge.com/news');
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
 
-<script>
-        // Sample array of recommended pages with titles, URLs, and image URLs
-        var recommendations = [
-            { title: 'The Silent Holocaust', url: 'https://warrobotdoge.com/news/silentholocaust', imageUrl: 'https://www.verywellhealth.com/thmb/G3Cy3e_pnLupt1qbXBj3Im9XX7o=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-1288913695-230c3b035bce4442b29e1598a492022d.jpg' },
-            { title: 'A New Year – The Same Patient Offer', url: 'https://warrobotdoge.com/news/new-year-same-offer', imageUrl: 'https://i.imgur.com/kcuPjrC.png' },
-            { title: 'Article 3', url: '/article3', imageUrl: 'path/to/article3-thumbnail.jpg' },
-            // Add more recommendations as needed
-        ];
+            // Extract all images with the class "image"
+            const images = Array.from(doc.querySelectorAll('.image'));
 
-        // Function to display random recommendations with thumbnails
-        function displayRandomRecommendations() {
-            var recommendationContainer = document.getElementById('recommendation-container');
+            // Extract all titles with the class "title"
+            const titles = Array.from(doc.querySelectorAll('.title')).map(title => title.textContent.trim());
 
-            // Shuffle the recommendations array for randomness
-            recommendations = shuffleArray(recommendations);
+            // Extract all links with the class "link"
+            const links = Array.from(doc.querySelectorAll('.link')).map(link => link.href.trim());
 
-            // Display up to 3 recommendations
-            for (var i = 0; i < Math.min(recommendations.length, 3); i++) {
-                var recommendation = recommendations[i];
+            // Shuffle the order of images, titles, and links
+            const shuffledIndexes = Array.from({ length: images.length }, (_, index) => index);
+            shuffleArray(shuffledIndexes);
 
-                var recommendationElement = document.createElement('div');
-                recommendationElement.className = 'recommendation-item';
+            // Create image containers with shuffled images, titles, and links
+            for (let i = 0; i < 3; i++) {
+                const containerElement = document.createElement('div');
+                const imageElement = document.createElement('img');
+                const titleElement = document.createElement('div');
+                const linkElement = document.createElement('a');
 
-                // Customize the format with an image thumbnail and a link to the article
-                recommendationElement.innerHTML = `
-                    <a href="${recommendation.url}">
-                        <img src="${recommendation.imageUrl}" alt="${recommendation.title} Thumbnail">
-                        <p>${recommendation.title}</p>
-                    </a>
-                `;
+                // Set attributes for image
+                if (images[shuffledIndexes[i]]) {
+                    imageElement.src = images[shuffledIndexes[i]].src;
+                    imageElement.alt = 'WarRobotDoge News Image ' + (i + 1);
+                } else {
+                    // If image is not found, use placeholder attributes
+                    imageElement.src = 'path/to/placeholder-image.jpg'; // Replace with a placeholder image path
+                    imageElement.alt = 'Image Here';
+                }
+                imageElement.className = 'image'; // Add class for styling
 
-                // Append each recommendation to the container
-                recommendationContainer.appendChild(recommendationElement);
+                // Set text content and styling for title
+                titleElement.className = 'image-title';
+                titleElement.textContent = titles[shuffledIndexes[i]] || 'Title Not Found';
+
+                // Set link attributes for both image and title
+                linkElement.className = 'image-link';
+                linkElement.href = links[shuffledIndexes[i]] || '#'; // Use # if link is not found
+                linkElement.target = '_blank'; // Open link in a new tab
+                linkElement.rel = 'noopener noreferrer';
+
+                // Append image and title to the link
+                linkElement.appendChild(imageElement);
+                linkElement.appendChild(titleElement);
+
+                // Append the link to the container
+                containerElement.appendChild(linkElement);
+
+                // Append the container to the main container
+                document.getElementById('image-container').appendChild(containerElement);
             }
+        } catch (error) {
+            console.error('Error fetching and displaying images with titles and links:', error);
         }
+    }
 
-        // Function to shuffle an array (Fisher-Yates algorithm)
-        function shuffleArray(array) {
-            for (var i = array.length - 1; i > 0; i--) {
-                var j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
+    // Call the function to fetch and display random images with titles and links on page load
+    fetchAndDisplayRandomImagesWithTitlesAndLinks();
+
+    // Function to shuffle an array (Fisher-Yates algorithm)
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
         }
+    }
 
-        // Call the function to display random recommendations on page load
-        displayRandomRecommendations();
+    function shareOnFacebook() {
+        // Get the text content under the class "article-sum"
+        var articleSumText = document.querySelector('.article-sum').textContent;
 
-        function toggleShareOptions() {
-            var shareOptions = document.getElementById('shareOptions');
-            shareOptions.style.display = (shareOptions.style.display === 'block' ? 'none' : 'block');
-        }
+        // Get the current page URL
+        var currentUrl = window.location.href;
 
-        function shareOnFacebook() {
-            // Get the text content under the class "article-sum"
-            var articleSumText = document.querySelector('.article-sum').textContent;
+        // Combine the article text and current URL for the Facebook share
+        var facebookShareText = articleSumText + ' ' + currentUrl;
 
-            // Get the current page URL
-            var currentUrl = window.location.href;
+        // Create the Facebook share URL with the combined text
+        var facebookShareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(currentUrl) + '&quote=' + encodeURIComponent(facebookShareText);
 
-            // Combine the article text and current URL for the Facebook share
-            var facebookShareText = articleSumText + ' ' + currentUrl;
+        // Open Facebook in a new window for sharing
+        window.open(facebookShareUrl);
+    }
 
-            // Create the Facebook share URL with the combined text
-            var facebookShareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(currentUrl) + '&quote=' + encodeURIComponent(facebookShareText);
+    function shareOnTwitter() {
+        // Get the text content under the class "article-sum"
+        var articleSumText = document.querySelector('.article-sum').textContent;
 
-            // Open Facebook in a new window for sharing
-            window.open(facebookShareUrl);
-        }
+        // Get the current page URL
+        var currentUrl = window.location.href;
 
-        function shareOnTwitter() {
-            // Get the text content under the class "article-sum"
-            var articleSumText = document.querySelector('.article-sum').textContent;
+        // Combine the article text and current URL for the tweet
+        var tweetText = articleSumText + ' ' + currentUrl;
 
-            // Get the current page URL
-            var currentUrl = window.location.href;
+        // Create the Twitter intent URL with the tweet text
+        var twitterIntentUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText);
 
-            // Combine the article text and current URL for the tweet
-            var tweetText = articleSumText + ' ' + currentUrl;
+        // Open Twitter in a new window and start composing a tweet
+        window.open(twitterIntentUrl);
+    }
 
-            // Create the Twitter intent URL with the tweet text
-            var twitterIntentUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText);
+    function shareOnEmail() {
+        // Get the text content under the class "article-sum"
+        var articleSumText = document.querySelector('.article-sum').textContent;
 
-            // Open Twitter in a new window and start composing a tweet
-            window.open(twitterIntentUrl);
-        }
+        // Get the current page URL
+        var currentUrl = window.location.href;
 
-        function shareOnEmail() {
-            // Get the text content under the class "article-sum"
-            var articleSumText = document.querySelector('.article-sum').textContent;
+        // Combine the article text and current URL for the email body
+        var emailBody = articleSumText + '\n\n' + 'Read more: ' + currentUrl;
 
-            // Get the current page URL
-            var currentUrl = window.location.href;
+        // Create the mailto: link with the subject and body
+        var mailtoLink = 'mailto:?subject=Check%20out%20this%20article%20on%20WarRobotDoge%20News&body=' + encodeURIComponent(emailBody);
 
-            // Combine the article text and current URL for the email body
-            var emailBody = articleSumText + '\n\n' + 'Read more: ' + currentUrl;
-
-            // Create the mailto: link with the subject and body
-            var mailtoLink = 'mailto:?subject=Check%20out%20this%20article%20on%20WarRobotDoge%20News&body=' + encodeURIComponent(emailBody);
-
-            // Open the user's default email app
-            window.location.href = mailtoLink;
-        }
+        // Open the user's default email app
+        window.location.href = mailtoLink;
+    }
 
 
 var cookieEmoji = document.getElementById('cookieEmoji');
@@ -413,15 +481,8 @@ var cookieEmoji = document.getElementById('cookieEmoji');
             sessionStorage.setItem('cookieCount', cookieCount);
         }
     });
-
-     var ogTitle = document.querySelector('.title').textContent;
-        document.querySelector('meta[property="og:title"]').content = ogTitle;
-
-        // Set Open Graph description dynamically based on the text in the "article-sum" class
-        var ogDescription = document.querySelector('.article-sum').textContent;
-        document.querySelector('meta[property="og:description"]').content = ogDescription;
-    
     </script>
 </body>
 
 </html>
+
