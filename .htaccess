@@ -1,0 +1,5 @@
+RewriteEngine On
+
+# Redirect from non-trailing slash to trailing slash
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*[^/])$ /$1/ [L,R=301]
