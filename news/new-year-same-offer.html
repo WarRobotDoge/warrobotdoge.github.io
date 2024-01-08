@@ -413,7 +413,6 @@ async function fetchAndDisplayRecommendedArticles() {
             const articleLink = document.createElement('a');
             articleLink.href = article.url;
             articleLink.title = article.title;
-            articleLink.target = '_self'; // Open link in the current tab
 
             const articleImage = document.createElement('img');
             articleImage.src = article.imageUrl;
@@ -426,6 +425,9 @@ async function fetchAndDisplayRecommendedArticles() {
             articleLink.appendChild(articleTitle);
             recommendationItem.appendChild(articleLink);
             recommendationContainer.appendChild(recommendationItem);
+
+            // Update the target attribute to '_self' after the link has been added to the DOM
+            articleLink.target = '_self';
         });
     } catch (error) {
         console.error('Error fetching and displaying recommended articles:', error);
@@ -516,6 +518,11 @@ cookieEmoji.addEventListener('click', function () {
         sessionStorage.setItem('cookieCount', cookieCount);
     }
 });
+
+
+
+
+
 
 </script>
 </body>
