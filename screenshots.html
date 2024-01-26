@@ -34,8 +34,12 @@
         for (let i = 0; i < numberOfImages; i++) {
             // Construct the image URL
             const imgElement = document.createElement('img');
-            imgElement.src = `${imageUrlPattern}${startImageNumber + i}_1.jpg`;
-            imgElement.alt = `Image ${startImageNumber + i}_1`;
+            const counter = startImageNumber + i;
+            imgElement.src = `${imageUrlPattern}1%20(${counter}).jpg`;
+            imgElement.alt = `Image 1 (${counter})`;
+
+            // Set the name of the screenshot with spaces replaced by "%20"
+            imgElement.setAttribute('download', `${imageUrlPattern}1%20(${counter}).jpg`);
 
             // Add an error event listener to check if the image is valid
             imgElement.onerror = function() {
