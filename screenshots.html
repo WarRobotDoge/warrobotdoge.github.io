@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <style>
+        /* Add styling for the images if needed */
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gallery"></div>
+
+    <script>
+        // URL pattern for the images
+        const imageUrlPattern = 'https://warrobotdoge.com/screenshots/';
+
+        // Starting image number
+        let startImageNumber = 1;
+
+        // Number of images to display
+        const numberOfImages = 20000; // You can adjust this as needed
+
+        // Get the gallery element
+        const galleryElement = document.getElementById('gallery');
+
+        // Loop through image numbers and create <img> elements
+        for (let i = 0; i < numberOfImages; i++) {
+            // Construct the image URL
+            const imgElement = document.createElement('img');
+            imgElement.src = `${imageUrlPattern}${startImageNumber + i}_1.jpg`;
+            imgElement.alt = `Image ${startImageNumber + i}_1`;
+
+            // Add an error event listener to check if the image is valid
+            imgElement.onerror = function() {
+                // If the image fails to load, don't display it
+                imgElement.style.display = 'none';
+            };
+
+            // Append the image element to the gallery
+            galleryElement.appendChild(imgElement);
+        }
+    </script>
+</body>
+</html>
