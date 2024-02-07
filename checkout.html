@@ -3,109 +3,366 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout</title>
-</head>
-<body>
-    <h1>Checkout</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Price Each</th>
-                <th>Total Price</th>
-            </tr>
-        </thead>
-        <tbody id="checkout-items">
-            <!-- Cart items will be displayed here -->
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3">Total</td>
-                <td id="checkout-total"></td>
-            </tr>
-        </tfoot>
-    </table>
-
-    <form id="payment-form" onsubmit="processPayment(event)">
-        <label for="card-number">Card Number:</label>
-        <input type="text" id="card-number" required><br><br>
-        <label for="expiry">Expiration Date:</label>
-        <input type="text" id="expiry" placeholder="MM/YY" required><br><br>
-        <label for="cvv">CVV:</label>
-        <input type="text" id="cvv" required><br><br>
-        <button type="submit">Pay Now</button>
-    </form>
-
-    <script>
-        // Parse cart items from URL parameters
-        var urlParams = new URLSearchParams(window.location.search);
-        var cartItems = {};
-        var totalPrice = parseFloat(urlParams.get("totalPrice"));
-
-        urlParams.forEach(function(value, key) {
-            if (key !== "totalPrice") {
-                cartItems[key] = parseInt(value);
-            }
-        });
-
-        // Display cart items
-        var checkoutItemsTable = document.getElementById('checkout-items');
-        for (var item in cartItems) {
-            var tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${item}</td>
-                <td>${cartItems[item]}</td>
-                <td>$${getItemPrice(item).toFixed(2)}</td>
-                <td>$${(cartItems[item] * getItemPrice(item)).toFixed(2)}</td>
-            `;
-            checkoutItemsTable.appendChild(tr);
+    <title>Merch Store</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        nav {
+            background-color: #666;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        section {
+            padding: 20px;
+        }
+        .product {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px;
+            display: inline-block;
+            width: 200px;
+            position: relative;
+        }
+        .product img {
+            width: 100%;
+            border-radius: 5px;
+        }
+        .product h3 {
+            margin: 5px 0;
+        }
+        .product p {
+            margin: 5px 0;
+        }
+        .btn-add-to-cart {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fefefe;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            z-index: 9999;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .popup img {
+            width: 200px; /* Adjust size as needed */
+            border-radius: 5px;
+            float: left;
+            margin-right: 20px;
+        }
+        .popup-content {
+            overflow: auto;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9998;
+            cursor: pointer;
         }
 
-        // Display total price
-        var checkoutTotal = document.getElementById('checkout-total');
-        checkoutTotal.textContent = "$" + totalPrice.toFixed(2);
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            z-index: 9999;
+        }
+
+        #cart-notification {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            z-index: 9999;
+        }
+
+        #cart-items-list {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fefefe;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            z-index: 9999;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            overflow: auto;
+        }
+
+        #cart-items-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #cart-items-list li {
+            margin-bottom: 10px;
+        }
+
+        #cart-total {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        #checkout-btn {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Our Merch Store</h1>
+    </header>
+    <nav>
+        <a href="#">Home</a> | 
+        <a href="#">Products</a> | 
+        <a href="#">Contact</a>
+    </nav>
+    <section>
+       <center> <div class="product">
+            <img src="https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-1617775385474-0.png" alt="Doge Shirt">
+            <h3>Doge Shirt</h3>
+            <p class="price">$19.99</p>
+            <button class="btn-add-to-cart" onclick="showPopup('Doge Shirt', '', 'https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-1617775385474-0.png', 19.99)">Add to Cart</button>
+        </div>
+        <div class="product">
+            <img src="https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16106962314830-0.png" alt="Doge Mug">
+            <h3>Doge Mug</h3>
+            <p class="price">$19.99</p>
+            <button class="btn-add-to-cart" onclick="showPopup('Doge Mug', '', 'https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16106962314830-0.png', 19.99)">Add to Cart</button>
+        </div>
+         <div class="product">
+            <img src="https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16177752255530-0.png" alt="Doge Hoodie">
+            <h3>Doge Hoodie</h3>
+            <p class="price">$44.99</p>
+            <button class="btn-add-to-cart" onclick="showPopup('Doge Hoodie', '', 'https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16177752255530-0.png', 44.99)">Add to Cart</button>
+        </div>
+          </center> 
+        <!-- Add more products as needed -->
+    </section>
+
+    <!-- Popup -->
+    <div id="popup" class="popup">
+        <span class="close" onclick="closePopup()">&times;</span>
+        <div class="popup-content">
+            <div style="float: left;">
+                <img id="popup-image" src="" alt="">
+            </div>
+            <div>
+                <h2 id="popup-name"></h2>
+                <p id="popup-description"></p>
+                <p id="popup-price" class="price"></p>
+            </div>
+        </div>
+        <button class="btn-add-to-cart" onclick="addToCart()">Add to Cart</button>
+    </div>
+
+    <!-- Background overlay -->
+    <div id="popup-overlay" class="popup-overlay" onclick="closePopup()"></div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Cart notification -->
+    <div id="cart-notification" onclick="toggleCart()"></div>
+
+    <!-- Cart items list -->
+    <div id="cart-items-list">
+        <span class="close" onclick="closeCart()">&times;</span>
+        <h2>Your Cart</h2>
+        <ul id="cart-items"></ul>
+        <p id="cart-total"></p>
+        <button id="checkout-btn" onclick="checkout()">Checkout</button>
+    </div>
+
+    <script>
+        var cartItemsCount = 0;
+        var cartItems = {};
+        var totalPrice = 0;
+        var notificationQueue = [];
+        var isNotifying = false;
+
+        function addToCart() {
+            var productName = document.getElementById('popup-name').textContent;
+            if (cartItems[productName]) {
+                cartItems[productName]++;
+            } else {
+                cartItems[productName] = 1;
+            }
+            cartItemsCount++;
+            totalPrice += parseFloat(document.getElementById('popup-price').textContent.slice(1));
+            updateCartNotification();
+            updateCartTotal();
+            closePopup();
+
+            // Add notification to queue
+            notificationQueue.push('Added to Cart!');
+            if (!isNotifying) {
+                showNotification();
+            }
+        }
+
+        function updateCartNotification() {
+            var cartNotification = document.getElementById('cart-notification');
+            cartNotification.textContent = cartItemsCount;
+            cartNotification.style.display = 'block';
+        }
+
+        function updateCartTotal() {
+            var cartTotal = document.getElementById('cart-total');
+            cartTotal.textContent = "Total: $" + totalPrice.toFixed(2);
+        }
+
+        function showCartItems() {
+            var cartItemsList = document.getElementById('cart-items');
+            cartItemsList.innerHTML = "";
+            for (var item in cartItems) {
+                var li = document.createElement("li");
+                li.textContent = `${cartItems[item]}x ${item} --- Total Price: $${(cartItems[item] * getItemPrice(item)).toFixed(2)}`;
+                cartItemsList.appendChild(li);
+            }
+            var cartItemsPopup = document.getElementById('cart-items-list');
+            cartItemsPopup.style.display = 'block';
+        }
+
+        function toggleCart() {
+            var cartItemsPopup = document.getElementById('cart-items-list');
+            if (cartItemsPopup.style.display === 'block') {
+                cartItemsPopup.style.display = 'none';
+            } else {
+                cartItemsPopup.style.display = 'block';
+                showCartItems();
+            }
+        }
+
+        function closeCart() {
+            var cartItemsPopup = document.getElementById('cart-items-list');
+            cartItemsPopup.style.display = 'none';
+        }
+
+        function showPopup(name, description, imageUrl, price) {
+            // Close the cart items list if it's open
+            closeCart();
+            
+            document.getElementById('popup-name').textContent = name;
+            document.getElementById('popup-description').textContent = description;
+            document.getElementById('popup-image').src = imageUrl;
+            document.getElementById('popup-price').textContent = '$' + price.toFixed(2);
+            document.getElementById('popup').style.display = 'block';
+            document.getElementById('popup-overlay').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('popup-overlay').style.display = 'none';
+        }
 
         function getItemPrice(name) {
             switch(name) {
-                case 'Product 1':
+                case 'Doge Shirt':
                     return 19.99;
-                case 'Product 2':
-                    return 24.99;
+                case 'Doge Mug':
+                    return 19.99;
+                case 'Doge Hoodie':
+                    return 44.99;
                 // Add more cases for other products as needed
                 default:
                     return 0;
             }
         }
 
-        function processPayment(event) {
-            event.preventDefault();
-            var cardNumber = document.getElementById('card-number').value;
-            var expiry = document.getElementById('expiry').value;
-            var cvv = document.getElementById('cvv').value;
-            // Send payment information to a server-side endpoint for processing
-            fetch('/process-payment', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    cardNumber: cardNumber,
-                    expiry: expiry,
-                    cvv: cvv,
-                    totalPrice: totalPrice,
-                    cartItems: cartItems
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert('Payment processed successfully!');
-                // Optionally, redirect to a thank you page or perform other post-purchase actions
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                alert('Payment failed. Please try again.');
-            });
+        function showNotification() {
+            var notification = document.getElementById('notification');
+            if (notificationQueue.length > 0) {
+                isNotifying = true;
+                notification.textContent = notificationQueue.shift();
+                notification.style.display = 'block';
+                setTimeout(function() {
+                    notification.style.display = 'none';
+                    isNotifying = false;
+                    if (notificationQueue.length > 0) {
+                        showNotification();
+                    }
+                }, 2000); // Notification display duration
+            }
+        }
+
+        function checkout() {
+            // Construct URL with cart items as parameters
+            var checkoutUrl = "checkout.html?";
+            for (var item in cartItems) {
+                checkoutUrl += encodeURIComponent(item) + "=" + encodeURIComponent(cartItems[item]) + "&";
+            }
+            checkoutUrl += "totalPrice=" + encodeURIComponent(totalPrice.toFixed(2));
+            // Redirect to the checkout page
+            window.location.href = checkoutUrl;
         }
     </script>
 </body>
