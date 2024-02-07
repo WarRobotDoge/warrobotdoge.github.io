@@ -37,6 +37,10 @@
         .product img {
             width: 100%;
             border-radius: 5px;
+            transition: transform 0.3s ease;
+        }
+        .product img:hover {
+            transform: scale(1.1);
         }
         .product h3 {
             margin: 5px 0;
@@ -187,19 +191,19 @@
     </nav>
     <section>
        <center> <div class="product">
-            <img id="shirt-img" src="https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-1617775385474-0.png" alt="Doge Shirt" onmouseover="changeImage(this)" onmouseout="resetImage(this)">
+            <img id="shirt-img" src="https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-1617775385474-0.png" alt="Doge Shirt">
             <h3>Doge Shirt</h3>
             <p class="price">$19.99</p>
             <button class="btn-add-to-cart" onclick="showPopup('Doge Shirt', '', 'https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-1617775385474-0.png', 19.99)">Add to Cart</button>
         </div>
         <div class="product">
-            <img id="mug-img" src="https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16106962314830-0.png" alt="Doge Mug" onmouseover="changeImage(this)" onmouseout="resetImage(this)">
+            <img id="mug-img" src="https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16106962314830-0.png" alt="Doge Mug">
             <h3>Doge Mug</h3>
             <p class="price">$19.99</p>
             <button class="btn-add-to-cart" onclick="showPopup('Doge Mug', '', 'https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16106962314830-0.png', 19.99)">Add to Cart</button>
         </div>
          <div class="product">
-            <img id="hoodie-img" src="https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16177752255530-0.png" alt="Doge Hoodie" onmouseover="changeImage(this)" onmouseout="resetImage(this)">
+            <img id="hoodie-img" src="https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16177752255530-0.png" alt="Doge Hoodie">
             <h3>Doge Hoodie</h3>
             <p class="price">$44.99</p>
             <button class="btn-add-to-cart" onclick="showPopup('Doge Hoodie', '', 'https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16177752255530-0.png', 44.99)">Add to Cart</button>
@@ -250,10 +254,12 @@
         var isNotifying = false;
 
         function changeImage(image) {
-             if (image.id === "mug-img") {
-                image.src = "https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16106962314830-2.png";
+            if (image.id === "shirt-img") {
+                image.src = "https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16177754191810-0.png";
+            } else if (image.id === "mug-img") {
+                image.src = "https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16106962314830-0.png";
             } else if (image.id === "hoodie-img") {
-                image.src = "https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16177752255530-1.png";
+                image.src = "https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16177752462170-0.png";
             }
         }
 
