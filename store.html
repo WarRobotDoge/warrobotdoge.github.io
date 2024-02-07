@@ -106,6 +106,19 @@
         }
 
         /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            z-index: 9999;
+        }
+
         #cart-notification {
             position: fixed;
             top: 10px;
@@ -115,6 +128,8 @@
             padding: 10px 20px;
             border-radius: 50%;
             cursor: pointer;
+            display: none;
+            z-index: 9999;
         }
 
         #cart-items-list {
@@ -171,25 +186,27 @@
         <a href="#">Contact</a>
     </nav>
     <section>
-        <div class="product">
-            <img src="product1.jpg" alt="Product 1">
-            <h3>Product 1</h3>
-            <p>Description of Product 1</p>
+       <center> <div class="product">
+            <img src="https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-1617775385474-0.png" alt="Doge Shirt">
+            <h3>Doge Shirt</h3>
             <p class="price">$19.99</p>
-            <button class="btn-add-to-cart" onclick="showPopup('Product 1', 'Description of Product 1', 'product1.jpg', 19.99)">Add to Cart</button>
+            <button class="btn-add-to-cart" onclick="showPopup('Doge Shirt', '', 'https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-1617775385474-0.png', 19.99)">Add to Cart</button>
         </div>
         <div class="product">
-            <img src="product2.jpg" alt="Product 2">
-            <h3>Product 2</h3>
-            <p>Description of Product 2</p>
-            <p class="price">$24.99</p>
-            <button class="btn-add-to-cart" onclick="showPopup('Product 2', 'Description of Product 2', 'product2.jpg', 24.99)">Add to Cart</button>
+            <img src="https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16106962314830-0.png" alt="Doge Mug">
+            <h3>Doge Mug</h3>
+            <p class="price">$19.99</p>
+            <button class="btn-add-to-cart" onclick="showPopup('Doge Mug', '', 'https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16106962314830-0.png', 19.99)">Add to Cart</button>
         </div>
+         <div class="product">
+            <img src="https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16177752255530-0.png" alt="Doge Hoodie">
+            <h3>Doge Hoodie</h3>
+            <p class="price">$44.99</p>
+            <button class="btn-add-to-cart" onclick="showPopup('Doge Hoodie', '', 'https://cdn.streamlabs.com/users/33258384/library/33258384-mockup-16177752255530-0.png', 44.99)">Add to Cart</button>
+        </div>
+          </center> 
         <!-- Add more products as needed -->
     </section>
-    <footer>
-        <p>&copy; 2024 Merch Store. All rights reserved.</p>
-    </footer>
 
     <!-- Popup -->
     <div id="popup" class="popup">
@@ -210,6 +227,9 @@
     <!-- Background overlay -->
     <div id="popup-overlay" class="popup-overlay" onclick="closePopup()"></div>
 
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
     <!-- Cart notification -->
     <div id="cart-notification" onclick="toggleCart()"></div>
 
@@ -226,6 +246,8 @@
         var cartItemsCount = 0;
         var cartItems = {};
         var totalPrice = 0;
+        var notificationQueue = [];
+        var isNotifying = false;
 
         function addToCart() {
             var productName = document.getElementById('popup-name').textContent;
@@ -239,6 +261,12 @@
             updateCartNotification();
             updateCartTotal();
             closePopup();
+
+            // Add notification to queue
+            notificationQueue.push('Added to Cart!');
+            if (!isNotifying) {
+                showNotification();
+            }
         }
 
         function updateCartNotification() {
@@ -257,7 +285,7 @@
             cartItemsList.innerHTML = "";
             for (var item in cartItems) {
                 var li = document.createElement("li");
-                li.textContent = `${item} - Quantity: ${cartItems[item]} - Price Each: $${getItemPrice(item).toFixed(2)} - Total Price: $${(cartItems[item] * getItemPrice(item)).toFixed(2)}`;
+                li.textContent = `${cartItems[item]}x ${item} --- Total Price: $${(cartItems[item] * getItemPrice(item)).toFixed(2)}`;
                 cartItemsList.appendChild(li);
             }
             var cartItemsPopup = document.getElementById('cart-items-list');
@@ -298,27 +326,44 @@
 
         function getItemPrice(name) {
             switch(name) {
-                case 'Product 1':
+                case 'Doge Shirt':
                     return 19.99;
-                case 'Product 2':
-                    return 24.99;
+                case 'Doge Mug':
+                    return 19.99;
+                case 'Doge Hoodie':
+                    return 44.99;
                 // Add more cases for other products as needed
                 default:
                     return 0;
             }
         }
 
-       function checkout() {
-    // Construct URL with cart items as parameters
-    var checkoutUrl = "checkout.html?";
-    for (var item in cartItems) {
-        checkoutUrl += encodeURIComponent(item) + "=" + encodeURIComponent(cartItems[item]) + "&";
-    }
-    checkoutUrl += "totalPrice=" + encodeURIComponent(totalPrice.toFixed(2));
-    // Redirect to the checkout page
-    window.location.href = checkoutUrl;
-}
+        function showNotification() {
+            var notification = document.getElementById('notification');
+            if (notificationQueue.length > 0) {
+                isNotifying = true;
+                notification.textContent = notificationQueue.shift();
+                notification.style.display = 'block';
+                setTimeout(function() {
+                    notification.style.display = 'none';
+                    isNotifying = false;
+                    if (notificationQueue.length > 0) {
+                        showNotification();
+                    }
+                }, 2000); // Notification display duration
+            }
+        }
 
+        function checkout() {
+            // Construct URL with cart items as parameters
+            var checkoutUrl = "checkout.html?";
+            for (var item in cartItems) {
+                checkoutUrl += encodeURIComponent(item) + "=" + encodeURIComponent(cartItems[item]) + "&";
+            }
+            checkoutUrl += "totalPrice=" + encodeURIComponent(totalPrice.toFixed(2));
+            // Redirect to the checkout page
+            window.location.href = checkoutUrl;
+        }
     </script>
 </body>
 </html>
