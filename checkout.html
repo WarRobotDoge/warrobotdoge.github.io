@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+</head>
+<body>
+    <h1>Checkout</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price Each</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody id="checkout-items">
+            <!-- Cart items will be displayed here -->
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3">Total</td>
+                <td id="checkout-total"></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <script>
+        // Parse cart items from URL parameters
+        var urlParams = new URLSearchParams(window.location.search);
+        var cartItems = {};
+        var totalPrice = parseFloat(urlParams.get("totalPrice"));
+
+        urlParams.forEach(function(value, key) {
+            if (key !== "totalPrice") {
+                cartItems[key] = parseInt(value);
+            }
+        });
+
+        // Display cart items
+        var checkoutItemsTable = document.getElementById('checkout-items');
+        for (var item in cartItems) {
+            var tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${item}</td>
+                <td>${cartItems[item]}</td>
+                <td>$${getItemPrice(item).toFixed(2)}</td>
+                <td>$${(cartItems[item] * getItemPrice(item)).toFixed(2)}</td>
+            `;
+            checkoutItemsTable.appendChild(tr);
+        }
+
+        // Display total price
+        var checkoutTotal = document.getElementById('checkout-total');
+        checkoutTotal.textContent = "$" + totalPrice.toFixed(2);
+
+        function getItemPrice(name) {
+            switch(name) {
+                case 'Product 1':
+                    return 19.99;
+                case 'Product 2':
+                    return 24.99;
+                // Add more cases for other products as needed
+                default:
+                    return 0;
+            }
+        }
+    </script>
+</body>
+</html>
