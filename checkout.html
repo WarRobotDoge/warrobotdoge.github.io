@@ -27,6 +27,16 @@
         </tfoot>
     </table>
 
+    <form id="payment-form" onsubmit="processPayment(event)">
+        <label for="card-number">Card Number:</label>
+        <input type="text" id="card-number" required><br><br>
+        <label for="expiry">Expiration Date:</label>
+        <input type="text" id="expiry" placeholder="MM/YY" required><br><br>
+        <label for="cvv">CVV:</label>
+        <input type="text" id="cvv" required><br><br>
+        <button type="submit">Pay Now</button>
+    </form>
+
     <script>
         // Parse cart items from URL parameters
         var urlParams = new URLSearchParams(window.location.search);
@@ -66,6 +76,36 @@
                 default:
                     return 0;
             }
+        }
+
+        function processPayment(event) {
+            event.preventDefault();
+            var cardNumber = document.getElementById('card-number').value;
+            var expiry = document.getElementById('expiry').value;
+            var cvv = document.getElementById('cvv').value;
+            // Send payment information to a server-side endpoint for processing
+            fetch('/process-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    cardNumber: cardNumber,
+                    expiry: expiry,
+                    cvv: cvv,
+                    totalPrice: totalPrice,
+                    cartItems: cartItems
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Payment processed successfully!');
+                // Optionally, redirect to a thank you page or perform other post-purchase actions
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Payment failed. Please try again.');
+            });
         }
     </script>
 </body>
