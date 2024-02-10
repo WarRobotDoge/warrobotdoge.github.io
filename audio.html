@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP3 File Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .search-container {
+            text-align: center;
+        }
+
+        .search-results {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .search-result-item {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    // Securely hashed password
+    const hashedPassword = "9fda5d7b4303e650b6c33cbb4bc72fda7b1528a2d248f3555019b2fbd048def5"; // SHA-256 hash of the password "your_password_here"
+
+    // Function to prompt for password and check its hash
+    function checkPassword() {
+        const password = prompt("Enter the password:");
+        const hashedInputPassword = sha256(password); // Assuming you have a function sha256() for hashing
+
+        if (hashedInputPassword === hashedPassword) {
+            displayContent();
+        } else {
+            alert("Incorrect password. Please try again.");
+        }
+    }
+
+    // Function to fetch and display songs
+    async function displayContent() {
+        // Simulated endpoint data
+        const songsData = {
+            "songs": [
+                { "title": "1/26/24", "url": "https://example.com/songs/1.mp3" },
+                { "title": "2/5/24", "url": "https://example.com/songs/2.mp3" },
+                { "title": "2/8/24", "url": "https://example.com/songs/3.mp3" }
+                // Add more songs as needed
+            ]
+        };
+
+        const songs = songsData.songs;
+        const searchResults = document.createElement('ul');
+        searchResults.classList.add('search-results');
+
+        songs.forEach((song, index) => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('search-result-item');
+
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.src = song.url;
+
+            const label = document.createElement('span');
+            label.textContent = song.title + ': ';
+
+            listItem.appendChild(label);
+            listItem.appendChild(audio);
+            searchResults.appendChild(listItem);
+        });
+
+        document.body.appendChild(searchResults);
+    }
+
+    // Call the function to check password when the page loads
+    window.onload = checkPassword;
+</script>
+
+<!-- Include a JavaScript library for SHA-256 hashing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
+
+</body>
+</html>
