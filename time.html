@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future Dates Countdown</title>
+    <style>
+ body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            background-image: url('https://source.unsplash.com/random');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        #countdowns {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .countdown {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+            width: calc(33.33% - 20px);
+            max-width: 300px;
+        }
+
+        .countdown:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .countdown h2 {
+            margin-top: 0;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .countdown p {
+            margin-top: 0;
+            font-size: 16px;
+        }
+
+        .countdown div {
+            font-size: 20px;
+            margin-bottom: 10px;
+            display: inline-block;
+            margin: 0 5px;
+            padding: 5px 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="countdowns">
+    <div class="countdown" id="countdown1">
+    <h2>April 25, 2024</h2>
+    <p>Birthday</p>
+    <div id="timer1"></div>
+</div>
+
+<div class="countdown" id="countdown2">
+    <h2>June 15, 2024</h2>
+    <p>Finish Freshman</p>
+    <div id="timer2"></div>
+</div>
+
+<div class="countdown" id="countdown3">
+    <h2>August 23, 2024</h2>
+    <p>Start Sophmore</p>
+    <div id="timer3"></div>
+</div>
+
+<div class="countdown" id="countdown4">
+    <h2>January 1, 2025</h2>
+    <p>New Year</p>
+    <div id="timer4"></div>
+</div>
+
+<div class="countdown" id="countdown5">
+    <h2>April 25, 2025</h2>
+    <p>Birthday</p>
+    <div id="timer5"></div>
+</div>
+
+<div class="countdown" id="countdown6">
+    <h2>June 15, 2025</h2>
+    <p>Finish Sophmore</p>
+    <div id="timer6"></div>
+</div>
+
+<div class="countdown" id="countdown7">
+    <h2>August 23, 2025</h2>
+    <p>Start Junior</p>
+    <div id="timer7"></div>
+</div>
+
+<div class="countdown" id="countdown8">
+    <h2>January 1, 2026</h2>
+    <p>New Year</p>
+    <div id="timer8"></div>
+</div>
+
+<div class="countdown" id="countdown9">
+    <h2>April 25, 2026</h2>
+    <p>Birthday</p>
+    <div id="timer9"></div>
+</div>
+
+<div class="countdown" id="countdown10">
+    <h2>June 15, 2026</h2>
+    <p>Finish Junior</p>
+    <div id="timer10"></div>
+</div>
+
+<div class="countdown" id="countdown11">
+    <h2>August 23, 2026</h2>
+    <p>Start Senior</p>
+    <div id="timer11"></div>
+</div>
+
+<div class="countdown" id="countdown12">
+    <h2>January 1, 2027</h2>
+    <p>New Year</p>
+    <div id="timer12"></div>
+</div>
+
+<div class="countdown" id="countdown13">
+    <h2>April 25, 2027</h2>
+    <p>Birthday</p>
+    <div id="timer13"></div>
+</div>
+
+<div class="countdown" id="countdown14">
+    <h2>June 15, 2027</h2>
+    <p>Graduate Senior</p>
+    <div id="timer14"></div>
+</div>
+    </div>
+
+    <script>
+        // Set the target dates
+        const targetDates = [
+               new Date('April 25, 2024').getTime(),
+            new Date('June 15, 2024').getTime(),
+            new Date('August 23, 2024').getTime(),
+            new Date('January 1, 2025').getTime(),
+                new Date('April 25, 2025').getTime(),
+            new Date('June 15, 2025').getTime(),
+            new Date('August 23, 2025').getTime(),
+            new Date('January 1, 2026').getTime(),
+               new Date('April 25, 2026').getTime(),
+            new Date('June 15, 2026').getTime(),
+            new Date('August 23, 2026').getTime(),
+            new Date('January 1, 2027').getTime(),
+               new Date('April 25, 2027').getTime(),
+            new Date('June 15, 2027').getTime()
+        ];
+
+        // Update countdowns every millisecond
+        setInterval(() => {
+            const now = new Date().getTime();
+            targetDates.forEach((targetDate, index) => {
+                const distance = targetDate - now;
+
+                if (distance <= 0) {
+                    document.getElementById(`countdown${index + 1}`).classList.add('hidden');
+                    return; // Stop processing this countdown
+                }
+
+                // Time calculations
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                const milliseconds = Math.floor(distance % 1000);
+
+                // Display the countdown
+                const countdownElement = document.getElementById(`timer${index + 1}`);
+                countdownElement.innerHTML = `
+                    <div>${days}d</div>
+                    <div>${hours}h</div>
+                    <div>${minutes}m</div>
+                    <div>${seconds}s</div>
+                    <div>${milliseconds}ms</div>
+                `;
+            });
+        }, 1);
+    </script>
+</body>
+</html>
