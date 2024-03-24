@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,7 +12,7 @@
     <meta property="og:description" content="News">
     <meta property="og:image" content="https://i.imgur.com/TaH2ey4.png">
     <title>WarRobotDoge News</title>
-        <style>
+    <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -119,74 +120,47 @@
         <a href="https://warrobotdoge.com/news">News</a>
     </nav>
 
-    <main id="articleContainer">
-        <!-- Articles will be dynamically added here by JavaScript -->
+    <main>
+        <article>
+            <a href="https://warrobotdoge.com/news/silentholocaust" class="link">
+                <img src="https://www.verywellhealth.com/thmb/G3Cy3e_pnLupt1qbXBj3Im9XX7o=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-1288913695-230c3b035bce4442b29e1598a492022d.jpg"
+                    alt="Thumbnail 1" class="image">
+            </a>
+            <div>
+                <h2><a href="https://warrobotdoge.com/news/silentholocaust" class="title">The Silent Holocaust</a>
+                    <a class="date">December 11, 2023</a><a class='date', href="https://warrobotdoge.com/news/silentholocaust">
+                        | </a><a class="date">WarRobotDoge</a></h2>
+                <p>This article delves into the contentious topic of abortion, drawing parallels to historical atrocities while presenting a viewpoint critical of the practice. The article concludes with a focus on recent events, including attempts to restrict abortion in certain states and allegations of election rigging in the context of abortion rights.</p>
+            </div>
+        </article>
+
+        <article>
+            <a href="https://warrobotdoge.com/news/new-year-same-offer" class="link">
+                <img src="https://i.imgur.com/kcuPjrC.png" alt="Thumbnail 2" class="image">
+            </a>
+            <div>
+                <h2><a href="https://warrobotdoge.com/news/new-year-same-offer" class="title">New Year – The Same
+                        Patient Offer</a> <a class="date">January 2, 2024</a><a class='date',
+                        href="https://warrobotdoge.com/news/new-year-same-offer"> | </a><a class="date">JesusSheep</a> </h2>
+                <p>
+This article reflects on time, mortality, and faith in Jesus Christ. It highlights the fleeting nature of life and the promise of eternal life through Jesus, urging readers to embrace faith over works for salvation. It emphasizes the importance of studying scripture, particularly the writings of the apostle Paul, for developing faith. The article concludes by calling on readers to repent and trust in Jesus, offering additional resources for further study.</p>
+            </div>
+        </article>
+
+        <article>
+            <a href="https://warrobotdoge.com/news/we-will-not-be-replaced" class="link">
+                <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi1.wp.com%2Fjcpa.org%2Fwp-content%2Fuploads%2F2019%2F03%2FAP_17046495067496-1_opt.jpeg%3Ffit%3D1200%252C801&f=1&nofb=1&ipt=2ebb2c3a70a1cfa0f4be287190f103bef1c98c66d7f1b902c3893ec4c0b01ed4&ipo=images"
+                    alt="Thumbnail 2" class="image">
+            </a>
+            <div>
+                <h2><a href="https://warrobotdoge.com/news/we-will-not-be-replaced" class="title">We Will Not Be
+                        Replaced</a> <a class="date">March 13, 2024</a><a class='date',
+                        href="https://warrobotdoge.com/news/we-will-not-be-replaced"> | </a><a class="date">WarRobotDoge</a></h2>
+                <p>Clear them out!</p>
+            </div>
+        </article>
+        <!-- Add more articles as needed -->
     </main>
-
-    <script>
-        // Array to hold article data
-        const articles = [
-            {
-                title: "The Silent Holocaust",
-                date: "December 11, 2023",
-                author: "WarRobotDoge",
-                image: "https://www.verywellhealth.com/thmb/G3Cy3e_pnLupt1qbXBj3Im9XX7o=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-1288913695-230c3b035bce4442b29e1598a492022d.jpg",
-                content: "This article delves into the contentious topic of abortion, drawing parallels to historical atrocities while presenting a viewpoint critical of the practice. The article concludes with a focus on recent events, including attempts to restrict abortion in certain states and allegations of election rigging in the context of abortion rights."
-            },
-            {
-                title: "New Year – The Same Patient Offer",
-                date: "January 2, 2024",
-                author: "JesusSheep",
-                image: "https://i.imgur.com/kcuPjrC.png",
-                content: "This article reflects on time, mortality, and faith in Jesus Christ. It highlights the fleeting nature of life and the promise of eternal life through Jesus, urging readers to embrace faith over works for salvation. It emphasizes the importance of studying scripture, particularly the writings of the apostle Paul, for developing faith. The article concludes by calling on readers to repent and trust in Jesus, offering additional resources for further study."
-            },
-            {
-                title: "We Will Not Be Replaced",
-                date: "March 13, 2024",
-                author: "WarRobotDoge",
-                image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi1.wp.com%2Fjcpa.org%2Fwp-content%2Fuploads%2F2019%2F03%2FAP_17046495067496-1_opt.jpeg%3Ffit%3D1200%252C801&f=1&nofb=1&ipt=2ebb2c3a70a1cfa0f4be287190f103bef1c98c66d7f1b902c3893ec4c0b01ed4&ipo=images",
-                content: "Clear them out!"
-            }
-            // Add more articles as needed
-        ];
-
-        // Function to shuffle articles randomly
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        // Function to create HTML elements for articles
-        function createArticle(article) {
-            const articleElement = document.createElement("article");
-            articleElement.innerHTML = `
-                <a href="#" class="link">
-                    <img src="${article.image}" alt="Thumbnail" class="image">
-                </a>
-                <div>
-                    <h2><a href="#" class="title">${article.title}</a> <a class="date">${article.date}</a><a class='date', href="#"> | </a><a class="date">${article.author}</a></h2>
-                    <p>${article.content}</p>
-                </div>
-            `;
-            return articleElement;
-        }
-
-        // Function to display shuffled articles on the page
-        function displayArticles() {
-            const articleContainer = document.getElementById("articleContainer");
-            const shuffledArticles = shuffle(articles);
-            shuffledArticles.forEach(article => {
-                const articleElement = createArticle(article);
-                articleContainer.appendChild(articleElement);
-            });
-        }
-
-        // Call the function to display articles when the page loads
-        displayArticles();
-    </script>
 </body>
 
 </html>
