@@ -1,94 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MP3 File Search</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Audio Player</title>
+<style>/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 
-        .search-container {
-            text-align: center;
-        }
+.audio-container {
+    text-align: center;
+}
 
-        .search-results {
-            list-style-type: none;
-            padding: 0;
-        }
+.control-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
 
-        .search-result-item {
-            margin: 5px 0;
-        }
-    </style>
+.volume-slider {
+    width: 100px;
+    margin: 0 10px;
+}
+
+#lyrics-container {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    width: 80%;
+    max-width: 500px;
+    overflow-y: scroll;
+    height: 200px;
+}
+/* styles.css */
+/* Add styles for highlighted lyric */
+.highlight {
+    color: blue; /* Change color to your desired highlight color */
+    font-weight: bold;
+}
+.lyrics-container {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.lyric {
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+.lyric.highlight {
+  background-color: #ffeeba;
+  font-weight: bold;
+}
+</style>
 </head>
 <body>
-
+<div class="audio-container">
+    <h1>Advanced Audio Player</h1>
+    <audio id="audio-player" controls>
+        <source src="https://warrobotdoge.com/uploads/Russia.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <div class="controls">
+        <button id="play-pause-btn" class="control-btn">Play</button>
+        <button id="repeat-btn" class="control-btn">Repeat</button>
+        <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="100" step="1">
+    </div>
+    <div id="lyrics" class="lyrics-container">
+        <!-- Lyrics will be displayed here -->
+    </div>
+</div>
 <script>
-    // Securely hashed password
-    const hashedPassword = "9fda5d7b4303e650b6c33cbb4bc72fda7b1528a2d248f3555019b2fbd048def5"; // SHA-256 hash of the password "your_password_here"
+    var text = lyrics; 
+var text = text.replace(/\n\r?/g, '<br />');
+  alert(text);
+</script>
+<script>// script.js
+const audioPlayer = document.getElementById('audio-player');
+const playPauseBtn = document.getElementById('play-pause-btn');
+const repeatBtn = document.getElementById('repeat-btn');
+const volumeSlider = document.getElementById('volume-slider');
+const lyricsContainer = document.getElementById('lyrics');
+let lyrics = [
+    { time: 0, text: '"Верните в моду любовь, где было очень тепло" englishenglishenglish' },
+    { time: 5, text: "И только рядом с тобой я забывал обо всём" },
+     { time: 9, text: "Верните в моду любовь, десяток искр из глаз" },
+     { time: 14, text: "И если плачешь ты, то давайте прямо сейчас" },
+     { time: 18.5, text: "Верните в моду любовь, где было очень тепло" },
+      { time: 23, text: "И только рядом с тобой я забывал обо всём" },
+      { time: 28, text: "Верните в моду любовь, десяток искр из глаз" },
+         { time: 32, text: "И если плачешь ты, то давайте прямо сейчас" },
+         { time: 36.9, text: "Я очень устал, в одной из квартир" },
+    // Add more lyrics as needed
+]; // Array to store lyrics and their timestamps
+let currentLyricIndex = -1; // Index of the current lyric
 
-    // Function to prompt for password and check its hash
-    function checkPassword() {
-        const password = prompt("Enter the password:");
-        const hashedInputPassword = sha256(password); // Assuming you have a function sha256() for hashing
+// Sort lyrics array by timestamp in ascending order
+lyrics.sort((a, b) => a.time - b.time);
 
-        if (hashedInputPassword === hashedPassword) {
-            displayContent();
-        } else {
-            alert("Incorrect password. Please try again.");
+// Add event listeners
+playPauseBtn.addEventListener('click', togglePlayPause);
+repeatBtn.addEventListener('click', toggleRepeat);
+volumeSlider.addEventListener('input', adjustVolume);
+
+// Function to display lyrics based on the current playback time
+audioPlayer.addEventListener('timeupdate', () => {
+    const currentTime = audioPlayer.currentTime;
+
+    // Find the index of the current lyric based on the current time
+    for (let i = 0; i < lyrics.length; i++) {
+        if (currentTime >= lyrics[i].time && (i === lyrics.length - 1 || currentTime < lyrics[i + 1].time)) {
+            if (currentLyricIndex !== i) {
+                currentLyricIndex = i;
+                displayLyrics();
+            }
+            break;
         }
     }
+});
 
-    // Function to fetch and display songs
-    async function displayContent() {
-        // Simulated endpoint data
-        const songsData = {
-            "songs": [
-                { "title": "1/26/24", "url": "https://example.com/songs/1.mp3" },
-                { "title": "2/5/24", "url": "https://example.com/songs/2.mp3" },
-                { "title": "2/8/24", "url": "https://example.com/songs/3.mp3" }
-                // Add more songs as needed
-            ]
-        };
+// Function to display lyrics
+function displayLyrics() {
+    // Remove highlight from all previous lyrics
+    document.querySelectorAll('.lyric').forEach(lyric => {
+        lyric.classList.remove('highlight');
+    });
+    
+    // Highlight the current lyric
+    const currentLyricText = lyrics[currentLyricIndex].text;
+    const lyricElement = document.createElement('div');
+    lyricElement.textContent = currentLyricText;
+    lyricElement.classList.add('lyric', 'highlight');
+    lyricsContainer.appendChild(lyricElement);
+}
+    
 
-        const songs = songsData.songs;
-        const searchResults = document.createElement('ul');
-        searchResults.classList.add('search-results');
-
-        songs.forEach((song, index) => {
-            const listItem = document.createElement('li');
-            listItem.classList.add('search-result-item');
-
-            const audio = document.createElement('audio');
-            audio.controls = true;
-            audio.src = song.url;
-
-            const label = document.createElement('span');
-            label.textContent = song.title + ': ';
-
-            listItem.appendChild(label);
-            listItem.appendChild(audio);
-            searchResults.appendChild(listItem);
-        });
-
-        document.body.appendChild(searchResults);
+// Toggle play/pause
+function togglePlayPause() {
+    if (audioPlayer.paused) {
+        audioPlayer.play();
+        playPauseBtn.textContent = 'Pause';
+    } else {
+        audioPlayer.pause();
+        playPauseBtn.textContent = 'Play';
     }
+}
 
-    // Call the function to check password when the page loads
-    window.onload = checkPassword;
+// Toggle repeat
+function toggleRepeat() {
+    audioPlayer.loop = !audioPlayer.loop;
+    repeatBtn.textContent = audioPlayer.loop ? 'Repeat: On' : 'Repeat: Off';
+}
+
+// Adjust volume
+function adjustVolume() {
+    audioPlayer.volume = volumeSlider.value / 100;
+}
+
 </script>
-
-<!-- Include a JavaScript library for SHA-256 hashing -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
-
 </body>
 </html>
