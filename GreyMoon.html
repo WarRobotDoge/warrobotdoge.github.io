@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft Texture Pack Download</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EYCEXST1XQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EYCEXST1XQ');
+
+  // Function to fetch download count from Google Analytics Reporting API
+  function fetchDownloadCount() {
+    const viewId = 'YOUR_VIEW_ID'; // Replace with your Google Analytics View ID
+    const metric = 'ga:totalEvents';
+    const dimension = 'ga:eventLabel';
+    const eventName = 'download';
+    const texturePackLabel = 'Greymoon 32x'; // Adjust if needed
+
+    gtag('event', 'loadGAReportingAPI', {
+      'event_category': 'Google Analytics',
+      'event_label': 'Fetch Download Count',
+      'non_interaction': true
+    });
+
+    gapi.analytics.ready(function() {
+      const report = new gapi.analytics.report.Data({
+        query: {
+          ids: 'ga:' + viewId,
+          metrics: metric,
+          dimensions: dimension,
+          'start-date': '30daysAgo',
+          'end-date': 'today',
+          'filters': `ga:eventCategory==${eventName};ga:eventLabel==${texturePackLabel}`
+        }
+      });
+
+      report.on('success', function(response) {
+        const downloadCount = response.totalsForAllResults[metric];
+        animateDownloadCount(downloadCount);
+      });
+
+      report.execute();
+    });
+  }
+
+  // JavaScript to animate the download count
+  function animateDownloadCount(targetCount) {
+    let currentCount = 0;
+    const increment = Math.ceil(targetCount / 100); // Adjust the increment speed as needed
+    const downloadCountElement = document.getElementById('downloadCount');
+
+    const interval = setInterval(() => {
+      currentCount += increment;
+      if (currentCount >= targetCount) {
+        clearInterval(interval);
+        currentCount = targetCount;
+      }
+      downloadCountElement.textContent = currentCount + ' times downloaded';
+    }, 10); // Adjust the interval time for smoother animation
+  }
+
+  // Function to track download event
+  function trackDownload() {
+    fetchDownloadCount();
+    gtag('event', 'download', {
+      'event_category': 'Texture Pack',
+      'event_label': 'Greymoon 32x',
+      'value': 1
+    });
+  }
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap">
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+    color: #333;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 40px;
+    background: linear-gradient(135deg, #63a4ff, #83eaf1);
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease;
+    position: relative;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  h1, p, button {
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  h1 {
+    font-size: 42px;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    animation-delay: 0.2s;
+  }
+
+  p {
+    margin-bottom: 30px;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    animation-delay: 0.4s;
+  }
+
+  button {
+    padding: 12px 24px;
+    background-color: #ff6b6b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    outline: none;
+    box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+    animation-delay: 0.6s;
+  }
+
+  button:hover {
+    background-color: #ff4d4d;
+  }
+
+  footer {
+    margin-top: 30px;
+    color: #666;
+    font-size: 14px;
+  }
+
+  .testimonials {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+
+  .testimonial {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    background: #fff;
+    border-radius: 6px;
+    margin-right: 10px;
+  }
+
+  .testimonial:nth-child(3n) {
+    margin-right: 0; /* Remove margin from the last testimonial in each row */
+  }
+
+  .social-media-links {
+    margin-top: 50px; /* Adjusted margin-top */
+    text-align: center;
+    background-color: #444;
+    padding: 10px 0;
+    border-radius: 6px;
+  }
+
+  .social-media-links a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: 20px;
+    transition: color 0.3s ease;
+  }
+
+  .social-media-links a:hover {
+    color: #ccc;
+  }
+
+  .faq {
+    margin-top: 40px;
+  }
+
+  .faq h2 {
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .faq ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .faq li {
+    margin-bottom: 20px;
+  }
+
+  .faq li h3 {
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .faq li p {
+    font-size: 16px;
+    color: #fff;
+  }
+
+  button {
+  padding: 12px 24px;
+  background-color: #ff6b6b;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  outline: none;
+  box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+  animation: fadeInUp 1s ease, pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Greymoon 32x Texture Pack</h1>
+    <p id="downloadCount">0 times downloaded</p>
+    <p>Enhance your Minecraft experience with Greymoon 32x! Download now and dive into a new world of creativity!</p>
+    <a href="https://warrobotdoge.com/uploads/GreyMoon-32x-V1.67.mcpack" onclick="trackDownload()">
+      <button id="downloadButton">Download Texture Pack</button>
+    </a>
+    <div class="testimonials">
+      <div class="testimonial">"This texture pack is great!" - Crispyz13</div>
+      <div class="testimonial">"It's different" - Salmon</div>
+      <div class="testimonial">"It'll get you banned because it's so good" - Mineplex Admins</div>
+      <!-- Add more testimonials as needed -->
+    </div>
+
+    <div class="faq">
+      <h2>FAQ</h2>
+      <ul>
+        <li>
+          <h3>Q: What is a Minecraft Bedrock Texture Pack?</h3>
+          <p>A: A Minecraft Bedrock Texture Pack is a set of modified textures that change the visual appearance of blocks, items, and other elements in the game.</p>
+        </li>
+        <li>
+          <h3>Q: How do you install a Texture Pack in Minecraft Bedrock Edition?</h3>
+          <p>A: To install a Texture Pack, download the .mcpack file, open Minecraft, go to Settings > Global Resources, select the pack, and activate it.</p>
+        </li>
+        <li>
+          <h3>Q: Can Texture Packs alter gameplay in Minecraft Bedrock Edition?</h3>
+          <p>A: No, Texture Packs only change visuals; they don't affect gameplay mechanics.</p>
+        </li>
+        <li>
+          <h3>Q: Where can I find Texture Packs for Minecraft Bedrock Edition?</h3>
+          <p>A: You can find Texture Packs on the Minecraft Marketplace, community forums, and third-party websites.</p>
+        </li>
+        <li>
+          <h3>Q: Can Texture Packs affect performance in Minecraft Bedrock Edition?</h3>
+          <p>A: Yes, Texture Packs may impact performance based on their complexity and optimization. Choose packs suitable for your device.</p>
+        </li>
+        <li>
+          <h3>Q: Are Texture Packs compatible across different versions of Minecraft Bedrock Edition?</h3>
+          <p>A: Texture Packs should be compatible with their designated versions, but check for updates or compatibility before installing.</p>
+        </li>
+      </ul>
+    </div>
+
+    <footer>
+      <div class="social-media-links">
+        <p>Follow us on social media:</p>
+        <a href="https://twitter.com/WarRobotDoge">Twitter</a>
+        <a href="https://steamcommunity.com/id/WarRobotDoge/">Steam</a>
+        <a href="https://instagram.com/WarRobotDoge">Instagram</a>
+      </div>
+      <p>For more information about WarRobotDoge, visit <a href="https://WarRobotDoge.com">WarRobotDoge.com</a></p>
+    </footer>
+  </div>
+<script>
+    gapi.analytics.ready(function() {
+      // Once the Reporting API is ready, fetch the download count
+      fetchDownloadCount();
+    });
+  </script>
+</body>
+</html>
