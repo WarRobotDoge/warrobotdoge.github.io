@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Minecraft Texture Pack Download</title>
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-EYCEXST1XQ"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -11,76 +9,19 @@
   gtag('js', new Date());
 
   gtag('config', 'G-EYCEXST1XQ');
-
-  // Function to fetch download count from Google Analytics Reporting API
-  function fetchDownloadCount() {
-    const viewId = 'YOUR_VIEW_ID'; // Replace with your Google Analytics View ID
-    const metric = 'ga:totalEvents';
-    const dimension = 'ga:eventLabel';
-    const eventName = 'download';
-    const texturePackLabel = 'Greymoon 32x'; // Adjust if needed
-
-    gtag('event', 'loadGAReportingAPI', {
-      'event_category': 'Google Analytics',
-      'event_label': 'Fetch Download Count',
-      'non_interaction': true
-    });
-
-    gapi.analytics.ready(function() {
-      const report = new gapi.analytics.report.Data({
-        query: {
-          ids: 'ga:' + viewId,
-          metrics: metric,
-          dimensions: dimension,
-          'start-date': '30daysAgo',
-          'end-date': 'today',
-          'filters': `ga:eventCategory==${eventName};ga:eventLabel==${texturePackLabel}`
-        }
-      });
-
-      report.on('success', function(response) {
-        const downloadCount = response.totalsForAllResults[metric];
-        animateDownloadCount(downloadCount);
-      });
-
-      report.execute();
-    });
-  }
-
-  // JavaScript to animate the download count
-  function animateDownloadCount(targetCount) {
-    let currentCount = 0;
-    const increment = Math.ceil(targetCount / 100); // Adjust the increment speed as needed
-    const downloadCountElement = document.getElementById('downloadCount');
-
-    const interval = setInterval(() => {
-      currentCount += increment;
-      if (currentCount >= targetCount) {
-        clearInterval(interval);
-        currentCount = targetCount;
-      }
-      downloadCountElement.textContent = currentCount + ' times downloaded';
-    }, 10); // Adjust the interval time for smoother animation
-  }
-
-  // Function to track download event
-  function trackDownload() {
-    fetchDownloadCount();
-    gtag('event', 'download', {
-      'event_category': 'Texture Pack',
-      'event_label': 'Greymoon 32x',
-      'value': 1
-    });
-  }
 </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft Texture Pack Download</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap">
 <style>
-  body {
+ body {
     font-family: 'Roboto', sans-serif;
     background-color: #f0f0f0;
     margin: 0;
     padding: 0;
     color: #333;
+       background: linear-gradient(135deg, #63a4ff, #83eaf1);
   }
 
   .container {
@@ -253,9 +194,9 @@
 </head>
 <body>
   <div class="container">
-    <h1>Greymoon 32x Texture Pack</h1>
-    <p id="downloadCount">0 times downloaded</p>
-    <p>Enhance your Minecraft experience with Greymoon 32x! Download now and dive into a new world of creativity!</p>
+    <h1>GreyMoon 32x Texture Pack</h1>
+    <p id="downloadCount">0 Downloads</p>
+    <p>Enhance your Minecraft experience with GreyMoon 32x! Download now and dive into a new world of creativity!</p>
     <a href="https://warrobotdoge.com/uploads/GreyMoon-32x-V1.67.mcpack" onclick="trackDownload()">
       <button id="downloadButton">Download Texture Pack</button>
     </a>
@@ -282,10 +223,6 @@
           <p>A: No, Texture Packs only change visuals; they don't affect gameplay mechanics.</p>
         </li>
         <li>
-          <h3>Q: Where can I find Texture Packs for Minecraft Bedrock Edition?</h3>
-          <p>A: You can find Texture Packs on the Minecraft Marketplace, community forums, and third-party websites.</p>
-        </li>
-        <li>
           <h3>Q: Can Texture Packs affect performance in Minecraft Bedrock Edition?</h3>
           <p>A: Yes, Texture Packs may impact performance based on their complexity and optimization. Choose packs suitable for your device.</p>
         </li>
@@ -300,17 +237,63 @@
       <div class="social-media-links">
         <p>Follow us on social media:</p>
         <a href="https://twitter.com/WarRobotDoge">Twitter</a>
-        <a href="https://steamcommunity.com/id/WarRobotDoge/">Steam</a>
+        <a href="https://youtube.com/c/WarRobotDoge/">Youtube</a>
         <a href="https://instagram.com/WarRobotDoge">Instagram</a>
       </div>
       <p>For more information about WarRobotDoge, visit <a href="https://WarRobotDoge.com">WarRobotDoge.com</a></p>
     </footer>
   </div>
-<script>
-    gapi.analytics.ready(function() {
-      // Once the Reporting API is ready, fetch the download count
-      fetchDownloadCount();
-    });
+  <script>
+   // Function to animate the download count
+function animateDownloadCount(finalCount) {
+  let currentCount = 0;
+  const duration = 7000; // Duration of the animation in milliseconds
+  const frames = 250; // Number of frames for the animation
+  const increment = finalCount / frames; // Calculate initial increment
+
+  const downloadCountElement = document.getElementById('downloadCount');
+
+  let frame = 0;
+  const interval = setInterval(() => {
+    frame++;
+
+    // Calculate the easing effect (slow down towards the end)
+    const progress = frame / frames;
+    const easedProgress = 1 - Math.pow(1 - progress, 2);
+
+    // Calculate current count based on eased progress
+    currentCount = Math.floor(easedProgress * finalCount);
+
+    // Update the display
+    downloadCountElement.textContent = currentCount + '+ Downloads';
+
+    // Check if animation is finished
+    if (frame >= frames) {
+      clearInterval(interval);
+      downloadCountElement.textContent = finalCount + '+ Downloads'; // Ensure final count is displayed
+    }
+  }, duration / frames);
+}
+
+// Call the function to animate the download count
+animateDownloadCount(5000); // Start animation from 0 to 5019
+
+// Function to add to Google count when download button is clicked
+document.getElementById('downloadButton').addEventListener('click', function() {
+  // Increment Google Analytics count (replace this with your Google Analytics implementation)
+  gtag('event', 'download', {
+    'event_category': 'Texture Pack',
+    'event_label': 'Greymoon 32x',
+  });
+
+  // Increment the displayed download count
+  const downloadCountElement = document.getElementById('downloadCount');
+  const currentCount = parseInt(downloadCountElement.textContent, 10);
+  downloadCountElement.textContent = currentCount + '+ Downloads';
+});
   </script>
+  
+  <!-- Google Analytics Script -->
+
 </body>
 </html>
