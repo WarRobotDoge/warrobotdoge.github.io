@@ -4,7 +4,7 @@ function adjustShareOptionsPosition() {
     const shareButtonRect = shareButton.getBoundingClientRect();
 
     // Set the left position of the share options container
-    shareOptions.style.left = (shareButtonRect.left - shareOptions.offsetWidth - 10) + 'px';
+    shareOptions.style.left = (shareButtonRect.left - shareOptions.offsetWidth + 180) + 'px';
 }
 // a
 // Call the function initially to set the initial position of the share options
