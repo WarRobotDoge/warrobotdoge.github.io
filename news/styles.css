@@ -101,17 +101,36 @@
             height: 80%;
         }
 
-        .share-options {
-            display: none;
-            position: absolute;
-            top: 11.5em;
-            left: 22em;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 0.5em;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+     .share-options {
+    position: absolute;
+    top: 11.5em; /* Adjust the top position as needed */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 0.5em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Adjust the max-width and left position based on the viewport width */
+@media (max-width: 600px) {
+    .share-options {
+        left: calc(50% - 20px); /* Center the options on smaller screens */
+        transform: translateX(-50%);
+        max-width: calc(100% - 20px);
+    }
+}
+
+@media (min-width: 601px) {
+    .share-options {
+        left: calc(50% - 240px); /* Adjust the left position as needed */
+        transform: translateX(-100%);
+        max-width: 200px; /* Adjust the max-width as needed */
+    }
+}
+/* Show the share options when the parent element is hovered */
+.round-share-button:hover + .share-options {
+    display: block;
+}
 
         .share-options a {
             display: block;
