@@ -1,4 +1,71 @@
-  body {
+  
+
+ .round-share-button {
+
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 2;
+    
+}
+
+.round-share-button img {
+    width: 24px;
+    height: 24px;
+}
+
+.share-options {
+    display: none; /* Initially hide the share options */
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1; /* Ensure it appears above other elements */
+    min-width: 150px; /* Set a minimum width */
+    max-width: 200px; /* Set a maximum width */
+    text-align: center; /* Center align the share options */
+}
+
+.share-options a {
+    display: block;
+    text-decoration: none;
+    color: #333;
+    padding: 8px 0;
+    transition: background-color 0.3s ease;
+    border-bottom: 1px solid #ddd; /* Add a border below each option */
+}
+
+.share-options a:last-child {
+    border-bottom: none; /* Remove border from the last option */
+}
+
+.share-options a:hover {
+    background-color: #f0f0f0;
+}
+
+.share-options.show {
+    display: block; /* Show the share options when the 'show' class is added */
+}
+
+.share-options a,
+.share-options .title {
+    text-align: center;
+}
+ 
+ nav a:hover {
+    text-decoration: underline;
+}
+
+
+
+
+body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -30,7 +97,6 @@
         nav a:hover {
             background-color: #454545;
               border-radius: 10%;
-          text-decoration: underline;
         }
 
         main {
@@ -83,69 +149,63 @@
             margin: 1em auto;
         }
 
-       .round-share-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 2;
-    
-}
+        .round-share-button {
+            cursor: pointer;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            position: absolute;
+            top: 10em;
+            left: 20em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
 
-    .round-share-button img {
-    width: 24px;
-    height: 24px;
-}
+        .round-share-button img {
+            width: 80%;
+            height: 80%;
+        }
 
-   .share-options {
-    display: none; /* Initially hide the share options */
+     .share-options {
     position: absolute;
+    top: 11.5em; /* Adjust the top position as needed */
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 5px;
-    padding: 10px;
+    padding: 0.5em;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 1; /* Ensure it appears above other elements */
-    min-width: 150px; /* Set a minimum width */
-    max-width: 200px; /* Set a maximum width */
-    text-align: center; /* Center align the share options */
 }
 
-
 /* Adjust the max-width and left position based on the viewport width */
+@media (max-width: 600px) {
+    .share-options {
+        left: calc(50% - 20px); /* Center the options on smaller screens */
+        transform: translateX(-50%);
+        max-width: calc(100% - 20px);
+    }
+}
 
+@media (min-width: 601px) {
+    .share-options {
+        left: calc(50% - 240px); /* Adjust the left position as needed */
+        transform: translateX(-100%);
+        max-width: 200px; /* Adjust the max-width as needed */
+    }
+}
 /* Show the share options when the parent element is hovered */
 .round-share-button:hover + .share-options {
     display: block;
 }
 
-       .share-options a {
-    display: block;
-    text-decoration: none;
-    color: #333;
-    padding: 8px 0;
-    transition: background-color 0.3s ease;
-    border-bottom: 1px solid #ddd; /* Add a border below each option */
-}
-
-.share-options a:last-child {
-    border-bottom: none; /* Remove border from the last option */
-}
-
-.share-options a:hover {
-    background-color: #f0f0f0;
-}
-
-.share-options.show {
-    display: block; /* Show the share options when the 'show' class is added */
-}
-
-.share-options a,
-.share-options .title {
-    text-align: center;
-}
+        .share-options a {
+            display: block;
+            text-decoration: none;
+            color: #333;
+            padding: 0.5em;
+            transition: background-color 0.3s;
+        }
 
         .article-image-text {
             text-align: center;
