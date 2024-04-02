@@ -6,7 +6,7 @@ function adjustShareOptionsPosition() {
     // Set the left position of the share options container
     shareOptions.style.left = (shareButtonRect.left - shareOptions.offsetWidth - 10) + 'px';
 }
-
+// a
 // Call the function initially to set the initial position of the share options
 adjustShareOptionsPosition();
 
