@@ -1,3 +1,16 @@
+function adjustShareOptionsPosition() {
+    const shareOptions = document.querySelector('.share-options');
+    const shareButton = document.querySelector('.round-share-button');
+    const shareButtonRect = shareButton.getBoundingClientRect();
+
+    // Set the left position of the share options container
+    shareOptions.style.left = (shareButtonRect.left - shareOptions.offsetWidth - 10) + 'px';
+}
+
+// Call the function initially to set the initial position of the share options
+adjustShareOptionsPosition();
+
+
 function toggleShareOptions() {
     var shareOptions = document.getElementById('shareOptions');
     shareOptions.style.display = (shareOptions.style.display === 'none' || shareOptions.style.display === '') ? 'block' : 'none';
