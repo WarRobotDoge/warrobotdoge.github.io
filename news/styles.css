@@ -115,21 +115,7 @@
 
 
 /* Adjust the max-width and left position based on the viewport width */
-@media (max-width: 600px) {
-    .share-options {
-        left: calc(50% - 20px); /* Center the options on smaller screens */
-        transform: translateX(-50%);
-        max-width: calc(100% - 20px);
-    }
-}
 
-@media (min-width: 601px) {
-    .share-options {
-        left: calc(50% - 240px); /* Adjust the left position as needed */
-        transform: translateX(-100%);
-        max-width: 200px; /* Adjust the max-width as needed */
-    }
-}
 /* Show the share options when the parent element is hovered */
 .round-share-button:hover + .share-options {
     display: block;
