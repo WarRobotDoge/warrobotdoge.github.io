@@ -55,6 +55,9 @@
     #result {
         margin-top: 20px;
     }
+    canvas {
+        margin-top: 20px;
+    }
 </style>
 </head>
 <body>
@@ -76,6 +79,7 @@
         <button type="submit">Calculate BMI</button>
     </form>
     <div id="result"></div>
+    <canvas id="bmiChart" width="300" height="300"></canvas>
 </div>
 
 <script>
@@ -91,23 +95,135 @@
         var heightInInches = feet * 12 + inches;
         var bmi = (weight / (heightInInches * heightInInches)) * 703;
         displayResult(bmi);
+        displayGraph(bmi);
     }
 
     function displayResult(bmi) {
         var resultDiv = document.getElementById('result');
-        var interpretation;
+        resultDiv.innerHTML = 'Your BMI is: ' + bmi.toFixed(2);
+    }
 
+    function displayGraph(bmi) {
+        var canvas = document.getElementById('bmiChart');
+        var ctx = canvas.getContext('2d');
+
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Circle parameters
+        var centerX = canvas.width / 2;
+        var centerY = canvas.height / 2;
+        var radius = canvas.width / 3;
+
+        // Color based on BMI category
+        var color;
         if (bmi < 18.5) {
-            interpretation = 'Underweight';
+            color = '#FFFF00'; // Yellow for underweight
+            var weightCategory = 'Underweight';
         } else if (bmi < 25) {
-            interpretation = 'Normal weight';
+            color = '#00FF00'; // Green for normal weight
+            var weightCategory = 'Normal weight';
         } else if (bmi < 30) {
-            interpretation = 'Overweight';
+            color = '#FFA500'; // Orange for overweight
+            var weightCategory = 'Overweight';
         } else {
-            interpretation = 'Obese';
+            color = '#FF0000'; // Red for obese
+            var weightCategory = 'Obese';
         }
 
-        resultDiv.innerHTML = 'Your BMI is: ' + bmi.toFixed(2) + '<br>' + 'Interpretation: ' + interpretation;
+        // Draw circle
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#000000';
+        ctx.stroke();
+
+        // Draw text labels
+        ctx.font = '12px Arial';
+        ctx.fillStyle = '#000';
+        ctx.textAlign = 'center';
+        ctx.fillText('Underweight', centerX - radius * 0.7, centerY - radius + 15);
+        ctx.fillText('Normal weight', centerX + radius * 0.6, centerY - radius + 15);
+        ctx.fillText('Overweight', centerX + radius - 15, centerY + 5);
+        ctx.fillText('Obese', centerX + radius * 0.6, centerY + radius * 0.8 + 5);
+
+        // Draw BMI value in the middle of the circle
+        ctx.font = 'bold 20px Arial';
+        ctx.fillText(bmi.toFixed(2), centerX, centerY + 8);
+
+        // Calculate pointer angle based on BMI
+        var pointerAngle = -Math.PI / 2 + (bmi - 18.5) * Math.PI / 20; // Linear interpolation between underweight and obese
+
+        // Draw pointer with animation
+        var pointerLength = 25;
+        var pointerX = centerX + (radius - pointerLength) * Math.cos(pointerAngle);
+        var pointerY = centerY + (radius - pointerLength) * Math.sin(pointerAngle);
+        var arrowLength = 10;
+        var arrowX = pointerX + arrowLength * Math.cos(pointerAngle);
+        var arrowY = pointerY + arrowLength * Math.sin(pointerAngle);
+
+        // Smooth animation
+        var startAngle = -Math.PI / 2;
+        var endAngle = pointerAngle;
+        var animationFrames = 60;
+        var frameCount = 0;
+
+        function animatePointer() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#000000';
+            ctx.stroke();
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#000';
+            ctx.textAlign = 'center';
+            ctx.fillText('Underweight', centerX - radius * 0.7, centerY - radius + 15);
+            ctx.fillText('Normal weight', centerX + radius * 0.6, centerY - radius + 15);
+            ctx.fillText('Overweight', centerX + radius - 15, centerY + 5);
+            ctx.fillText('Obese', centerX + radius * 0.6, centerY + radius * 0.8 + 5);
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText(bmi.toFixed(2), centerX, centerY + 8);
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(pointerX, pointerY);
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#000';
+            ctx.stroke();
+            ctx.save();
+            ctx.translate(arrowX, arrowY);
+            ctx.rotate(pointerAngle + Math.PI / 2);
+            ctx.beginPath();
+            ctx.moveTo(-5, 0);
+            ctx.lineTo(5, 0);
+            ctx.lineTo(0, -10);
+            ctx.closePath();
+            ctx.fillStyle = '#000';
+            ctx.fill();
+            ctx.restore();
+            
+            frameCount++;
+            if (frameCount < animationFrames) {
+                pointerAngle = startAngle + (endAngle - startAngle) * (frameCount / animationFrames);
+                pointerX = centerX + (radius - pointerLength) * Math.cos(pointerAngle);
+                pointerY = centerY + (radius - pointerLength) * Math.sin(pointerAngle);
+                arrowX = pointerX + arrowLength * Math.cos(pointerAngle);
+                arrowY = pointerY + arrowLength * Math.sin(pointerAngle);
+                requestAnimationFrame(animatePointer);
+            } else {
+                // Display weight category above the graph after animation completes
+                var weightLabelY = centerY - radius - 30;
+                ctx.font = 'bold 16px Arial';
+                ctx.fillStyle = '#000';
+                ctx.fillText(weightCategory, centerX, weightLabelY);
+            }
+        }
+
+        animatePointer();
     }
 </script>
 </body>
