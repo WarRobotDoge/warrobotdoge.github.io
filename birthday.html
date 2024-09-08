@@ -25,7 +25,7 @@
             background-color: #333;
             left: 50%;
             transform: translateX(-50%);
-            height: 100vh; /* Adjust height to viewport */
+            height: 100vh;
             z-index: 1;
         }
 
@@ -43,11 +43,10 @@
 
         .content {
             position: relative;
-            height: 100vh; /* Adjust height to viewport */
         }
 
         .content-section {
-            position: absolute;
+            position: relative;
             width: 40%;
             padding: 20px;
             background-color: #fff;
@@ -55,11 +54,13 @@
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             opacity: 0;
             transition: opacity 0.5s;
+            margin: 50vh 0; /* Reduced margin to make sections closer */
         }
 
         /* Attach content sections to the dots with alternating positions */
         .content-section.right {
             right: 10%;
+            margin-left: 50%;
         }
 
         .content-section.left {
@@ -78,16 +79,7 @@
         .dot:nth-child(9) { top: 170vh; }
         .dot:nth-child(10) { top: 190vh; }
 
-        .content-section:nth-child(1) { top: 10vh; }
-        .content-section:nth-child(2) { top: 30vh; }
-        .content-section:nth-child(3) { top: 50vh; }
-        .content-section:nth-child(4) { top: 70vh; }
-        .content-section:nth-child(5) { top: 90vh; }
-        .content-section:nth-child(6) { top: 110vh; }
-        .content-section:nth-child(7) { top: 130vh; }
-        .content-section:nth-child(8) { top: 150vh; }
-        .content-section:nth-child(9) { top: 170vh; }
-        .content-section:nth-child(10) { top: 190vh; }
+        .content-section:nth-child(1) { margin-top: 0; }
     </style>
 </head>
 <body>
@@ -106,13 +98,13 @@
     </div>
     <div class="content">
         <div class="content-section right">
-            Section 1 Content
+            1992<br>Hi
         </div>
         <div class="content-section left">
             Section 2 Content
         </div>
         <div class="content-section right">
-            Section 3 Content
+            1992<br><img src="https://warrobotdoge.com/j/hi/20240412_104326.jpg" alt="Description of the image" width="280" height="360">
         </div>
         <div class="content-section left">
             Section 4 Content
@@ -141,17 +133,17 @@
         document.addEventListener('scroll', function() {
             const dots = document.querySelectorAll('.dot');
             const sections = document.querySelectorAll('.content-section');
-            const scrollPosition = window.scrollY + window.innerHeight / 2;
+            const scrollPosition = window.scrollY + window.innerHeight;
 
-            dots.forEach((dot, index) => {
-                const dotPosition = index * 20 + 10; // Adjust position offset
-                const section = sections[index];
-                
-                if (scrollPosition >= dotPosition * window.innerHeight / 100 && scrollPosition < (dotPosition + 10) * window.innerHeight / 100) {
-                    dot.style.opacity = '1';
+            sections.forEach((section, index) => {
+                const sectionTop = section.offsetTop;
+                const sectionBottom = sectionTop + section.offsetHeight;
+
+                if (scrollPosition >= sectionTop && scrollPosition < sectionBottom + window.innerHeight) {
+                    dots[index].style.opacity = '1';
                     section.style.opacity = '1';
                 } else {
-                    dot.style.opacity = '0';
+                    dots[index].style.opacity = '0';
                     section.style.opacity = '0';
                 }
             });
