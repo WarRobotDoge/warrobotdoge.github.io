@@ -6,16 +6,7 @@
   <title>Bookworm Flash Game</title>
 </head>
 <body>
-  <script>
-    window.RufflePlayer = window.RufflePlayer || {};
-
-    window.addEventListener("DOMContentLoaded", () => {
-        let ruffle = window.RufflePlayer.newest();
-        let player = ruffle.createPlayer();
-        let container = document.getElementById("container");
-        container.appendChild(player);
-        player.ruffle().load("/bookworm/bookwormflash.swf");
-    });
+  <embed src="/bookworm/bookwormflash.swf" width="800" height="600" type="application/x-shockwave-flash">
 </script>
 <script src="/ruffle/ruffle.js"></script>
 </body>
