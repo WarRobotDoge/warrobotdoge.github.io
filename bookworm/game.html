@@ -12,27 +12,34 @@
       background-size: cover; /* Ensures the background stretches to fill the screen */
       background-attachment: scroll; /* Makes the background scroll with the page */
       min-height: 100vh; /* Ensures body fills the screen height */
+      flex-direction: column;
     }
 
     /* Add some dummy content for scrolling */
-    .content {
-      min-height: 100vh; /* Ensure it fills the viewport */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: Arial, sans-serif;
-      padding: 20px; /* Adds padding for better spacing on small screens */
-    }
+  
 
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  padding: 20px; /* Adds padding for better spacing */
+  z-index: 1;
+  position: relative; /* Ensures the content can be positioned on top of the white section */
+  margin-top: -20px; /* Pulls content upward to connect with the white section */
+  flex-grow: 1; /* Makes the content section grow to take up available space */
+}
     .game-container {
       width: 100%; /* Full width of the content container */
       max-width: 800px; /* Max width for the game */
       aspect-ratio: 4 / 3; /* Maintain the aspect ratio of the game */
       display: flex;
       justify-content: center;
+      position: relative; /* Places the footer at the bottom of the page flow */
       align-items: center;
-      margin-bottom: 400px; /* Adds space below the embed */
+      margin-bottom: 20px; /* Adds space below the embed */
       margin-top: 40px; /* Adds space below the embed */
+      z-index: 2; 
     }
 
     .game-container embed {
@@ -40,24 +47,27 @@
       height: 100%; /* Adjust height relative to width to maintain aspect ratio */
       max-width: 800px; /* Prevent the embed from exceeding its original size */
       max-height: 600px; /* Prevent the embed from exceeding its original size */
+      position: relative; /* Places the footer at the bottom of the page flow */
     }
 
     footer {
-      background: url('https://warrobotdoge.com/bookworm/images/site/Footer.png') no-repeat center bottom;
-      background-size: cover;
+      background: url('https://warrobotdoge.com/bookworm/images/site/Footer2.png') no-repeat center bottom;
+      background-size: cover; /* Ensures the background covers the entire footer without stretching */
       height: 200px; /* Adjust to match your footer image height */
       width: 100%;
       position: relative; /* Places the footer at the bottom of the page flow */
       margin-top: -200px; /* Overlaps the background slightly */
+      margin-left: 1px; /* Shifts the footer 1px to the right */
       z-index: 1; /* Ensures it's above the background */
+      flex-shrink: 0;
     }
 
     .header {
       display: flex;
-      margin-top: 50px;
+      margin-top: 20px;
       justify-content: center;
       align-items: center;
-      padding: 10px 0; /* Space around the logo */
+      padding: 15px 0; /* Space around the logo */
     }
 
     .header img {
@@ -67,15 +77,40 @@
     }
 
     .navbar {
-      text-align: center; /* Center-align the navbar */
-    }
+  background-color: #ED1C24; /* Red background */
+  width: 100%; /* Make the navbar take the full width */
+  max-width: 931px; /* Set the width of the navbar */
+  height: 80px; /* Set the height of the navbar */
+  border-radius: 15px 15px 0 0; /* Rounded top corners, unrounded bottom */
+  margin: 0 auto; /* Centers the navbar */
+  display: flex;
+  justify-content: center;
+  position: relative; /* Places the footer at the bottom of the page flow */
+  align-items: center;
+  z-index: 2;
+  box-shadow: inset 0 10px 10px -8px white; /* Inner white shadow */
+  background: linear-gradient(to bottom, #ED1C24 90%, white 100%); /* Gradient fade */
+}
 
-    .navbar img {
-      max-width: 100%; /* Makes the navbar image responsive */
-      height: auto;
-    }
+    .navbar-text {
+  color: white;
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+}
 
-
+.white-section {
+  background-color: white;
+  width: 100%; /* Make the navbar take the full width */
+  max-width: 931px; /* Match the width of the navbar */
+  height: 100vh; /* Full viewport height to extend down to the footer */
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  top: -20px; /* Moves the white section upward */
+  padding-top: 20px; /* Adds spacing above the content for a clean layout */
+}
+  
   </style>
 </head>
 <body>
@@ -83,13 +118,17 @@
     <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="Bookworm Logo">
 </div>
 
-<div class="navbar"> <img src="https://warrobotdoge.com/bookworm/images/site/header.png" alt="Header"> </div>
-
+<div class="navbar">
+  <span class="navbar-text"></span>
+  </div>
+  <div class="white-section">
   <div class="content">
     <div class="game-container">
       <embed src="/bookworm/BookWorm_Original.swf" width="800" height="600" type="application/x-shockwave-flash">
     </div>
   </div>
+  
+</div>
 
   <footer></footer>
   <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
