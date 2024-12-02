@@ -111,16 +111,135 @@
   padding-top: 20px; /* Adds spacing above the content for a clean layout */
 }
   
+.navbar-links {
+  list-style-type: none;
+  justify-content: space-around;
+  display: flex;
+  list-style: none; /* Removes default list bullets */
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li {
+  margin: 0 20px; /* Increased space between each link */
+  position: relative; /* For positioning the fancy hover effects */
+}
+
+.navbar-links a {
+  color: white; /* Link color */
+  text-decoration: none; /* Remove underline from links */
+  font-size: 18px; /* Adjust font size */
+  font-weight: bold; /* Make the text bold */
+  text-transform: uppercase; /* Transform the text to uppercase */
+  letter-spacing: 1px; /* Adds spacing between letters */
+  transition: all 0.3s ease; /* Smooth transition for hover effects */
+  position: relative;
+  z-index: 1;
+}
+
+
+.navbar-links a::after {
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 3px;
+  background-color: #ffffff; /* Underline color */
+  bottom: -5px; /* Position the underline slightly below the text */
+  left: 50%;
+  transition: all 0.3s ease; /* Smooth transition for the underline effect */
+  z-index: -1; /* Place the underline behind the text */
+  transform: translateX(-50%);
+}
+
+.navbar-links a:hover {
+  color: #fff; /* Keep the color white */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6); /* Glowing effect on hover */
+}
+
+.navbar-links a:hover::after {
+  width: 100%; /* Expand the underline on hover */
+}
+
+.navbar-links a:active {
+  transform: scale(0.98); /* Slight shrink effect when clicking */
+}
+
+.navbar-links li:hover a {
+  color: #8B0000; /* Change the text color to red on hover */
+}
+
+.navbar-links a:focus {
+  outline: none; /* Removes the outline on focus */
+}
+
+body {
+  font-family: 'Arial', sans-serif; /* Apply Arial font to the body */
+}
+
+/* Dropdown menu container */
+.dropdown-menu {
+  display: none; /* Hide the dropdown menu by default */
+  position: absolute;
+  top: 100%; /* Position it below the parent link */
+  left: 0;
+  background-color: #706d6d80; /* Dark background for dropdown */
+  min-width: 160px;
+  border-radius: 5px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+
+/* Show dropdown when hovering over the parent link */
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+/* Style for the dropdown items */
+.dropdown-menu li {
+  padding: 10px;
+}
+
+.dropdown-menu a {
+  color: white;
+  text-decoration: none;
+  display: block;
+  padding: 5px 10px;
+}
+
+.dropdown-menu a:hover {
+  background-color: #ed1c24; /* Hover effect for dropdown items */
+}
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="header">
+    <a href="https://warrobotdoge.com/bookworm">
     <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="Bookworm Logo">
 </div>
 
 <div class="navbar">
   <span class="navbar-text"></span>
-  </div>
+  <ul class="navbar-links">
+    <li><a href="https://warrobotdoge.com/bookworm">Home</a></li>
+    <li class="dropdown">
+      <a href="#link2">Games</a>
+      <!-- Dropdown menu -->
+      <ul class="dropdown-menu">
+        <li><a href="https://warrobotdoge.com/bookworm/game1">Game 1</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/game2">Game 2</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/game3">Game 3</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/game4">Game 4</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/game1">Game 1</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/game1">Game 1</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/game1">Game 1</a></li>
+      </ul>
+    </li>
+    <li><a href="#link2">Archives</a></li>
+  </ul>
+</div>
+
+
   <div class="white-section">
   <div class="content">
     <div class="game-container">
