@@ -4,13 +4,94 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bookworm Flash Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('https://warrobotdoge.com/bookworm/images/site/bkgd.jpg') no-repeat top center;
+      background-size: cover; /* Ensures the background stretches to fill the screen */
+      background-attachment: scroll; /* Makes the background scroll with the page */
+      min-height: 100vh; /* Ensures body fills the screen height */
+    }
+
+    /* Add some dummy content for scrolling */
+    .content {
+      min-height: 100vh; /* Ensure it fills the viewport */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      padding: 20px; /* Adds padding for better spacing on small screens */
+    }
+
+    .game-container {
+      width: 100%; /* Full width of the content container */
+      max-width: 800px; /* Max width for the game */
+      aspect-ratio: 4 / 3; /* Maintain the aspect ratio of the game */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 400px; /* Adds space below the embed */
+      margin-top: 40px; /* Adds space below the embed */
+    }
+
+    .game-container embed {
+      width: 100%; /* Make the embed width flexible */
+      height: 100%; /* Adjust height relative to width to maintain aspect ratio */
+      max-width: 800px; /* Prevent the embed from exceeding its original size */
+      max-height: 600px; /* Prevent the embed from exceeding its original size */
+    }
+
+    footer {
+      background: url('https://warrobotdoge.com/bookworm/images/site/Footer.png') no-repeat center bottom;
+      background-size: cover;
+      height: 200px; /* Adjust to match your footer image height */
+      width: 100%;
+      position: relative; /* Places the footer at the bottom of the page flow */
+      margin-top: -200px; /* Overlaps the background slightly */
+      z-index: 1; /* Ensures it's above the background */
+    }
+
+    .header {
+      display: flex;
+      margin-top: 50px;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0; /* Space around the logo */
+    }
+
+    .header img {
+      max-width: 100%; /* Makes image responsive */
+      height: auto;
+      max-height: 100px; /* Adjust the logo size */
+    }
+
+    .navbar {
+      text-align: center; /* Center-align the navbar */
+    }
+
+    .navbar img {
+      max-width: 100%; /* Makes the navbar image responsive */
+      height: auto;
+    }
+
+
+  </style>
 </head>
 <body>
-  <embed src="/bookworm/bookwormflash.swf" width="800" height="600" type="application/x-shockwave-flash">
-    <embed src="/bookworm/BookWorm_Original.swf" width="800" height="600" type="application/x-shockwave-flash">
- <embed src="/bookworm/bookworm.swf" width="800" height="600" type="application/x-shockwave-flash">
+  <div class="header">
+    <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="Bookworm Logo">
+</div>
 
-  
-<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+<div class="navbar"> <img src="https://warrobotdoge.com/bookworm/images/site/header.png" alt="Header"> </div>
+
+  <div class="content">
+    <div class="game-container">
+      <embed src="/bookworm/BookWorm_Original.swf" width="800" height="600" type="application/x-shockwave-flash">
+    </div>
+  </div>
+
+  <footer></footer>
+  <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
 </body>
 </html>
