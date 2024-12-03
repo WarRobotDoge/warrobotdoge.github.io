@@ -1,16 +1,4 @@
 (async function() {
-    const scripts = [
-        "emulator.js",
-        "nipplejs.js",
-        "shaders.js",
-        "storage.js",
-        "gamepad.js",
-        "GameManager.js",
-        "socket.io.min.js",
-        "compression.js"
-    ];
-
-
     const folderPath = (path) => path.substring(0, path.length - path.split('/').pop().length);
     let scriptPath = (typeof window.EJS_pathtodata === "string") ? window.EJS_pathtodata : folderPath((new URL(document.currentScript.src)).pathname);
     if (!scriptPath.endsWith('/')) scriptPath+='/';
@@ -21,10 +9,8 @@
             script.src = function() {
                 if ('undefined' != typeof EJS_paths && typeof EJS_paths[file] === 'string') {
                     return EJS_paths[file];
-                } else if (file.endsWith("emulator.min.js")) {
-                    return scriptPath + file;
                 } else {
-                    return scriptPath + "src/" + file;
+                    return scriptPath+file;
                 }
             }();
             script.onload = resolve;
@@ -60,9 +46,13 @@
         if (minifiedFailed) {
             console.log("Attempting to load non-minified files");
             if (file === "emulator.min.js") {
-                for (let i=0; i<scripts.length; i++) {
-                    await loadScript(scripts[i]);
-                }
+                await loadScript('emulator.js');
+                await loadScript('nipplejs.js');
+                await loadScript('shaders.js');
+                await loadScript('storage.js');
+                await loadScript('gamepad.js');
+                await loadScript('GameManager.js');
+                await loadScript('socket.io.min.js');
             } else {
                 await loadStyle('emulator.css');
             }
@@ -70,9 +60,13 @@
     }
     
     if (('undefined' != typeof EJS_DEBUG_XX && true === EJS_DEBUG_XX)) {
-        for (let i=0; i<scripts.length; i++) {
-            await loadScript(scripts[i]);
-        }
+        await loadScript('emulator.js');
+        await loadScript('nipplejs.js');
+        await loadScript('shaders.js');
+        await loadScript('storage.js');
+        await loadScript('gamepad.js');
+        await loadScript('GameManager.js');
+        await loadScript('socket.io.min.js');
         await loadStyle('emulator.css');
     } else {
         await loadScript('emulator.min.js');
