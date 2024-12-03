@@ -40,6 +40,7 @@
       margin-bottom: 20px; /* Adds space below the embed */
       margin-top: 40px; /* Adds space below the embed */
       z-index: 2; 
+      margin: 0 auto;
     }
 
     .game-container embed {
@@ -48,6 +49,7 @@
       max-width: 800px; /* Prevent the embed from exceeding its original size */
       max-height: 600px; /* Prevent the embed from exceeding its original size */
       position: relative; /* Places the footer at the bottom of the page flow */
+      margin: 0 auto;
     }
 
     footer {
@@ -103,7 +105,7 @@
   background-color: white;
   width: 100%; /* Make the navbar take the full width */
   max-width: 931px; /* Match the width of the navbar */
-  height: 100vh; /* Full viewport height to extend down to the footer */
+  height: 110vh; /* Full viewport height to extend down to the footer */
   margin: 0 auto;
   position: relative;
   z-index: 1;
@@ -165,7 +167,7 @@
 }
 
 .navbar-links li:hover a {
-  color: #8B0000; /* Change the text color to red on hover */
+  color: #d3d3d3; /* Change the text color to red on hover */
 }
 
 .navbar-links a:focus {
@@ -182,7 +184,8 @@ body {
   position: absolute;
   top: 100%; /* Position it below the parent link */
   left: 0;
-  background-color: #706d6d80; /* Dark background for dropdown */
+  margin-top: 5px;
+  background-color: #ED1C24; /* Dark background for dropdown */
   min-width: 160px;
   border-radius: 5px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
@@ -209,6 +212,57 @@ body {
 .dropdown-menu a:hover {
   background-color: #ed1c24; /* Hover effect for dropdown items */
 }
+
+.texty {
+  font-family: Arial, Helvetica, sans-serif;
+  max-width: 60%; /* Limits the width of the text */
+  width: 594px;
+  margin: 20px auto; /* Center the text horizontally and add spacing above/below */
+  margin-left: 30px;
+  display: block; /* Ensures the text section behaves like a block */
+  text-align: justify; /* Makes the text align evenly on both sides */
+  line-height: 1.1; /* Improves readability with better line spacing */
+}
+
+
+#cusdis_thread {
+  margin: 20px auto; /* Centers the comment section horizontally and adds spacing */
+  max-width: 800px; /* Optional: Set a max width for better layout */
+  padding: 10px; /* Optional: Add padding around the comments section */
+}
+
+.custom-button {
+  position: absolute;
+  top: 30px; /* Adjusts vertical position relative to the top of the white section */
+  right: 50px; /* Keeps the button near the right edge */
+  padding: 10px 20px; /* Adds padding to make it a small rectangle */
+  font-size: 14px; /* Adjust font size for a clean look */
+  background: linear-gradient(to bottom, #f16d00 60%, #e24300 100% ); /* Gradient fade */
+  color: white; /* Button text color */
+  border: none; /* Removes default border */
+  border-radius: 15px; /* Slightly rounded corners */
+  cursor: pointer; /* Changes the cursor to a pointer on hover */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Adds subtle shadow */
+  z-index: 2; /* Ensures it is above other elements */
+}
+
+.custom-button:hover {
+  background-color: #d91b21; /* Slightly darker red on hover */
+  transform: translateY(-2px); /* Move slightly up */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Add deeper shadow */
+}
+
+.button:active {
+  transform: translateY(1px); /* Press down effect */
+}
+
+.custom-button .small-text {
+  font-size: 12px;         /* Smaller text */
+  font-weight: normal;     /* Normal weight for small text */
+  opacity: 0.8;            /* Slightly reduce opacity for smaller text */
+  margin-top: 5px;         /* Adds space between the main text and small text */
+}
+
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
@@ -223,33 +277,50 @@ body {
   <ul class="navbar-links">
     <li><a href="https://warrobotdoge.com/bookworm">Home</a></li>
     <li class="dropdown">
-      <a href="#link2">Games</a>
+      <a href="#Games">Games</a>
       <!-- Dropdown menu -->
       <ul class="dropdown-menu">
-        <li><a href="https://warrobotdoge.com/bookworm/game1">Game 1</a></li>
-        <li><a href="https://warrobotdoge.com/bookworm/game2">Game 2</a></li>
-        <li><a href="https://warrobotdoge.com/bookworm/game3">Game 3</a></li>
-        <li><a href="https://warrobotdoge.com/bookworm/game4">Game 4</a></li>
-        <li><a href="https://warrobotdoge.com/bookworm/game1">Game 1</a></li>
-        <li><a href="https://warrobotdoge.com/bookworm/game1">Game 1</a></li>
-        <li><a href="https://warrobotdoge.com/bookworm/game1">Game 1</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/bookworm">BookWorm Deluxe</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/bookworm-adventures">BookWorm Adventures</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/bookworm-adventures-2">BookWorm Adventures 2</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/bookworm-gameboy">BookWorm GameBoy</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/bookworm-pocketpc">BookWorm Pocket PC</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/bookworm-ds">BookWorm DS</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/bookworm-mobile">BookWorm Mobile</a></li>
+        <li><a href="https://warrobotdoge.com/bookworm/bookworm-hd">BookWorm HD</a></li>
       </ul>
     </li>
-    <li><a href="#link2">Archives</a></li>
+    <li><a href="https://warrobotdoge.com/archives">Archives</a></li>
   </ul>
 </div>
 
 
   <div class="white-section">
+  <div class="texty">
+    <p>Have an appetite for words? Then join Lex the Bookworm in the hit word-puzzle game created by PopCap, makers of the best casual games this side of Jupiter! Link letter tiles left, right, up and down to build words to keep Lex sated and smiling. The bigger the word, the better the bonus. But watch out for burning letters — they could spell disaster for you and Lex!</p>
+    <p>If you need a quick word break, link letters fast in Action mode. If laid-back wordplay is more your style, go with Classic. No matter which mode you like best, you’ll relax and tune up your brain every time you play!</p>
+  </div>
+
+  <div class="button-container">
+    <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_Deluxe_1.13.zip" target="_blank" class="button-link">
+    <button class="custom-button">
+      Download for Windows<br>
+      <span class="small-text">BookWorm Deluxe 1.13 - 4.41MB</span>
+    </button>
+  </div>
+
   <div class="content">
     <div class="game-container">
       <embed src="/bookworm/BookWorm_Original.swf" width="800" height="600" type="application/x-shockwave-flash">
     </div>
   </div>
-  
+ 
+
+
 </div>
 
   <footer></footer>
   <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+
 </body>
 </html>
