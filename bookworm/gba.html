@@ -242,22 +242,21 @@ body {
 
   <div class="white-section">
   <div class="content">
-    <div style='width:640px;height:480px;max-width:100%'>
-        <div id='game'></div>
+    <div style="width:640px;height:480px;max-width:100%;margin:auto">
+        <div id="game"></div>
     </div>
-    
-    <script type='text/javascript'>
-        EJS_player = '#game';
-        // Can also be fceumm or nestopia
-        EJS_core = 'gba';
-        // Lightgun
-        EJS_lightgun = false; // can be true or false
-        // URL to BIOS file
-        EJS_biosUrl = ''; // https://dl.dropboxusercontent.com/s/[random-code]/bios.bin
-        // URL to Game rom
-        EJS_gameUrl = 'https://warrobotdoge.com/bookworm/Bookworm.gba'; // https://dl.dropboxusercontent.com/s/[random-code]/mario.nes
-        // Path to the data directory
-        EJS_pathtodata = 'data/';
+    <script>
+        EJS_player = "#game";
+        EJS_core = "gba";
+        EJS_gameName = "Bookworm";
+        EJS_color = "#1ae40c";
+        EJS_backgroundImage = '/bookworm/images/logo/BookWorm_Logo.png'
+        EJS_volume = 1
+        EJS_startOnLoaded = true;
+        EJS_pathtodata = "/bookworm";
+        EJS_volume = 1
+        EJS_gameUrl = "/bookworm/Bookworm.gba";
+        EJS_biosUrl = "/bookworm/GBAbios.bin";
     </script>
     <script src='/bookworm/loader.js'></script>
   </div>
