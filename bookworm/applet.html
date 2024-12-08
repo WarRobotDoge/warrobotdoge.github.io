@@ -8,10 +8,18 @@
 </head>
 <body>
     <h1>Wordfall Game</h1>
-    <applet code="wordfall.WordFallApplet.class" archive="hostedgame/wordfall.jar" width="411" height="330" >
-		<param name="requiredgifzip" value="bookworm/hostedgame/bookworm.zip">
+    <applet code="wordfall.WordFallApplet.class" name="gameApplet" id="gameApplet" archive="hostedgame/wordfall.jar" width="411" height="330" mayscript viewastext>
+		<param name="requiredgifzip" value="hostedgame/bookworm.zip">
 		<param name="randid" value="2073628808">
-		<param name="CABBASE" value="bookworm/hostedgame/wordfall.cab">
+		<param name="CABBASE" value="hostedgame/wordfall.cab">
+        <param name="showAds" value="1">
+		<param name="adUrl" value="http://www.popcap.com/installer_download.php?url=Bookworm_setup.exe&amp;tag=1&amp;src=upgrade">
+		<param name="bgColor" value="CCFFFF">
+		<param name="host1" value="61edfb0d4897255f8ddcfb9349910e2f">
+		<param name="host2" value="3822b03658d97aaa0ed728738e8ee8c6">
+		<param name="host3" value="53f6c0b85e6530ead3e913d2fcca7f58">
+		<param name="hosterr" value="http://www.warrobotdoge.com">
+		<param name="hosterrhash" value="b4302a1f3a59ed12e48040914069532c">
 	</applet>
     <script>
         cheerpjInit();
