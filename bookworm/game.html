@@ -20,7 +20,7 @@
         /* Add some dummy content for scrolling */
       
     
-    .content {
+         .content {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -55,7 +55,7 @@
         }
     
         footer {
-          background: url('https://warrobotdoge.com/bookworm/images/site/Footer2.png') no-repeat center bottom;
+          background: url('https://warrobotdoge.com/bookworm/images/site/BFooter.png') no-repeat center bottom;
           background-size: cover; /* Ensures the background covers the entire footer without stretching */
           height: 200px; /* Adjust to match your footer image height */
           
@@ -73,13 +73,13 @@
           padding: 15px 0; /* Space around the logo */
         }
     
-        .header img {
-          max-width: 100%; /* Makes image responsive */
+       .header img {
+         max-width: 100%; /* Makes image responsive */
           height: auto;
           max-height: 100px; /* Adjust the logo size */
-        }
+      }
     
-        .navbar {
+      .navbar {
       background-color: #ED1C24; /* Red background */
       width: 100%; /* Make the navbar take the full width */
       max-width: 931px; /* Set the width of the navbar */
@@ -231,44 +231,7 @@
       max-width: 800px; /* Optional: Set a max width for better layout */
       padding: 10px; /* Optional: Add padding around the comments section */
     }
-    
-    .custom-button {
-      position: flex;
-      top: 30px; /* Adjusts vertical position relative to the top of the white section */
-      right: 50px; /* Keeps the button near the right edge */
-      padding: 10px 20px; /* Adds padding to make it a small rectangle */
-      font-size: 14px; /* Adjust font size for a clean look */
-      background: linear-gradient(to bottom, #f16d00 60%, #e24300 100% ); /* Gradient fade */
-      color: white; /* Button text color */
-      border: none; /* Removes default border */
-      border-radius: 15px; /* Slightly rounded corners */
-      cursor: pointer; /* Changes the cursor to a pointer on hover */
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Adds subtle shadow */
-      z-index: 2; /* Ensures it is above other elements */
-    }
-    
-    .custom-button:hover {
-      background-color: #d91b21; /* Slightly darker red on hover */
-      transform: translateY(-2px); /* Move slightly up */
-      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Add deeper shadow */
-    }
-    
-    .button:active {
-      transform: translateY(1px); /* Press down effect */
-    }
-    
-    .custom-button .small-text {
-      font-size: 12px;         /* Smaller text */
-      font-weight: normal;     /* Normal weight for small text */
-      opacity: 0.8;            /* Slightly reduce opacity for smaller text */
-      margin-top: 5px;         /* Adds space between the main text and small text */
-    }
-    
-    .button-container {
-      display: flex; /* Centers the button inside its container */
-      justify-content: center;
-      margin-bottom: 20px; /* Adds spacing below each button */
-    }
+   
     
     .content-wrapper {
       display: flex; /* Enables flexbox for the text and buttons */
@@ -277,16 +240,90 @@
       gap: 20px; /* Optional: Adds spacing between text and buttons */
     }
     
-    .button-container-wrapper {
-      display: flex;
-      flex-direction: column; /* Stack buttons vertically */
-      margin-top: 30px;
-      margin-right: 50px;
-      gap: 10px; /* Adds spacing between buttons */
-      row-gap: 0px;
-      align-items: flex-start; /* Align buttons to the left */
-      max-width: 35%; /* Limits the width of the buttons */
+  
+    #versionOptions a:hover {
+        background-color: #d91b21;
     }
+
+    #versionOptions a {
+        display: block;
+        padding: 10px 20px;
+        background-color: #ED1C24;
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        border: 1px solid white;
+        margin-top: -1px; /* Prevents borders from stacking */
+    }
+
+    .dropdown2 {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown2-button {
+            padding: 10px 20px;
+            font-size: 14px;
+            background: linear-gradient(to bottom, #f16d00 60%, #e24300 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-right: 60px;
+            margin-top: 20px;
+        }
+
+        .dropdown2-button:hover {
+            background-color: #d91b21;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .dropdown2-arrow {
+            border: solid white;
+            border-width: 0 4px 4px 0;
+            display: inline-block;
+            padding: 5px;
+            transform: rotate(45deg);
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown2-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #ED1C24;
+            min-width: 200px;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            padding: 10px 0;
+        }
+
+        .dropdown2-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: block;
+        }
+
+        .dropdown2-menu a:hover {
+            background-color: #d91b21;
+        }
+
+        .dropdown2.open .dropdown2-menu {
+            display: block;
+        }
+
+        .dropdown2.open .dropdown2-arrow {
+            transform: rotate(-135deg);
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
@@ -302,7 +339,7 @@
         <ul class="navbar-links">
             <li><a href="https://warrobotdoge.com/bookworm">Home</a></li>
             <li class="dropdown">
-                <a href="#Games">Games</a>
+                <a href="https://warrobotdoge.com/bookworm">Games</a>
                 <!-- Dropdown menu -->
                 <ul class="dropdown-menu">
                     <li><a href="https://warrobotdoge.com/bookworm/bookworm">BookWorm Deluxe</a></li>
@@ -328,38 +365,21 @@
                 <p>If you need a quick word break, link letters fast in Action mode. If laid-back wordplay is more your style, go with Classic. No matter which mode you like best, you’ll relax and tune up your brain every time you play!</p>
             </div>
 
-            <div class="button-container-wrapper">
-                <div class="button-container">
-                    <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13.zip" target="_blank" class="button-link"> <!--BookWorm Deluxe 1.13-->
-                        <button class="custom-button">
-                            Download for Windows
-                            <br>
-                            <span class="small-text">BookWorm Deluxe 1.13 - 4.4MB</span>
-                        </button>
-                    </a>
-                </div>
-
-                <div class="button-container">
-                    <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.02.zip" target="_blank" class="button-link"> <!--BookWorm Deluxe 1.02-->
-                        <button class="custom-button">
-                            Download for Windows
-                            <br>
-                            <span class="small-text">BookWorm Deluxe 1.02 - 7.2MB</span>  
-                        </button>
-                    </a>
-                </div>
-
-                <div class="button-container">
-                  <a href="https://download1478.mediafire.com/4jzutfasempgLH8ICp63IvZxp0_xnh8TpX0H57fqriTyoXiTeMhu1A2CaNeICSnkFnpTAvJJ9N4OnI3T-1Age0AjbEk23qhkoJwJEvpauJP7k9P-QukAq2H9rFYzrz7spdHGNM1NybEO6_L66FRKEr5xv_hLHVyu5va0elyYVGM/hl330g958wmbx6t/BookWorm_1.01.zip" target="_blank" class="button-link"> <!--BookWorm Deluxe 1.01-->
-                      <button class="custom-button">
-                          Download for Windows
-                          <br>
-                          <span class="small-text">BookWorm Deluxe 1.01 - 33MB</span>  
-                      </button>
-                  </a>
+            <div class="content-wrapper">
+              <div class="dropdown2">
+                  <button class="dropdown2-button">
+                      Download for Windows
+                      <span class="dropdown2-arrow"></span>
+                  </button>
+                  <div class="dropdown2-menu">
+                      <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13.zip" target="_blank">BookWorm Deluxe 1.13 (4.4MB)</a>
+                      <a href="https://warrobotdoge.com/bookworm/downloads/BookWorm_1.03.zip" target="_blank">BookWorm Deluxe 1.03 (7.9MB)</a>
+                      <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.02.zip" target="_blank">BookWorm Deluxe 1.02 (7.2MB)</a>
+                      <a href="https://download1478.mediafire.com/4jzutfasempgLH8ICp63IvZxp0_xnh8TpX0H57fqriTyoXiTeMhu1A2CaNeICSnkFnpTAvJJ9N4OnI3T-1Age0AjbEk23qhkoJwJEvpauJP7k9P-QukAq2H9rFYzrz7spdHGNM1NybEO6_L66FRKEr5xv_hLHVyu5va0elyYVGM/hl330g958wmbx6t/BookWorm_1.01.zip" target="_blank">BookWorm Deluxe 1.01 (33MB)</a>
+                      <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13_Spanish.zip" target="_blank">BookWorm Deluxe 1.13 en Español (12MB)</a>
+                  </div>
               </div>
-
-            </div>
+          </div>
         </div>
 
 
@@ -375,6 +395,22 @@
     </div>
 
     <footer></footer>
+    <script>
+      // Dropdown toggle functionality
+      const dropdown2 = document.querySelector('.dropdown2');
+      const dropdown2Button = document.querySelector('.dropdown2-button');
+
+      dropdown2Button.addEventListener('click', () => {
+          dropdown2.classList.toggle('open');
+      });
+
+      // Close the dropdown if clicked outside
+      document.addEventListener('click', (event) => {
+          if (!dropdown2.contains(event.target)) {
+              dropdown2.classList.remove('open');
+          }
+      });
+  </script>
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
 
 </body>
