@@ -218,51 +218,34 @@ body {
     <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="Bookworm Logo">
 </div>
 
-<div class="navbar">
-  <span class="navbar-text"></span>
-  <ul class="navbar-links">
-    <li><a href="https://warrobotdoge.com/bookworm">Home</a></li>
-    <li class="dropdown">
-      <a href="#link2">Games</a>
-      <!-- Dropdown menu -->
-      <ul class="dropdown-menu">
-        <li><a href="https://warrobotdoge.com/bookworm/game1">Game 1</a></li>
-        <li><a href="https://warrobotdoge.com/bookworm/game2">Game 2</a></li>
-        <li><a href="https://warrobotdoge.com/bookworm/game3">Game 3</a></li>
-        <li><a href="https://warrobotdoge.com/bookworm/game4">Game 4</a></li>
-        <li><a href="https://warrobotdoge.com/bookworm/game1">Game 1</a></li>
-        <li><a href="https://warrobotdoge.com/bookworm/game1">Game 1</a></li>
-        <li><a href="https://warrobotdoge.com/bookworm/game1">Game 1</a></li>
-      </ul>
-    </li>
-    <li><a href="#link2">Archives</a></li>
-  </ul>
+<div style="width:640px;height:480px;max-width:100%;margin:auto">
+  <div id="game"></div>
 </div>
+<script>
+  EJS_player = "#game";
+  EJS_core = "nds";
+  EJS_gameName = "Bookworm";
+  EJS_color = "#1ae40c";
+  EJS_backgroundImage = '/bookworm/images/logo/BookWorm_Logo.png'
+  EJS_volume = 1
+  EJS_startOnLoaded = true;
+  EJS_pathtodata = "/bookworm/";
+  EJS_volume = 1
+  EJS_gameUrl = "/bookworm/downloads/Bookworm_DS.nds";
+  EJS_biosUrl = "/bookworm/bios7.bin";
+</script>
+<script src='/bookworm/loader.js'></script>
 
 
-  <div class="white-section">
+
+ 
   <div class="content">
-    <div style="width:640px;height:480px;max-width:100%;margin:auto">
-        <div id="game"></div>
-    </div>
-    <script>
-        EJS_player = "#game";
-        EJS_core = "nds";
-        EJS_gameName = "Bookworm";
-        EJS_color = "#1ae40c";
-        EJS_backgroundImage = 'https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png'
-        EJS_volume = 1
-        EJS_startOnLoaded = true;
-        EJS_pathtodata = "https://warrobotdoge.com/bookworm/";
-        EJS_volume = 1
-        EJS_gameUrl = "https://warrobotdoge.com/bookworm/downloads/Bookworm_DS.nds";
-        EJS_biosUrl = "https://warrobotdoge.com/bookworm/bios7.bin";
-    </script>
-    <script src='https://warrobotdoge.com/bookworm/loader.js'></script>
+    
+
   </div>
   
-</div>
 
-  <footer></footer>
+
+ 
 </body>
 </html>
