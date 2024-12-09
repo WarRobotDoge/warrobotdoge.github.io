@@ -30,7 +30,6 @@
       }
 
       .game-container {
-        width: 100%;  /* Full width of the content container */
         max-width: 800px;  /* Max width for the game */
         aspect-ratio: 4 / 3;  /* Maintain the aspect ratio of the game */
         display: flex;
@@ -54,9 +53,9 @@
       footer {
         background: url('https://warrobotdoge.com/bookworm/images/site/BFooter.png') no-repeat center bottom;
         background-size: cover;   /* Ensures the background covers the entire footer without stretching */
-        height: 200px;  /* Adjust to match your footer image height */
+        height: 300px;  /* Adjust to match your footer image height */
         position: relative;   /* Places the footer at the bottom of the page flow */
-        margin-top: -200px;   /* Overlaps the background slightly */
+        margin-top: -300px;   /* Overlaps the background slightly */
         z-index: 1;   /* Ensures it's above the background */
         flex-shrink: 0;
       }
@@ -102,7 +101,7 @@
         background-color: white;
         width: 100%; /* Make the navbar take the full width */
         max-width: 931px; /* Match the width of the navbar */
-        height: 110vh;  /* Full viewport height to extend down to the footer */
+        height: 60vh;  /* Full viewport height to extend down to the footer */
         margin: 0 auto;
         position: relative;
         z-index: 1;
@@ -235,7 +234,6 @@
       }
 
       .content-wrapper {
-        display: flex;   /* Enables flexbox for the text and buttons */
         align-items: flex-start;   /* Align items to the top of the container */
         justify-content: space-between;    /* Space between text and buttons */
         gap: 20px;   /* Optional: Adds spacing between text and buttons */
@@ -388,6 +386,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   </head>
   <body>
+
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v21.0"></script>
+
+
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
         <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="Bookworm Logo">
@@ -432,13 +435,11 @@
         </li>
       </ul>
     </div>
+
     <div class="white-section">
-      <div class="content-wrapper">
-        <div class="texty">
-          <p>Have an appetite for words? Then join Lex the Bookworm in the hit word-puzzle game created by PopCap, makers of the best casual games this side of Jupiter! Link letter tiles left, right, up and down to build words to keep Lex sated and smiling. The bigger the word, the better the bonus. But watch out for burning letters — they could spell disaster for you and Lex!</p>
-          <p>If you need a quick word break, link letters fast in Action mode. If laid-back wordplay is more your style, go with Classic. No matter which mode you like best, you’ll relax and tune up your brain every time you play!</p>
-        </div>
-        <div class="content-wrapper">
+   
+        
+        <!-- <div class="content-wrapper">
           <div class="dropdown2">
             <button class="dropdown2-button"> Download for Windows <span class="dropdown2-arrow"></span>
             </button>
@@ -452,79 +453,26 @@
           </div>
         </div>
       </div>
+    -->
 
-      <!-- Screenshot container -->
-      <div class="parent">
-        <div class="section">
-          <h2>Screenshots</h2>
-          <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BookWorm_1.jpg" alt="Screenshot 1" class="active">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BookWorm_2.jpg" alt="Screenshot 2">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BookWorm_4.jpg" alt="Screenshot 3">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BookWorm_3.jpg" alt="Screenshot 4">
-          </div>
+    <div class="filler"></div>
+      <div class="filler"></div>
+      <div class="filler"></div>
+      <div class="content">
+        <div class="game-container">
+          <embed src="/bookworm/BookWorm_Original.swf" type="application/x-shockwave-flash"> <!--width="800" height="600"  BookWorm_Original.swf -->
         </div>
-
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-<p>I love Bookworm. I own the game on Steam and EA. I own 3 original BookWorm boxes, multiple disks (some sealed!), and I have hundreds of hours on the game. BookWorm was released on February 25, 2003, being a predecesor to the MSN game, <a href="https://warrobotdoge.com/bookworm/bespelled">Bespelled</a>. It was <a href="https://web.archive.org/web/20240911022953/https://www.guinnessworldrecords.com/world-records/most-downloaded-word-puzzle-game">awarded</a> the world's most downloaded word puzzle game in June, 2010, with 100 million downloads. This version of BookWorm was originally a <a href="https://warrobotdoge.com/bookworm/applet">Java</a> game on the PopCap website, but was later changed to a flash version after HTML5 was in debut. There are multiple Flash remakes. There's a Java clone (one with and without a timer), and theres a Flash remake of the final update of BookWorm. You can play both versions below. Learn more at the <a href="https://warrobotdoge/bookworm/archives">Archives</a> page.</p>
-</div>
-</div>
-  
-
-
-
       </div>
     
 
+      <div class="fb-comments" data-href="https://warrobotdoge.com/bookworm/game" data-width="" data-numposts="5"></div>
 
 
-<!--Bookworm Deluxe 1.0
-Name: Mark Williams
-A2ENT-447KC-RQJZ6-JMD7C
-=
-Name: Sandra Jones
-4CR4M-EDQ7L-NCW47-2JJK4
-=
-Name: Allan Thompson
-A2LLX-DT443-GDKYP-X4C3U
-=
-Name: Mark Drussel
-3MWZE-KVGN3-HFUNE-FJRW2
-=
-Name: Felix
-9LD3Q-UM3C4-NTDVV-VPM7D
-=
-Name: inYoLUMbaLUMba
-3NYX7-C9EL9-3R4JP-YR2C4
--->
-
-<applet></applet>
-
-      <div class="filler"></div>
-      <div class="section">
-        <h2>BookWorm Flash</h2>
-      </div>
-      <div class="content">
-        <div class="game-container">
-          <embed src="/bookworm/Bookworm_Flash_Adv.swf" type="application/x-shockwave-flash"> <!--width="800" height="600"  BookWorm_Original.swf -->
-        </div>
-      </div>
-      
-    </div>
-
-    <script src="https://utteranc.es/client.js"
-        repo="https://github.com/settings/installations/58143240"
-        issue-term="game"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
-</script>
-
-
-
+   
 <div class="filler"></div>
+<div class="filler"></div>
+
+
     </div>
     <footer></footer>
     <script>
