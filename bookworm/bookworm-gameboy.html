@@ -540,6 +540,16 @@
       // Change images every 3 seconds
       setInterval(showNextImage, 3000);
     </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const embed = document.querySelector('embed');
+        if (embed) {
+            embed.setAttribute("autoplay", "true"); // Enable autoplay
+            embed.play(); // Play the Flash content
+        }
+    });
+</script>
+
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
   </body>
 </html>
