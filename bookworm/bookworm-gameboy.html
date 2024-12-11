@@ -495,7 +495,7 @@
                 EJS_gameUrl = "/bookworm/Bookworm.gba";
                 EJS_biosUrl = "/bookworm/GBAbios.bin";
               </script>
-              <script src='https://cdn.emulatorjs.org/stable/data/loader.js'></script>
+              <script src='/bookworm/loader.js'></script>
         </div>
         <center>
             <p><b>Controls:</b><br>Start: Enter Key<br>Move Around: Arrow Keys<br>A: Z<br>B: X</p>
@@ -508,7 +508,6 @@
 <br>
 <br>
 <br>
-
     </div>
     <footer></footer>
     <script>
@@ -540,16 +539,6 @@
       // Change images every 3 seconds
       setInterval(showNextImage, 3000);
     </script>
-    <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const embed = document.querySelector('embed');
-        if (embed) {
-            embed.setAttribute("autoplay", "true"); // Enable autoplay
-            embed.play(); // Play the Flash content
-        }
-    });
-</script>
-
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
   </body>
 </html>
