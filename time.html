@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -153,7 +154,7 @@
             <div id="timer14"></div>
         </div>
         <div class="countdown" id="countdown14">
-            <h2>January 1, 2024</h2>
+            <h2>January 1, 2025</h2>
             <p>New Year Stats</p>
             <div id="timer15"></div>
         </div>
@@ -208,9 +209,9 @@
             });
 
             // Calculate and display days passed since New Year
-            const newYearDate = new Date('January 1, 2024').getTime();
+            const newYearDate = new Date('January 1, 2025').getTime();
             const daysSinceNewYear = Math.floor((now - newYearDate) / (1000 * 60 * 60 * 24));
-            const millisecondsInYear = (new Date('January 1, 2025').getTime() - newYearDate); // Account for leap years
+            const millisecondsInYear = (new Date('January 1, 2026').getTime() - newYearDate); // Account for leap years
             const percentageOfYearPassed = ((now - newYearDate) / millisecondsInYear) * 100;
 
             const newYearCountdownElement = document.getElementById('timer15');
