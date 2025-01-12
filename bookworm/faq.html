@@ -1,0 +1,490 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookworm Deluxe</title>
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/BookWorm.jpg" type="image/jpg">
+    <meta name="description" content="Play and Download BookWorm Deluxe! Play BookWorm Deluxe in Spanish, French, German, Italian, and Dutch!" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/BookWorm_Cover.jpg" />
+    <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm" />
+    <meta name="keywords" content="BookWorm,Download,Play" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: url('https://warrobotdoge.com/bookworm/images/site/bkgd.jpg') no-repeat top center;
+        background-size: cover; /* Ensures the background stretches to fill the screen */
+        background-attachment: scroll; /* Makes the background scroll with the page */
+        min-height: 100vh; /* Ensures body fills the screen height */
+        font-family: 'Arial', sans-serif;  /* Apply Arial font to the body */
+        flex-direction: column;
+      }
+
+      /* Add some dummy content for scrolling */
+      .content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        padding: 20px;  /* Adds padding for better spacing */
+        z-index: 1;
+        position: relative;  /* Ensures the content can be positioned on top of the white section */
+        margin-top: -20px;  /* Pulls content upward to connect with the white section */
+        flex-grow: 1;  /* Makes the content section grow to take up available space */
+      }
+
+      .game----container {
+        max-width: 800px;  /* Max width for the game */
+        aspect-ratio: 4 / 3;  /* Maintain the aspect ratio of the game */
+        display: flex;
+        justify-content: center;
+        position: relative; /* Places the footer at the bottom of the page flow */  /*alignf-items: center; */
+        margin-bottom: 20px;  /* Adds space below the embed */
+        margin-top: 20px;  /* Adds space below the embed */
+        z-index: 2;
+        margin: 0 auto;
+      }
+
+
+      .game-container {
+      text-align: center;
+      width: 800px;
+      height: 600px;
+      background-color: black; /* Black box placeholder */
+      display: inline-block;
+    }
+
+      .game-contaliner embed { /*NOT IN UUSE*/
+        width: 100%;    /* Make the embed width flexible */
+        height: 100%;   /* Adjust height relative to width to maintain aspect ratio */
+        max-width: 800px;   /* Prevent the embed from exceeding its original size */
+        max-height: 600px;  /* Prevent the embed from exceeding its original size */
+        position: relative;   /* Places the footer at the bottom of the page flow */
+        margin: 0 auto;
+      }
+
+      .language-buttons button:hover {
+      background-color: #3f51b5;
+    }
+
+    .language-buttons button {
+      font-size: 16px;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      border: none;
+      background-color: #5c6bc0;
+      color: white;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+
+      footer {
+        background: url('https://warrobotdoge.com/bookworm/images/site/BFooter.png') no-repeat center bottom;
+        background-size: cover;   /* Ensures the background covers the entire footer without stretching */
+        height: 300px;  /* Adjust to match your footer image height */
+        position: relative;   /* Places the footer at the bottom of the page flow */
+        margin-top: -300px;   /* Overlaps the background slightly */
+        z-index: 1;   /* Ensures it's above the background */
+        flex-shrink: 0;
+      }
+
+      .header {
+        display: flex;
+        margin-top: 20px;
+        justify-content: center;
+        align-items: center;
+        padding: 15px 0;  /* Space around the logo */
+      }
+
+      .header img {
+        max-width: 100%; /* Makes image responsive */
+        height: auto;
+        max-height: 100px;  /* Adjust the logo size */
+      }
+
+      .navbar {
+        background-color: #ED1C24; /* Red background */
+        width: 100%; /* Make the navbar take the full width */
+        max-width: 931px; /* Set the width of the navbar */
+        height: 80px; /* Set the height of the navbar */
+        border-radius: 15px 15px 0 0; /* Rounded top corners, unrounded bottom */
+        margin: 0 auto; /* Centers the navbar */
+        display: flex;
+        justify-content: center;
+        position: relative; /* Places the footer at the bottom of the page flow */
+        align-items: center;
+        z-index: 2;
+        box-shadow: inset 0 10px 10px -8px white; /* Inner white shadow */
+        background: linear-gradient(to bottom, #ED1C24 90%, white 100%); /* Gradient fade */
+      }
+
+      .navbar-text {
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      .white-section {
+        background-color: white;
+        width: 100%; /* Make the navbar take the full width */
+        max-width: 931px; /* Match the width of the navbar */
+        height: 150vh;  /* Full viewport height to extend down to the footer */
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+        top: -20px;   /* Moves the white section upward */
+        padding-top: 20px;   /* Adds spacing above the content for a clean layout */
+        flex-grow: 1;
+        padding-bottom: 200px;  /* Add space between content and footer */
+      }
+
+      .navbar-links {
+        list-style-type: none;
+        justify-content: space-around;
+        display: flex;
+        list-style: none;  /* Removes default list bullets */
+        margin: 0;
+        padding: 0;
+      }
+
+      .navbar-links li {
+        margin: 0 20px; /* Increased space between each link */
+        position: relative;  /* For positioning the fancy hover effects */
+      }
+
+      .navbar-links a {
+        color: white; /* Link color */
+        text-decoration: none;  /* Remove underline from links */
+        font-size: 18px; /* Adjust font size */
+        font-weight: bold;  /* Make the text bold */
+        text-transform: uppercase; /* Transform the text to uppercase */
+        letter-spacing: 1px; /* Adds spacing between letters */
+        transition: all 0.3s ease;  /* Smooth transition for hover effects */
+        position: relative;
+        z-index: 1;
+      }
+
+      .navbar-links a::after {
+        content: "";
+        position: absolute;
+        width: 0%;
+        height: 3px;
+        background-color: #ffffff; /* Underline color */
+        bottom: -5px; /* Position the underline slightly below the text */
+        left: 50%;
+        transition: all 0.3s ease;  /* Smooth transition for the underline effect */
+        z-index: -1;  /* Place the underline behind the text */
+        transform: translateX(-50%);
+      }
+
+      .navbar-links a:hover {
+        color: #fff;  /* Keep the color white */
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);  /* Glowing effect on hover */
+      }
+
+      .navbar-links a:hover::after {
+        width: 100%; /* Expand the underline on hover */
+      }
+
+      .navbar-links a:active {
+        transform: scale(0.98);  /* Slight shrink effect when clicking */
+      }
+
+      .navbar-links li:hover a {
+        color: #d3d3d3;  /* Change the text color to red on hover */
+      }
+
+      .navbar-links a:focus {
+        outline: none;  /* Removes the outline on focus */
+      }
+
+      /* Dropdown menu container */
+      .dropdown-menu {
+        display: none; /* Hide the dropdown menu by default */
+        position: absolute;
+        top: 100%;  /* Position it below the parent link */
+        left: 0;
+        margin-top: 5px;
+        background-color: #ED1C24;  /* Dark background for dropdown */
+        min-width: 160px;
+        border-radius: 5px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+      }
+
+      /* Show dropdown when hovering over the parent link */
+      .dropdown:hover .dropdown-menu {
+        display: block;
+      }
+
+      /* Style for the dropdown items */
+      .dropdown-menu li {
+        padding: 10px;
+      }
+
+      .dropdown-menu a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        padding: 5px 10px;
+      }
+
+      .dropdown-menu a:hover {
+        background-color: #ed1c24; /* Hover effect for dropdown items */
+      }
+
+      .texty {
+        font-family: Arial, Helvetica, sans-serif;
+        flex: 1;
+        max-width: 100%;  /* Limits the width of the text */
+        width: 594px;
+        margin: 20px auto; /* Center the text horizontally and add spacing above/below */
+        margin-left: 30px;
+        display: block; /* Ensures the text section behaves like a block */
+        text-align: justify;  /* Makes the text align evenly on both sides */
+        line-height: 1.1; /* Improves readability with better line spacing */
+      }
+
+      .text {
+        font-family: Arial, Helvetica, sans-serif;
+        flex: 1;
+        margin-left: 35px;
+        display: block; /* Ensures the text section behaves like a block */
+        text-align: justify;  /* Makes the text align evenly on both sides */
+        line-height: 1.1; /* Improves readability with better line spacing */
+      }
+
+      #cusdis_thread {
+        margin: 20px auto;  /* Centers the comment section horizontally and adds spacing */
+        max-width: 800px;  /* Optional: Set a max width for better layout */
+        padding: 10px;  /* Optional: Add padding around the comments section */
+      }
+
+      .content-wrapper {
+        display: flex;   /* Enables flexbox for the text and buttons */
+        align-items: flex-start;   /* Align items to the top of the container */
+        justify-content: space-between;    /* Space between text and buttons */
+        gap: 20px;   /* Optional: Adds spacing between text and buttons */
+      }
+
+      .filler {
+        margin-top: 25px;
+        margin-bottom: 25px;
+      }
+
+      #versionOptions a:hover {
+        background-color: #d91b21;
+      }
+
+      #versionOptions a {
+        display: block;
+        padding: 10px 20px;
+        background-color: #ED1C24;
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        border: 1px solid white;
+        margin-top: -1px;  /* Prevents borders from stacking */
+      }
+
+      .dropdown2 {
+        position: relative;
+        display: inline-block;
+      }
+
+      .dropdown2-button {
+        padding: 10px 20px;
+        font-size: 14px;
+        background: linear-gradient(to bottom, #f16d00 60%, #e24300 100%);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-right: 60px;
+        margin-top: 20px;
+      }
+
+      .dropdown2-button:hover {
+        background-color: #d91b21;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .dropdown2-arrow {
+        border: solid white;
+        border-width: 0 4px 4px 0;
+        display: inline-block;
+        padding: 5px;
+        transform: rotate(45deg);
+        transition: transform 0.3s ease;
+      }
+
+      .dropdown2-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: #ED1C24;
+        min-width: 200px;
+        border-radius: 8px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+        padding: 10px 0;
+      }
+
+      .dropdown2-menu a {
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        display: block;
+      }
+
+      .dropdown2-menu a:hover {
+        background-color: #d91b21;
+      }
+
+      .dropdown2.open .dropdown2-menu {
+        display: block;
+      }
+
+      .dropdown2.open .dropdown2-arrow {
+        transform: rotate(-135deg);
+      }
+
+    
+
+
+      /* Show the active image */
+      .screenshot-container img.active {
+        opacity: 1;
+      }
+
+      h2 {
+        color: #ea5e00;
+        border-bottom: 2px solid #D8D8D8;
+        font-size: 1.125em;
+        font-weight: bold;
+        padding-bottom: 5px;
+        margin-bottom: 0;
+        margin-left: 35px;
+        margin-bottom: 10px;
+      }
+
+      .parent {
+  display: flex;  /* Use flexbox for horizontal layout */
+  flex-wrap: nowrap;  /* Prevent items from wrapping to a new line */
+}
+
+      .section {
+        box-sizing: border-box;
+      }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    <div class="header">
+      <a href="https://warrobotdoge.com/bookworm">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="Bookworm Logo">
+    </div>
+    <div class="navbar">
+      <span class="navbar-text"></span>
+      <ul class="navbar-links">
+        <li>
+          <a href="https://warrobotdoge.com/bookworm">Home</a>
+        </li>
+        <li class="dropdown">
+          <a href="https://warrobotdoge.com/bookworm">Games</a> <!-- Dropdown menu -->
+          <ul class="dropdown-menu">
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm">BookWorm Deluxe</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-adventures">BookWorm Adventures</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-adventures-2">BookWorm Adventures 2</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-gameboy">BookWorm GameBoy</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-pocketpc">BookWorm Pocket PC</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-ds">BookWorm DS</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-mobile">BookWorm Mobile</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-xbox">BookWorm Xbox</a>
+            </li>
+            <li>
+            <a href="https://warrobotdoge.com/bookworm/bookworm-tag">BookWorm TAG</a>
+            </li>
+            <li>
+            <a href="https://warrobotdoge.com/bookworm/bookworm-hd">BookWorm HD</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="https://warrobotdoge.com/archives">Archives</a>
+        </li>
+      </ul>
+    </div>
+    <div class="white-section">
+      <div class="content-wrapper">
+      
+
+      <!-- Screenshot container -->
+      <div class="parent">
+        <div class="section">
+          <h2>FAQ / Frequently Asked Questions</h2>
+          <div class="texty">
+            <strong><p>What is the BookWorm Games Archive?</p></strong>
+            <p>The BookWorm Games Archive is an archival project created by WarRobotDoge. The website's purpose is to save all downloads, screenshots, and information on all versions of one of PopCap's most popular games, BookWorm.</p>
+
+            <strong><p>What games does the BookWorm Games Archive offer?</p></strong>
+            <p>The BookWorm Games Archive provides BookWorm Deluxe (and its flash counterparts in 6 languages), BookWorm Adventures (in 4 languages), BookWorm Adventures 2, BookWorm GameBoy and BookWorm DS (which you can play on this site!), BookWorm Pocket PC/Palm OS (with an emulator!), BookWorm Mobile, BookWorm Xbox (with a download!), BookWorm and BookWorm Heroes for iOS, and knowledge about BookWorm HD, BookWorm for TAG TV, and BookWorm BlackBerry!</p>
+
+            <strong><p>What happened to BookWorm and why was it removed?</p></strong>
+            <p>No one really knows why EA removed BookWorm from their stores in 2016, but we do think it's because the game wasn't making money, and the game was simply getting old. BookWorm Adventures was released in 2006, so by 2016, it was already 10 yeard old. I know it couldn't have been because of licensing, because their trademarks stil lasted for another decade.  </p>
+
+            <strong><p>How do I download games from the BookWorm Games Archive?</p></strong>
+            <p>If I have a download for it, simply navigate to the game you wish to download, and you'll find a download link or instructions for obtaining the game. Some games may require an emulator or specific setup instructions.</p>
+
+            <strong><p>Are the games from the BookWorm Games Archive free?</p></strong>
+            <p>Yes, all the BookWorm Games I provide are free for you to download and play. However, some versions may require additional tools or emulators to run, and the website may provide these along with the games.</p>
+
+            <strong><p>Do I need a special device to play the games?</p></strong>
+            <p>Some games (such as BookWorm GameBoy, BookWorm DS, or BookWorm Pocket PC/Palm OS) may require specific hardware or emulators. The archive will provide instructions and necessary tools for playing these games on modern devices. However, you can play the flash version of BookWorm, and the emulated versions of BookWorm GameBoy and BookWorm DS right in your browser!</p>
+
+            <strong><p>Will new versions of BookWorm be added to the archive?</p></strong>
+            <p>The archive is dedicated to preserving existing versions of BookWorm. While new versions might not be added, the site may continue to share news, updates, or other downloads. If I find a new download for a BookWorm version, I'll update the download link and the site page.</p>
+
+            <strong><p>How can I contribute to the BookWorm Games Archive?</p></strong>
+            <p>If you have any missing versions, screenshots, or other assets related to the BookWorm series, you can give it to me and I'll upload it!</p>
+
+            <strong><p>Is the BookWorm Games Archive affiliated with PopCap or EA?</p></strong>
+            <p>No, the BookWorm Games Archive is an independent fan-made project. It is not officially affiliated with PopCap or EA but aims to preserve and celebrate the legacy of BookWorm games.</p>
+
+            <p>Burrrp, welcome to BookWorm. Lex loves burping.</p>
+         </div>
+        </div>
+      </div>
+    </div>
+ </div>
+    <footer></footer>
+  </body>
+</html>
