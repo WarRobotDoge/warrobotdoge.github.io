@@ -35,52 +35,6 @@
         flex-grow: 1;  /* Makes the content section grow to take up available space */
       }
 
-      .game----container {
-        max-width: 800px;  /* Max width for the game */
-        aspect-ratio: 4 / 3;  /* Maintain the aspect ratio of the game */
-        display: flex;
-        justify-content: center;
-        position: relative; /* Places the footer at the bottom of the page flow */  /*alignf-items: center; */
-        margin-bottom: 20px;  /* Adds space below the embed */
-        margin-top: 20px;  /* Adds space below the embed */
-        z-index: 2;
-        margin: 0 auto;
-      }
-
-
-      .game-container {
-      text-align: center;
-      width: 800px;
-      height: 600px;
-      background-color: black; /* Black box placeholder */
-      display: inline-block;
-    }
-
-      .game-contaliner embed { /*NOT IN UUSE*/
-        width: 100%;    /* Make the embed width flexible */
-        height: 100%;   /* Adjust height relative to width to maintain aspect ratio */
-        max-width: 800px;   /* Prevent the embed from exceeding its original size */
-        max-height: 600px;  /* Prevent the embed from exceeding its original size */
-        position: relative;   /* Places the footer at the bottom of the page flow */
-        margin: 0 auto;
-      }
-
-      .language-buttons button:hover {
-      background-color: #3f51b5;
-    }
-
-    .language-buttons button {
-      font-size: 16px;
-      padding: 10px 20px;
-      margin: 5px;
-      cursor: pointer;
-      border: none;
-      background-color: #5c6bc0;
-      color: white;
-      border-radius: 5px;
-      transition: background-color 0.3s;
-    }
-
 
       footer {
         background: url('https://warrobotdoge.com/bookworm/images/site/BFooter.png') no-repeat center bottom;
@@ -281,16 +235,6 @@
         background-color: #d91b21;
       }
 
-      #versionOptions a {
-        display: block;
-        padding: 10px 20px;
-        background-color: #ED1C24;
-        color: white;
-        text-decoration: none;
-        font-size: 14px;
-        border: 1px solid white;
-        margin-top: -1px;  /* Prevents borders from stacking */
-      }
 
       .dropdown2 {
         position: relative;
@@ -484,6 +428,9 @@
         </div>
       </div>
     </div>
+    <div class="commentbox"></div>
+<script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
+<script>commentBox('5680061592109056-proj')</script>
  </div>
     <footer></footer>
   </body>
