@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bookworm Deluxe</title>
     <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/BookWorm.jpg" type="image/jpg">
-    <meta name="description" content="Download and Play BookWorm Deluxe!" />
+    <meta name="description" content="Play and Download BookWorm Deluxe! Play BookWorm Deluxe in Spanish, Frnech, German, Italian, and Dutch!" />
     <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/BookWorm_Cover.jpg" />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm" />
     <meta name="keywords" content="BookWorm,Download,Play" />
@@ -34,7 +35,7 @@
         flex-grow: 1;  /* Makes the content section grow to take up available space */
       }
 
-      .game-container {
+      .game----container {
         max-width: 800px;  /* Max width for the game */
         aspect-ratio: 4 / 3;  /* Maintain the aspect ratio of the game */
         display: flex;
@@ -46,7 +47,16 @@
         margin: 0 auto;
       }
 
-      .game-container embed {
+
+      .game-container {
+      text-align: center;
+      width: 800px;
+      height: 600px;
+      background-color: black; /* Black box placeholder */
+      display: inline-block;
+    }
+
+      .game-contaliner embed { /*NOT IN UUSE*/
         width: 100%;    /* Make the embed width flexible */
         height: 100%;   /* Adjust height relative to width to maintain aspect ratio */
         max-width: 800px;   /* Prevent the embed from exceeding its original size */
@@ -54,6 +64,23 @@
         position: relative;   /* Places the footer at the bottom of the page flow */
         margin: 0 auto;
       }
+
+      .language-buttons button:hover {
+      background-color: #3f51b5;
+    }
+
+    .language-buttons button {
+      font-size: 16px;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      border: none;
+      background-color: #5c6bc0;
+      color: white;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
 
       footer {
         background: url('https://warrobotdoge.com/bookworm/images/site/BFooter.png') no-repeat center bottom;
@@ -106,7 +133,7 @@
         background-color: white;
         width: 100%; /* Make the navbar take the full width */
         max-width: 931px; /* Match the width of the navbar */
-        height: 120vh;  /* Full viewport height to extend down to the footer */
+        height: 150vh;  /* Full viewport height to extend down to the footer */
         margin: 0 auto;
         position: relative;
         z-index: 1;
@@ -449,14 +476,14 @@
         </div>
         <div class="content-wrapper">
           <div class="dropdown2">
-            <button class="dropdown2-button"> Download for Windows <span class="dropdown2-arrow"></span>
+            <button class="dropdown2-button">Download for Windows<span class="dropdown2-arrow"></span>
             </button>
             <div class="dropdown2-menu">
               <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13.zip" target="_blank">BookWorm Deluxe 1.13 (4.4MB)</a>
               <a href="https://warrobotdoge.com/bookworm/downloads/BookWorm_1.03.zip" target="_blank">BookWorm Deluxe 1.03 (7.9MB)</a>
               <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.02.zip" target="_blank">BookWorm Deluxe 1.02 (7.2MB)</a>
               <a href="https://download1478.mediafire.com/4jzutfasempgLH8ICp63IvZxp0_xnh8TpX0H57fqriTyoXiTeMhu1A2CaNeICSnkFnpTAvJJ9N4OnI3T-1Age0AjbEk23qhkoJwJEvpauJP7k9P-QukAq2H9rFYzrz7spdHGNM1NybEO6_L66FRKEr5xv_hLHVyu5va0elyYVGM/hl330g958wmbx6t/BookWorm_1.01.zip" target="_blank">BookWorm Deluxe 1.01 (33MB)</a>
-              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13_Spanish.zip" target="_blank">BookWorm Deluxe 1.13 en Español (12MB)</a>
+              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13_Spanish.zip" target="_blank">BookWorm Deluxe 1.13 Spanish (12MB)</a>
             </div>
           </div>
         </div>
@@ -483,40 +510,32 @@
 </div>
     
 
-
-
-<!--Bookworm Deluxe 1.0
-Name: Mark Williams
-A2ENT-447KC-RQJZ6-JMD7C
-=
-Name: Sandra Jones
-4CR4M-EDQ7L-NCW47-2JJK4
-=
-Name: Allan Thompson
-A2LLX-DT443-GDKYP-X4C3U
-=
-Name: Mark Drussel
-3MWZE-KVGN3-HFUNE-FJRW2
-=
-Name: Felix
-9LD3Q-UM3C4-NTDVV-VPM7D
-=
-Name: inYoLUMbaLUMba
-3NYX7-C9EL9-3R4JP-YR2C4
--->
-
       <div class="filler"></div>
       <div class="section">
         <h2>BookWorm Flash</h2>
       </div>
+      
+      
+       <center><div class="language-buttons">
+    <button onclick="changeGame('english')">English</button>
+    <button onclick="changeGame('original')">Original</button>
+    <button onclick="changeGame('french')">French</button>
+    <button onclick="changeGame('german')">German</button>
+    <button onclick="changeGame('spanish')">Spanish</button>
+    <button onclick="changeGame('italian')">Italian</button>
+    <button onclick="changeGame('dutch')">Dutch</button>
+  </div></center>
+  <br>
+  <br>
+
       <div class="content">
-        <div class="game-container">
-          <embed src="/bookworm/Bookworm_Flash_Adv.swf" type="application/x-shockwave-flash"> <!--width="800" height="600"  BookWorm_Original.swf -->
+  
+        <div class="game-container" id="game-container">
+          <!-- embed src="/bookworm/Bookworm_Flash_Adv.swf" type="application/x-shockwave-flash"> -->
         </div>
+        
       </div>
-      <center>
-        <p>Want to play the Java Flash version? Play <a href="https://warrobotdoge.com/bookworm/game">here</a>.</p>
-    </center>
+      
     </div>
 
 <br>
@@ -528,34 +547,84 @@ Name: inYoLUMbaLUMba
     </div>
     <footer></footer>
     <script>
-      // Dropdown toggle functionality
-      const dropdown2 = document.querySelector('.dropdown2');
-      const dropdown2Button = document.querySelector('.dropdown2-button');
-      dropdown2Button.addEventListener('click', () => {
-        dropdown2.classList.toggle('open');
-      });
-      // Close the dropdown if clicked outside
-      document.addEventListener('click', (event) => {
-        if (!dropdown2.contains(event.target)) {
-          dropdown2.classList.remove('open');
-        }
-      });
-    </script>
-    <script>
-      const images = document.querySelectorAll('.screenshot-container img');
-      let currentIndex = 0;
+        // Function to change the game based on selected language
+        function changeGame(language) {
+            var gamePath;
 
-      function showNextImage() {
-        // Remove the "active" class from the current image
-        images[currentIndex].classList.remove('active');
-        // Increment the index, looping back to 0 if at the last image
-        currentIndex = (currentIndex + 1) % images.length;
-        // Add the "active" class to the next image
-        images[currentIndex].classList.add('active');
+            // Define the game path based on selected language
+            switch(language) {
+        case 'english':
+          gamePath = 'https://warrobotdoge.com/bookworm/Bookworm_Flash_Adv.swf';
+          break;
+        case 'original':
+          gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_Original.swf';
+          break;
+        case 'french':
+          gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_French.swf';
+          break;
+        case 'german':
+          gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_German.swf';
+          break;
+        case 'spanish':
+          gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_Spanish.swf';
+          break;
+        case 'italian':
+          gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_Italian.swf';
+          break;
+        case 'dutch':
+          gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_Dutch.swf';
+          break;
+        default:
+          gamePath = 'https://warrobotdoge.com/bookworm/Bookworm_Flash_Adv.swf';
+          break;
       }
-      // Change images every 3 seconds
-      setInterval(showNextImage, 3000);
+
+            // Clear the game container before loading a new SWF
+            const gameContainer = document.getElementById('game-container');
+            gameContainer.innerHTML = '';  // Clear previous game
+
+            // Create a new embed element to load the SWF
+            const swfEmbed = document.createElement('embed');
+            swfEmbed.src = gamePath;
+            swfEmbed.width = "800";
+            swfEmbed.height = "600";
+            swfEmbed.type = "application/x-shockwave-flash";
+            gameContainer.appendChild(swfEmbed);
+        }
+
+        window.onload = function() {
+        changeGame('english');  // Change to the desired default language
+    };
     </script>
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    <script>
+        // Dropdown toggle functionality
+        const dropdown2 = document.querySelector('.dropdown2');
+        const dropdown2Button = document.querySelector('.dropdown2-button');
+        dropdown2Button.addEventListener('click', () => {
+          dropdown2.classList.toggle('open');
+        });
+        // Close the dropdown if clicked outside
+        document.addEventListener('click', (event) => {
+          if (!dropdown2.contains(event.target)) {
+            dropdown2.classList.remove('open');
+          }
+        });
+      </script>
+      <script>
+        const images = document.querySelectorAll('.screenshot-container img');
+        let currentIndex = 0;
+  
+        function showNextImage() {
+          // Remove the "active" class from the current image
+          images[currentIndex].classList.remove('active');
+          // Increment the index, looping back to 0 if at the last image
+          currentIndex = (currentIndex + 1) % images.length;
+          // Add the "active" class to the next image
+          images[currentIndex].classList.add('active');
+        }
+        // Change images every 3 seconds
+        setInterval(showNextImage, 3000);
+      </script>
   </body>
 </html>
