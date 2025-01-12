@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applet Example</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1-crypto-js.js"></script> <!-- Include CryptoJS for hashing -->
+</head>
+<body>
+  <h1>Applet Example</h1>
+  <div id="applet-container"></div>
+
+  <script>
+    // Function to generate a SHA256 hash of the domain
+    function generateDomainHash(domain) {
+      return CryptoJS.SHA256(domain).toString(CryptoJS.enc.Hex);
+    }
+
+    // Predefined hash for warrobotdoge.com (this should be generated beforehand)
+    const predefinedHash = "61edfb0d4897255f8ddcfb9349910e2f"; // Replace with the correct hash
+
+    // Get the current domain
+    const currentDomain = window.location.hostname;
+
+    // Generate the hash of the current domain
+    const domainHash = generateDomainHash(currentDomain);
+
+    // Check if the generated hash matches the predefined hash
+    if (domainHash === predefinedHash) {
+      // If the hashes match, load the applet
+      const appletContainer = document.getElementById("applet-container");
+      const applet = document.createElement("applet");
+      applet.code = "YourApplet.class"; // Replace with the applet code
+      applet.width = "500";
+      applet.height = "500";
+      appletContainer.appendChild(applet);
+    } else {
+      // If the hashes don't match, display a message or block the applet
+      alert("Applet can only be loaded from authorized domains.");
+    }
+  </script>
+</body>
+</html>
