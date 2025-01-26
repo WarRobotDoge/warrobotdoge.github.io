@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- flashvar fallback values -->
+  <var id="language"          >nl</var>
+  <var id="country"           >NL</var> 
+  <var id="showAds"           >true</var>
+  <var id="hasDownloadable"   >false</var>
+  <var id="downloadableURL"   >http://www.popcap.com</var>
+  <var id="cheatsEnabled"     >true</var>
+
+  <!-- general configuration values -->
+  <var id="api_realgames"     >true</var>
+  <var id="api_msn"           >false</var>
+  <var id="api_gamescafe"     >false</var>
+</root>
