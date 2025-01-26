@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<root size="8264384">
+  <file type="xml" path="localized/[lang]/text/text.xml"                        id="text.xml" />
+  <file type="xml" path="localized/[lang]/images/images.xml"                    id="images.xml" />
+	
+	<file type="mov" path="localized/[lang]/movies/letter_probs.swf"          		id="letter_probs.swf" />
+	<file type="mov" path="localized/[lang]/movies/dictionary.swf"          			id="dictionary.swf" />
+	<file type="mov" path="localized/[lang]/movies/dictionary_noext.swf"          id="dictionary_noext.swf" />
+	<file type="mov" path="localized/[lang]/movies/bonus_words.swf"          			id="bonus_words.swf" />
+	<file type="img" path="localized/[lang]/movies/help.swf"          						id="help" />
+	<file type="mov" path="localized/[lang]/movies/sounds.swf"          					id="sounds.swf" />
+</root>
