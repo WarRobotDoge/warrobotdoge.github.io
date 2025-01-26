@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<String id="strLoadString">FLASHED DOOR MEDIATONIC</String>
+	
+  <!-- levelcomplete -->
+  <String id="strBestWord">Beste Woord</String>
+  <String id="strLongWord">Langste Woord</String>
+  <String id="strDeluxeHeader">Download de\nvolledige versie</String>
+  <String id="strDeluxeMsg">Verbeterde graphics, geluid\nen effecten\nBeeldvullende gameplay\nMeer spannende levels\nSla je topscores op\nSpeel offline!</String>
+  
+	<!-- mainscreen -->
+	<String id="strPlayGame">
+		<![CDATA[<TEXTFORMAT LEADING='-14'><FONT SIZE='50'>Spel\n</FONT><FONT SIZE='26'>spelen</FONT></TEXTFORMAT>]]>
+	</String>
+	<String id="strLearnHowToPlay">
+		<![CDATA[<TEXTFORMAT LEADING='-10'><FONT SIZE='35'>Ontdek\n</FONT><FONT SIZE='22'>hoe je\n</FONT><FONT SIZE='28'>moet spelen</FONT></TEXTFORMAT>]]>
+	</String>
+	<String id="strDownloadFullGame">
+		<![CDATA[<TEXTFORMAT LEADING='-10'><FONT SIZE='35'>Download\n</FONT><FONT SIZE='20'>het\n</FONT><FONT SIZE='26'>volledige spel</FONT></TEXTFORMAT>]]>
+	</String>
+	
+	<!-- new game popup -->
+	<String id="strNewGame">Nieuw Spel?</String>
+	<String id="strLeaveGame">Spel stoppen?</String>
+	<String id="strDoYouWantToQuit">Wil je stoppen?</String>
+	<String id="strDoYouWantToRestart">Wil je opnieuw beginnen?</String>
+	<String id="strYes">JA</String>
+	<String id="strNo">NEE</String>
+	
+	<!-- hints -->
+	<String id="strHintsPopHeader1">Bonussteentje!</String>
+	<String id="strHintsPopMsg1">Gebruik dat groene steentje in een woord voor extra bonuspunten</String>
+	<String id="strHintsPopHeader2">Vuur Alarm!</String>
+	<String id="strHintsPopMsg2">Dat brandende steentje is te dichtbij! Gebruik hem snel, anders vliegt je bibliotheek in de fik!</String>
+	<String id="strHintsPopHeader3">Pas op!</String>
+	<String id="strHintsPopMsg3">Laat het brandende steentje niet de bodem bereiken, die steekt de bieb in de fik! HINT: maak langere woorden, dan krijg je minder rode steentjes.</String>
+	<String id="strHintsPopHeader4">Kan Niet Schudden!</String>
+	<String id="strHintsPopMsg4">Er zijn teveel vuursteentjes boven aan het bord!</String>
+	<String id="strHintsPopHeader5">Kan Niet Schudden!</String>
+	<String id="strHintsPopMsg5">Er staan teveel vuursteentjes op het bord!</String>
+	<String id="strHintsPopHeader6">PAUZE</String>
+	<String id="strHintsPopHeader7">Kan Niet Schudden!</String>
+	<String id="strHintsPopMsg7">Als je nu schudt, verlies je het spel</String>
+	<String id="strClickHereToContinue">Klik hier om door te gaan</String>
+	<String id="strClickHereToDisableHints">Klik hier om hints uit te schakelen</String>
+	<String id="strOK">OK</String>
+	
+	<String id="strNew">NIEUW</String>
+	<String id="strQuit">STOP</String>
+	<String id="strSubmit">VERSTUREN</String>
+	
+	<String id="strBPop">MAAK HET\nBONUSWOORD\nVOOR EXTRA\nPUNTEN!</String>
+	<String id="strClickscram">KLIK HIER\nom\nletters\nte schudden!</String>
+	<String id="strLevel">Level</String>
+	<String id="strLEVEL">LEVEL</String>
+	<String id="strComplete">Voltooid!</String>
+	<String id="strGame">Game</String>
+	<String id="strGame2">Game</String>
+	<String id="strOver">Over</String>
+	<String id="strComplete2">Voltooid</String>
+	<String id="strClickHere">Klik hier om</String>
+	<String id="strToContinue">door te gaan!</String>
+	<String id="strDownloadFullVersion"><![CDATA[<FONT SIZE='12'>Download de gratis probeerversie!\n</FONT><FONT SIZE='16' COLOR="#000000"><B>Klik hier</B></FONT>]]></String>
+	<String id="strHowToPlay">Speluitleg</String>
+	
+	<String id="strInstruction1">Klik op de letters om er een woord van te maken</String>
+	<String id="strInstruction2">Klik op de Versturen om woorden weg te halen</String>
+	<String id="strInstruction3">Pas op voor brandende steentjes! Als ze de bodem bereiken, is het game over!</String>
+	<String id="strInstruction4">Klik op de boekenwurm om alle letters door elkaar te gooien, maar tegen een prijs!</String>
+	
+	<String id="strBonusWord">Bonuswoord</String>
+	<String id="strRewardTiles">Bonussteen</String>
+	<String id="strScoring">Score</String>
+	<String id="strClickLeftButton">Klik op een knop links voor meer hulp</String>
+	<String id="strInstPage1">Bonuswoorden verschijnen aan het begin van het tweede level onder de boekenwurm. Als je een bonuswoord kunt maken, krijg je een flinke bonusscore! Daarna verschijnt er een nieuw, moeilijker bonuswoord. Als je achter elkaar bonuswoorden maakt, wordt je score hoger en hoger!</String>
+	<String id="strInstPage2">Groene steentjes verschijnen op willekeurige plekken en ze verhogen de woordscore. Verdien gouden steentjes door woorden te maken met minimaal 5 letters. Gouden steentjes zijn meer waard dan groene! Combineer 2 of meer bonusstenen in een woord voor een hogere woordscore. Je kunt ook diamanten en saffieren steentjes verdienen!</String>
+	<String id="strInstPage3">Je score hangt af van de lengte van het woord, de zeldzaamheid van de letters in het woord, bonusstenen in het woord en het level waarin je zit.</String>
+	<String id="strInstWord">PRET</String>
+	<String id="strInstPoints">340 punten</String>
+	
+	<String id="strScore">Punten</String>
+	<String id="strLetters">Letters</String>
+	
+	<String id="strBONUS">BONUS!</String>
+</root>
