@@ -554,55 +554,66 @@
     </div>
     <footer></footer>
     <script>
-        // Function to change the game based on selected language
-        function changeGame(language) {
-            var gamePath;
+      // Function to change the game based on selected language
+      function changeGame(language) {
+          var gamePath;
 
-            // Define the game path based on selected language
-            switch(language) {
-        case 'english':
-          gamePath = 'https://warrobotdoge.com/bookworm/Bookworm_Flash_Adv.swf';
-          break;
-        case 'original':
-          gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_Original.swf';
-          break;
-        case 'french':
-          gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_French.swf';
-          break;
-        case 'german':
-          gamePath = 'https://warrobotdoge.com/bookworm/de/BookWorm_German.swf'; //https://media.jaludo.com/bookworm/de/bookworm.swf
-          break;
-        case 'spanish':
-          gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_Spanish.swf';
-          break;
-        case 'italian':
-          gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_Italian.swf';
-          break;
-        case 'dutch':
-          gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_Dutch.swf'; //https://media.jaludo.com/bookworm/nl/bookworm.swf
-          break;
-        default:
-          gamePath = 'https://warrobotdoge.com/bookworm/Bookworm_Flash_Adv.swf';
-          break;
+          // Define the game path based on selected language
+          switch(language) {
+              case 'english':
+                  gamePath = 'https://warrobotdoge.com/bookworm/Bookworm_Flash_Adv.swf';
+                  break;
+              case 'original':
+                  gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_Original.swf';
+                  break;
+              case 'french':
+                  gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_French.swf';
+                  break;
+              case 'german':
+                  gamePath = 'https://warrobotdoge.com/bookworm/de/bookworm.html';  // Load HTML for German
+                  break;
+              case 'spanish':
+                  gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_Spanish.swf';
+                  break;
+              case 'italian':
+                  gamePath = 'https://warrobotdoge.com/bookworm/BookWorm_Italian.swf';
+                  break;
+              case 'dutch':
+                  gamePath = 'https://warrobotdoge.com/bookworm/nl/bookworm.html';  // Load HTML for Dutch
+                  break;
+              default:
+                  gamePath = 'https://warrobotdoge.com/bookworm/Bookworm_Flash_Adv.swf';
+                  break;
+          }
+
+          // Clear the game container before loading a new game
+          const gameContainer = document.getElementById('game-container');
+          gameContainer.innerHTML = '';  // Clear previous game
+
+          // If the gamePath is an HTML file, load it using an iframe
+          if (gamePath.endsWith('.html')) {
+              const iframe = document.createElement('iframe');
+              iframe.src = gamePath;
+              iframe.width = "800";
+              iframe.height = "600";
+              iframe.style.border = "none";  // Optional: Remove iframe border
+              gameContainer.appendChild(iframe);
+          } else {
+              // Otherwise, load the SWF file as before
+              const swfEmbed = document.createElement('embed');
+              swfEmbed.src = gamePath;
+              swfEmbed.width = "800";
+              swfEmbed.height = "600";
+              swfEmbed.type = "application/x-shockwave-flash";
+              gameContainer.appendChild(swfEmbed);
+          }
       }
 
-            // Clear the game container before loading a new SWF
-            const gameContainer = document.getElementById('game-container');
-            gameContainer.innerHTML = '';  // Clear previous game
+      window.onload = function() {
+          changeGame('english');  // Change to the desired default language
+      };
+</script>
 
-            // Create a new embed element to load the SWF
-            const swfEmbed = document.createElement('embed');
-            swfEmbed.src = gamePath;
-            swfEmbed.width = "800";
-            swfEmbed.height = "600";
-            swfEmbed.type = "application/x-shockwave-flash";
-            gameContainer.appendChild(swfEmbed);
-        }
-
-        window.onload = function() {
-        changeGame('english');  // Change to the desired default language
-    };
-    </script>
     
     <script>
         // Dropdown toggle functionality
