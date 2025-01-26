@@ -1,0 +1,13 @@
+//game config options
+
+//turn on the zone api
+
+&zone_api=true&
+
+//link to deluxe download
+
+&deluxelink=&
+
+//all loaded - this config info must be present
+
+&configloaded=true&
