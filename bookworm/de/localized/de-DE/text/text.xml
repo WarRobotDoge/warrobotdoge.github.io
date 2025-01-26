@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<String id="strLoadString">FLASHED VON MEDIATONIC</String>
+	
+	<!-- levelcomplete -->
+  <String id="strBestWord">Bestes Wort</String>
+  <String id="strLongWord">Längstes Wort</String>
+  <String id="strDeluxeHeader">Die Vollversion\nherunterladen</String>
+  <String id="strDeluxeMsg">Verbesserte(r) Grafik, Musik und Effekte\nVollbild spielen\nNoch mehr aufregende Levels\nDeine Highscores speichern\nOffline spielen!</String>
+  
+	<!-- mainscreen -->
+	<String id="strPlayGame">
+		<![CDATA[<TEXTFORMAT LEADING='-20'><FONT SIZE='50'>Jetzt\n</FONT><FONT SIZE='26'>spielen</FONT></TEXTFORMAT>]]>
+	</String>
+	<String id="strLearnHowToPlay">
+		<![CDATA[<TEXTFORMAT LEADING='-14'><FONT SIZE='35'>Lerne,\n</FONT><FONT SIZE='22'>wie man\n</FONT><FONT SIZE='26'>spielt</FONT></TEXTFORMAT>]]>
+	</String>
+	<String id="strDownloadFullGame">
+		<![CDATA[<TEXTFORMAT LEADING='-14'><FONT SIZE='35'>Spiel\n</FONT><FONT SIZE='24'>herunterladen</FONT></TEXTFORMAT>]]>
+	</String>
+	
+	<!-- new game popup -->
+	<String id="strNewGame">Neues Spiel?</String>
+	<String id="strLeaveGame">SPIEL VERLASSEN?</String>
+	<String id="strDoYouWantToQuit">Willst du aufhören?</String>
+	<String id="strDoYouWantToRestart">Willst du jetzt neu\nanfangen?</String>
+	<String id="strYes">JA</String>
+	<String id="strNo">NEIN</String>
+	
+	<!-- hints -->
+	<String id="strHintsPopHeader1">Bonusquadrat!</String>
+	<String id="strHintsPopMsg1">Verwende dieses grüne\nQuadrat in einem Wort für\nzusätzliche Bonuspunkte.</String>
+	<String id="strHintsPopHeader2">Feueralarm!</String>
+	<String id="strHintsPopMsg2">Dieses brennende Quadrat ist\nviel zu nah!\n\nVerwende dieses Quadrat, oder\ndeine Bibliothek brennt!</String>
+	<String id="strHintsPopHeader3">Achtung!</String>
+	<String id="strHintsPopMsg3">Lass brennende Quadrate nicht den\nBoden erreichen; sie werden die\nBibliothek in Brand stecken!\n\nHINWEIS: Bilde längere Wörter und\ndu erhältst weniger rote Quadrate.</String>
+	<String id="strHintsPopHeader4">Ich kann nicht mischen!</String>
+	<String id="strHintsPopMsg4">Es gibt zu viele brennende\nQuadraten am oberen Spielfeldrand!</String>
+	<String id="strHintsPopHeader5">Ich kann nicht mischen!</String>
+	<String id="strHintsPopMsg5">Es gibt zu viele brennende\nQuadrate auf dem Spielbrett!</String>
+	<String id="strHintsPopHeader6">PAUSE</String>
+	<String id="strHintsPopHeader7">Ich kann nicht mischen!</String>
+	<String id="strHintsPopMsg7">Wenn ich jetzt mische,\nverlierst du das Spiel!</String>
+	<String id="strClickHereToContinue">Hier klicken, um fortzufahren</String>
+	<String id="strClickHereToDisableHints">Hinweise ausschalten</String>
+	<String id="strOK">OK</String>
+	
+	<String id="strNew">NEU</String>
+	<String id="strQuit">Ende</String>
+	<String id="strSubmit">EiNREiCHEN</String>
+	
+	<String id="strBPop">BILDE DEN\nBONUSWORT,\nFÜR EXTRA\nPUNKTE!</String>
+	<String id="strClickscram">Klick auf\nmich, um die\nQuadrate zu\nmischen!</String>
+	<String id="strLevel">Level</String>
+	<String id="strLEVEL">LEVEL</String>
+	<String id="strComplete">Geschafft!</String>
+	<String id="strGame">Spiel</String>
+	<String id="strGame2">Spiel</String>
+	<String id="strOver">Ende</String>
+	<String id="strComplete2">zu Ende</String>
+	<String id="strClickHere">Hier klicken,</String>
+	<String id="strToContinue">um fortzufahren!</String>
+	<String id="strDownloadFullVersion"><![CDATA[<FONT SIZE='12'>Probe kostenlos Herunterladen!\n</FONT><FONT SIZE='16' COLOR="#000000"><B>Hier klicken</B></FONT>]]></String>
+	<String id="strHowToPlay">Spielanleitung</String>
+	
+	<String id="strInstruction1">Klick auf Buchstaben, um aus ihnen Wörter zu bilden.</String>
+	<String id="strInstruction2">Klick auf Einreichen, um den Bücherwurm zu füttern.</String>
+	<String id="strInstruction3">Achte auf brennende Quadrate! Wenn sie den Boden erreichen, ist das Spiel vorbei!</String>
+	<String id="strInstruction4">Klick auf den Bücherwurm, um die Buchstaben zu mischen, mit Verlust!</String>
+	
+	<String id="strBonusWord">Bonuswörter</String>
+	<String id="strRewardTiles">Bonusquadrate</String>
+	<String id="strScoring">Punkte</String>
+	<String id="strClickLeftButton">Klick auf Buchstaben, um aus ihnen\nWörter zu bilden.</String>
+	<String id="strInstPage1">Bonuswörter erscheinen zu Beginn der zweiten Spielebene unterhalb des Bücherwurms. Wenn es dir gelingt, ein Bonuswort zu bilden, erhältst du einen Punktebonus! Danach erscheint ein neues und schwierigeres Bonuswort. Durch das kontinuierliche Bilden von Bonuswörtern erhältst du immer mehr Bonuspunkte!</String>
+	<String id="strInstPage2">Grüne Quadrate erscheinen zufällig und steigern die Punktzahl von Wörtern! Verdiene goldene Quadrate, indem du Wörter mit 5 und mehr Buchstaben bildest. Goldene Quadrate sind mehr wert als grüne! Kombiniere zwei oder mehr Bonusquadrate in einem Wort für mehr Punkte! So kannst du Diamant- und Saphirquadrate erhalten!</String>
+	<String id="strInstPage3">Deine Punktzahl hängt von der Länge des Wortes ab, von der Seltenheit der Buchstaben im Wort, ob es Belohnungsquadrate im Wort gibt, und auf welcher Spielebene du bist.</String>
+	<String id="strInstWord">SPAß</String>
+	<String id="strInstPoints">340 Punkte</String>
+	
+	<String id="strScore">Punkte</String>
+	<String id="strLetters">Buchstaben</String>
+	
+	<String id="strBONUS">BONUS!</String>
+	
+	
+</root>
