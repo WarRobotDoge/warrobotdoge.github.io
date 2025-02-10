@@ -70,7 +70,8 @@
         <button onclick="loadGame(2)">Doki Doki Literature Club</button>
         <button onclick="loadGame(3)">Slope</button>
         <button onclick="loadGame(4)">Worldguessr</button>
-        <button onclick="loadGame(5)">Moto X3m</button>
+        <button onclick="loadGame(5)">Moto X3M</button>
+        <button onclick="loadGame(6)">Minecraft</button>
     </div>
 
     <script>
@@ -93,9 +94,13 @@
                 case 5:
                     content = '<iframe id="game-frame" src="https://games.cdn.famobi.com/html5games/m/moto-x3m/v100/?fg_domain=play.famobi.com&fg_aid=A-O9JYH&fg_uid=442157bb-0a48-4e9b-9fa6-e1503f16e8e3&fg_pid=4e5f1429-8e41-4902-8f28-f0662edb1836&fg_beat=455&original_ref=https%3A%2F%2Fplay.famobi.com%2Fmoto-x3m%2FA-O9JYH" allowfullscreen style="width: 100%; height: 100%;"></iframe>';
                     break;
+
+                case 6:
+                content = '<iframe id="game-frame" src="https://eaglercraft.com/mc/1.8.8/" allowfullscreen style="width: 100%; height: 100%;"></iframe>';
+                break;
             }
             gameContainer.innerHTML = content;
-        }
+        } 
     </script>
 </body>
 </html>
