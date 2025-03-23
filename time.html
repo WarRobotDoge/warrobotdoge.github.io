@@ -1,7 +1,3 @@
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,12 +13,21 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f0f0;
-            background-image: url('https://source.unsplash.com/random');
-            background-size: cover;
-            background-position: center;
             color: #fff;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            overflow: hidden; /* Prevents scrollbars due to video */
+            position: relative; /* Keeps the video at the background */
+        }
+
+        /* Video background styling */
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1; /* Ensures video stays behind content */
         }
 
         #countdowns {
@@ -80,146 +85,152 @@
     </style>
 </head>
 <body>
+<video class="video-background" autoplay muted loop>
+    <source src="https://warrobotdoge.com/uploads/ps3-background.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+
 <iframe class="hidden2" width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PL20-yUvuef9rk7hZ5yEs0pdfICJpGpB1a&autoplay=1&loop=1&mute=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    <div id="countdowns">
-        <!-- Countdowns for provided dates -->
-        <div class="countdown" id="countdown1">
-            <h2>April 25, 2024</h2>
-            <p>Birthday</p>
-            <div id="timer1"></div>
-        </div>
-        <div class="countdown" id="countdown2">
-            <h2>August 21, 2024</h2>
-            <p>Start Sophmore</p>
-            <div id="timer2"></div>
-        </div>
-        <div class="countdown" id="countdown3">
-            <h2>November 5, 2024</h2>
-            <p>Election Day</p>
-            <div id="timer3"></div>
-        </div>
-        <div class="countdown" id="countdown4">
-            <h2>January 1, 2025</h2>
-            <p>New Year</p>
-            <div id="timer4"></div>
-        </div>
-        <div class="countdown" id="countdown5">
-            <h2>April 25, 2025</h2>
-            <p>Birthday</p>
-            <div id="timer5"></div>
-        </div>
-        <div class="countdown" id="countdown6">
-            <h2>June 13, 2025</h2>
-            <p>Finish Sophomore</p>
-            <div id="timer6"></div>
-        </div>
-        <div class="countdown" id="countdown7">
-            <h2>August 23, 2025</h2>
-            <p>Start Junior</p>
-            <div id="timer7"></div>
-        </div>
-        <div class="countdown" id="countdown8">
-            <h2>January 1, 2026</h2>
-            <p>New Year</p>
-            <div id="timer8"></div>
-        </div>
-        <div class="countdown" id="countdown9">
-            <h2>April 25, 2026</h2>
-            <p>Birthday</p>
-            <div id="timer9"></div>
-        </div>
-        <div class="countdown" id="countdown10">
-            <h2>June 15, 2026</h2>
-            <p>Finish Junior</p>
-            <div id="timer10"></div>
-        </div>
-        <div class="countdown" id="countdown11">
-            <h2>August 23, 2026</h2>
-            <p>Start Senior</p>
-            <div id="timer11"></div>
-        </div>
-        <div class="countdown" id="countdown12">
-            <h2>January 1, 2027</h2>
-            <p>New Year</p>
-            <div id="timer12"></div>
-        </div>
-        <div class="countdown" id="countdown13">
-            <h2>April 25, 2027</h2>
-            <p>Birthday</p>
-            <div id="timer13"></div>
-        </div>
-        <div class="countdown" id="countdown14">
-            <h2>June 15, 2027</h2>
-            <p>Graduate Senior</p>
-            <div id="timer14"></div>
-        </div>
-        <div class="countdown" id="countdown14">
-            <h2>January 1, 2025</h2>
-            <p>New Year Stats</p>
-            <div id="timer15"></div>
-        </div>
+
+<div id="countdowns">
+    <!-- Countdowns for provided dates -->
+    <div class="countdown" id="countdown1">
+        <h2>April 25, 2024</h2>
+        <p>Birthday</p>
+        <div id="timer1"></div>
     </div>
+    <div class="countdown" id="countdown2">
+        <h2>August 21, 2024</h2>
+        <p>Start Sophmore</p>
+        <div id="timer2"></div>
+    </div>
+    <div class="countdown" id="countdown3">
+        <h2>November 5, 2024</h2>
+        <p>Election Day</p>
+        <div id="timer3"></div>
+    </div>
+    <div class="countdown" id="countdown4">
+        <h2>January 1, 2025</h2>
+        <p>New Year</p>
+        <div id="timer4"></div>
+    </div>
+    <div class="countdown" id="countdown5">
+        <h2>April 25, 2025</h2>
+        <p>Birthday</p>
+        <div id="timer5"></div>
+    </div>
+    <div class="countdown" id="countdown6">
+        <h2>June 13, 2025</h2>
+        <p>Finish Sophomore</p>
+        <div id="timer6"></div>
+    </div>
+    <div class="countdown" id="countdown7">
+        <h2>August 23, 2025</h2>
+        <p>Start Junior</p>
+        <div id="timer7"></div>
+    </div>
+    <div class="countdown" id="countdown8">
+        <h2>January 1, 2026</h2>
+        <p>New Year</p>
+        <div id="timer8"></div>
+    </div>
+    <div class="countdown" id="countdown9">
+        <h2>April 25, 2026</h2>
+        <p>Birthday</p>
+        <div id="timer9"></div>
+    </div>
+    <div class="countdown" id="countdown10">
+        <h2>June 15, 2026</h2>
+        <p>Finish Junior</p>
+        <div id="timer10"></div>
+    </div>
+    <div class="countdown" id="countdown11">
+        <h2>August 23, 2026</h2>
+        <p>Start Senior</p>
+        <div id="timer11"></div>
+    </div>
+    <div class="countdown" id="countdown12">
+        <h2>January 1, 2027</h2>
+        <p>New Year</p>
+        <div id="timer12"></div>
+    </div>
+    <div class="countdown" id="countdown13">
+        <h2>April 25, 2027</h2>
+        <p>Birthday</p>
+        <div id="timer13"></div>
+    </div>
+    <div class="countdown" id="countdown14">
+        <h2>June 15, 2027</h2>
+        <p>Graduate Senior</p>
+        <div id="timer14"></div>
+    </div>
+    <div class="countdown" id="countdown14">
+        <h2>January 1, 2025</h2>
+        <p>New Year Stats</p>
+        <div id="timer15"></div>
+    </div>
+</div>
 
-    <script>
-        // Set the target dates
-        const targetDates = [
-            new Date('April 25, 2024').getTime(),
-            new Date('August 21, 2024').getTime(),
-            new Date('November 5, 2024').getTime(),
-            new Date('January 1, 2025').getTime(),
-            new Date('April 25, 2025').getTime(),
-            new Date('June 13, 2025').getTime(),
-            new Date('August 23, 2025').getTime(),
-            new Date('January 1, 2026').getTime(),
-            new Date('April 25, 2026').getTime(),
-            new Date('June 15, 2026').getTime(),
-            new Date('August 23, 2026').getTime(),
-            new Date('January 1, 2027').getTime(),
-            new Date('April 25, 2027').getTime(),
-            new Date('June 15, 2027').getTime()
-        ];
+<script>
+    // Set the target dates
+    const targetDates = [
+        new Date('April 25, 2024').getTime(),
+        new Date('August 21, 2024').getTime(),
+        new Date('November 5, 2024').getTime(),
+        new Date('January 1, 2025').getTime(),
+        new Date('April 25, 2025').getTime(),
+        new Date('June 13, 2025').getTime(),
+        new Date('August 23, 2025').getTime(),
+        new Date('January 1, 2026').getTime(),
+        new Date('April 25, 2026').getTime(),
+        new Date('June 15, 2026').getTime(),
+        new Date('August 23, 2026').getTime(),
+        new Date('January 1, 2027').getTime(),
+        new Date('April 25, 2027').getTime(),
+        new Date('June 15, 2027').getTime()
+    ];
 
-        // Update countdowns every millisecond
-        setInterval(() => {
-            const now = new Date().getTime();
-            targetDates.forEach((targetDate, index) => {
-                const distance = targetDate - now;
+    // Update countdowns every millisecond
+    setInterval(() => {
+        const now = new Date().getTime();
+        targetDates.forEach((targetDate, index) => {
+            const distance = targetDate - now;
 
-                if (distance <= 0) {
-                    document.getElementById(`countdown${index + 1}`).classList.add('hidden');
-                    return; // Stop processing this countdown
-                }
+            if (distance <= 0) {
+                document.getElementById(`countdown${index + 1}`).classList.add('hidden');
+                return; // Stop processing this countdown
+            }
 
-                // Time calculations
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                const milliseconds = Math.floor(distance % 1000);
+            // Time calculations
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            const milliseconds = Math.floor(distance % 1000);
 
-                // Display the countdown
-                const countdownElement = document.getElementById(`timer${index + 1}`);
-                countdownElement.innerHTML = `
-                    <div>${days}d</div>
-                    <div>${hours}h</div>
-                    <div>${minutes}m</div>
-                    <div>${seconds}s</div>
-                    <div>${milliseconds}ms</div>
-                `;
-            });
-
-            // Calculate and display days passed since New Year
-            const newYearDate = new Date('January 1, 2025').getTime();
-            const daysSinceNewYear = Math.floor((now - newYearDate) / (1000 * 60 * 60 * 24));
-            const millisecondsInYear = (new Date('January 1, 2026').getTime() - newYearDate); // Account for leap years
-            const percentageOfYearPassed = ((now - newYearDate) / millisecondsInYear) * 100;
-
-            const newYearCountdownElement = document.getElementById('timer15');
-            newYearCountdownElement.innerHTML = `
-                <div>${daysSinceNewYear} days since New Year</div>
-                <div>${percentageOfYearPassed.toFixed(10)}% of the year passed</div> <!-- Adjust precision here -->
+            // Display the countdown
+            const countdownElement = document.getElementById(`timer${index + 1}`);
+            countdownElement.innerHTML = `
+                <div>${days}d</div>
+                <div>${hours}h</div>
+                <div>${minutes}m</div>
+                <div>${seconds}s</div>
+                <div>${milliseconds}ms</div>
             `;
-        }, 1);
-    </script>
+        });
+
+        // Calculate and display days passed since New Year
+        const newYearDate = new Date('January 1, 2025').getTime();
+        const daysSinceNewYear = Math.floor((now - newYearDate) / (1000 * 60 * 60 * 24));
+        const millisecondsInYear = (new Date('January 1, 2026').getTime() - newYearDate); // Account for leap years
+        const percentageOfYearPassed = ((now - newYearDate) / millisecondsInYear) * 100;
+
+        const newYearCountdownElement = document.getElementById('timer15');
+        newYearCountdownElement.innerHTML = `
+            <div>${daysSinceNewYear} days since New Year</div>
+            <div>${percentageOfYearPassed.toFixed(10)}% of the year passed</div> <!-- Adjust precision here -->
+        `;
+    }, 1);
+</script>
 </body>
 </html>
