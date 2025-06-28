@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,6 +73,7 @@
         <button onclick="loadGame(4)">Worldguessr</button>
         <button onclick="loadGame(5)">Moto X3M</button>
         <button onclick="loadGame(6)">Minecraft</button>
+        <button onclick="loadGame(7)">Buckshot Roulette</button>
     </div>
 
     <script>
@@ -97,6 +99,9 @@
 
                 case 6:
                 content = '<iframe id="game-frame" src="https://eaglercraft.com/mc/1.8.8/" allowfullscreen style="width: 100%; height: 100%;"></iframe>';
+                break;
+                case 7:
+                content = '<iframe id="game-frame" src="https://buckshotroulette.com/home" allowfullscreen style="width: 100%; height: 100%;"></iframe>';
                 break;
             }
             gameContainer.innerHTML = content;
