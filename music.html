@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Music Visualizer</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --card: #121821;
+    --text: #e6edf3;
+    --muted: #8aa0b4;
+    --accent: #4aa8ff;
+    --glow: 0 0 24px rgba(74,168,255,.45);
+  }
+  * { box-sizing: border-box }
+  html, body { height: 100% }
+  body {
+    margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+    color: var(--text); background: radial-gradient(1200px 800px at 80% -20%, #1a2330 0%, var(--bg) 40%);
+    display: grid; place-items: center; padding: 24px;
+  }
+  .app { width: min(100%, 980px); }
+  .card { background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); border: 1px solid #1e2936; border-radius: 18px; box-shadow: 0 8px 40px rgba(0,0,0,.35); overflow: hidden }
+  header { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid #1e2936; background: rgba(18,24,33,.6); backdrop-filter: blur(6px); flex-direction: column; align-items: flex-start; }
+  header .title { font-weight: 700; letter-spacing: .2px }
+  header .muted { color: var(--muted); font-size: 12px }
+  .meta { color: var(--accent); font-size: 14px; margin-top: 4px }
+  .controls { display: grid; grid-template-columns: 1fr auto; gap: 14px; padding: 16px 18px; border-top: 1px solid #1e2936; background: rgba(18,24,33,.55) }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center }
+  .btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #2a3a4d; background: #121821; color: var(--text); padding: 10px 14px; border-radius: 12px; cursor: pointer; transition: .2s transform ease, .2s box-shadow ease, .2s background ease }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,0,0,.25) }
+  .btn.primary { background: linear-gradient(180deg, #1c2a3b, #15202d); border-color: #2f3e52 }
+  .file { position: relative; overflow: hidden }
+  .file input { position: absolute; inset: 0; opacity: 0; cursor: pointer }
+  .sl { display: grid; gap: 4px; min-width: 180px }
+  .sl label { font-size: 12px; color: var(--muted) }
+  input[type="range"] { width: 100% }
+  canvas { width: 100%; height: 44vh; display: block; background: conic-gradient(from 180deg at 50% 50%, rgba(29,39,53,.3), rgba(29,39,53,.15)); }
+  .progress { position: relative; height: 6px; background: #121821; border-top: 1px solid #1e2936 }
+  .bar { position: absolute; inset: 0; transform-origin: left; background: linear-gradient(90deg, #3b82f6, #22d3ee); box-shadow: var(--glow); width: 0% }
+  .pulse { transition: filter .08s ease; filter: drop-shadow(0 0 0 rgba(74,168,255,.0)) }
+  .pulse.is-beat { filter: drop-shadow(0 0 24px rgba(74,168,255,.75)) }
+  footer { display: flex; justify-content: space-between; padding: 10px 18px; color: var(--muted); font-size: 12px }
+  .hint { opacity: .8 }
+  .select, select { background: #121821; color: var(--text); border: 1px solid #2a3a4d; border-radius: 10px; padding: 8px 10px }
+  .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #0e141b; border: 1px solid #223042; padding: 2px 6px; border-radius: 6px; }
+  @media (max-width: 640px) { canvas { height: 40vh } }
+</style>
+</head>
+<body>
+<div class="app card">
+<header style="display:flex; flex-direction:column; gap:6px;">
+  <div style="display:flex; align-items:center; gap:12px;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 12a8 8 0 1 0 16 0" stroke="#4aa8ff" stroke-width="2"/>
+      <path d="M4 12a8 8 0 0 1 12-6.928M20 12a8 8 0 0 0-4-6.928" stroke="#22d3ee" stroke-width="2"/>
+    </svg>
+    <div class="title">Beat‑Line Visualizer</div>
+  </div>
+  <div class="muted">Drop MP3s | Display metadata & album art</div>
+  <div class="meta" id="trackName">No track loaded</div>
+  <img id="coverArt" class="cover" src="" alt="" style="display:none;margin-top:6px">
+</header>
+
+  <canvas id="scope" class="pulse" aria-label="Audio visualizer"></canvas>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <div class="controls">
+    <div class="row">
+      <button class="btn primary" id="play">Play</button>
+      <label class="btn file">Load song<input id="file" type="file" accept="audio/*" multiple /></label>
+      <button id="loop" class="btn">Loop Off</button>
+      <select id="mode" class="select" title="Visualizer mode">
+        <option value="line">Line (oscilloscope)</option>
+        <option value="bars">Bars (spectrum)</option>
+      </select>
+      <div class="sl"><label for="smoothing">Smoothing</label><input id="smoothing" type="range" min="0" max="0.95" step="0.01" value="0.75"/></div>
+      <div class="sl"><label for="sensitivity">Beat Sensitivity</label><input id="sensitivity" type="range" min="1.05" max="2.0" step="0.01" value="1.30"/></div>
+      <div class="sl"><label for="volume">Volume</label><input id="volume" type="range" min="0" max="1" step="0.01" value="0.9"/></div>
+    </div>
+    <div class="row">
+      <div class="meta" id="time">00:00 / 00:00</div>
+    </div>
+    <div class="row">
+      <select id="playlist" class="select"><option value="">-- Select Track --</option></select>
+      <button id="prev" class="btn">Prev</button>
+      <button id="next" class="btn">Next</button>
+    </div>
+  </div>
+
+  <audio id="audio" crossorigin="anonymous"></audio>
+
+  <footer>
+    <span class="hint">Tip: press <span class="kbd">Space</span> to play/pause • drag & drop files anywhere</span>
+    <span>Made by WarRobotDoge</span>
+  </footer>
+</div>
+
+<script>
+const audio = document.getElementById('audio');
+const playBtn = document.getElementById('play');
+const fileInput = document.getElementById('file');
+const canvas = document.getElementById('scope');
+const bar = document.getElementById('bar');
+const timeEl = document.getElementById('time');
+const smoothingEl = document.getElementById('smoothing');
+const sensitivityEl = document.getElementById('sensitivity');
+const modeEl = document.getElementById('mode');
+const volumeEl = document.getElementById('volume');
+const playlistEl = document.getElementById('playlist');
+const trackNameEl = document.getElementById('trackName');
+const nextBtn = document.getElementById('next');
+const prevBtn = document.getElementById('prev');
+const loopBtn = document.getElementById('loop');
+
+const ctx2d = canvas.getContext('2d');
+let width, height, dpr;
+function resize() {
+  dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  width = canvas.clientWidth; height = canvas.clientHeight;
+  canvas.width = Math.floor(width * dpr);
+  canvas.height = Math.floor(height * dpr);
+  ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+new ResizeObserver(resize).observe(canvas);
+resize();
+
+// Playlist logic
+let playlist = [];
+let currentTrack = 0;
+
+function fileName(file){ return file.name.replace(/\.[^/.]+$/,""); }
+
+function addToPlaylist(file){
+  const url = URL.createObjectURL(file);
+  playlist.push({file, url, name: fileName(file)});
+  const option = document.createElement('option');
+  option.value = playlist.length-1;
+  option.textContent = file.name;
+  playlistEl.appendChild(option);
+}
+
+function loadTrack(index){
+  if(!playlist[index]) return;
+  currentTrack = index;
+  audio.src = playlist[index].url;
+  trackNameEl.textContent = playlist[index].name;
+  audio.play().then(()=>{ playBtn.textContent='Pause'; if(!rafId) draw(); });
+  playlistEl.value = index;
+}
+
+// Audio context setup
+const ctx = new (window.AudioContext || window.webkitAudioContext)();
+const track = ctx.createMediaElementSource(audio);
+const analyser = ctx.createAnalyser();
+analyser.fftSize = 2048;
+const analyserFreq = ctx.createAnalyser();
+analyserFreq.fftSize = 1024;
+const gain = ctx.createGain();
+gain.gain.value = parseFloat(volumeEl.value);
+
+track.connect(analyser);
+track.connect(analyserFreq);
+analyser.connect(gain);
+analyserFreq.connect(gain);
+gain.connect(ctx.destination);
+
+const timeData = new Uint8Array(analyser.frequencyBinCount);
+const freqData = new Uint8Array(analyserFreq.frequencyBinCount);
+
+const energyHistory = new Float32Array(43);
+let eIndex=0, historyFilled=false, lastBeat=0;
+
+function computeBeat(thresholdMul){
+  analyserFreq.getByteFrequencyData(freqData);
+  const bands = Math.floor(freqData.length*0.6);
+  let energy = 0;
+  for(let i=0;i<bands;i++) energy += freqData[i]*(1 - i/bands*0.2);
+  const avg = average(energyHistory, historyFilled?energyHistory.length:eIndex||1);
+  const variance = varianceOf(energyHistory, historyFilled?energyHistory.length:eIndex||1, avg)+1e-6;
+  const C = thresholdMul + (variance/50000);
+  const isBeat = energy>C*avg && (performance.now()-lastBeat)>120;
+  energyHistory[eIndex++] = energy;
+  if(eIndex >= energyHistory.length){ eIndex=0; historyFilled=true; }
+  if(isBeat) lastBeat = performance.now();
+  return isBeat;
+}
+function average(arr,len){ let s=0; for(let i=0;i<len;i++) s+=arr[i]; return s/len; }
+function varianceOf(arr,len,avg){ let v=0; for(let i=0;i<len;i++){const d=arr[i]-avg; v+=d*d;} return v/len; }
+
+let rafId;
+function draw(){
+  rafId=requestAnimationFrame(draw);
+  ctx2d.clearRect(0,0,width,height);
+
+  analyser.smoothingTimeConstant=parseFloat(smoothingEl.value);
+  const isBeat=computeBeat(parseFloat(sensitivityEl.value));
+  canvas.classList.toggle('is-beat',isBeat);
+
+  if(modeEl.value==='line') drawOscilloscope(isBeat);
+  else drawBars(isBeat);
+
+  const progress=audio.duration?(audio.currentTime/audio.duration):0;
+  bar.style.width=(progress*100).toFixed(2)+'%';
+  timeEl.textContent=formatTime(audio.currentTime)+' / '+(isFinite(audio.duration)?formatTime(audio.duration):'00:00');
+}
+
+function drawOscilloscope(isBeat){
+  analyser.getByteTimeDomainData(timeData);
+  ctx2d.lineWidth=isBeat?3.2:2.2;
+  ctx2d.strokeStyle=isBeat?'#22d3ee':'#4aa8ff';
+  ctx2d.shadowColor='#4aa8ff';
+  ctx2d.shadowBlur=isBeat?16:6;
+  ctx2d.beginPath();
+  const slice=width/timeData.length;
+  const mid=height/2;
+  for(let i=0;i<timeData.length;i++){
+    const v=(timeData[i]-128)/128;
+    const x=i*slice;
+    const y=mid+v*(height*0.42*(isBeat?1.04:1));
+    i===0?ctx2d.moveTo(x,y):ctx2d.lineTo(x,y);
+  }
+  ctx2d.stroke();
+}
+
+function drawBars(isBeat){
+  analyserFreq.getByteFrequencyData(freqData);
+  const N=freqData.length;
+  const barCount=Math.floor(width/6);
+  const step=Math.max(1,Math.floor(N/barCount));
+  const w=(width/(N/step))*0.85;
+  for(let i=0,x=0;i<N;i+=step,x+=w*1.18){
+    const v=freqData[i]/255;
+    const h=Math.max(2,v*height*0.9);
+    ctx2d.fillStyle=i%2===0?'#4aa8ff':'#22d3ee';
+    ctx2d.globalAlpha=isBeat?0.95:0.8;
+    ctx2d.fillRect(x,height-h,w,h);
+  }
+  ctx2d.globalAlpha=1;
+}
+
+function formatTime(sec){
+  if(!isFinite(sec)) return '00:00';
+  const m=Math.floor(sec/60), s=Math.floor(sec%60);
+  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+async function togglePlay(){
+  if(ctx.state==='suspended') await ctx.resume();
+  if(audio.src && !audio.paused){ audio.pause(); playBtn.textContent='Play'; }
+  else { if(!audio.src) return; await audio.play(); playBtn.textContent='Pause'; if(!rafId) draw(); }
+}
+
+playBtn.addEventListener('click',togglePlay);
+volumeEl.addEventListener('input',()=>{ gain.gain.value=parseFloat(volumeEl.value); });
+
+fileInput.addEventListener('change', (e)=>{
+  const files=e.target.files;
+  for(let f of files) addToPlaylist(f);
+  loadTrack(currentTrack);
+});
+
+playlistEl.addEventListener('change',()=>loadTrack(parseInt(playlistEl.value)));
+
+nextBtn.addEventListener('click',()=>{ const next=(currentTrack+1)%playlist.length; loadTrack(next); });
+prevBtn.addEventListener('click',()=>{ const prev=(currentTrack-1+playlist.length)%playlist.length; loadTrack(prev); });
+
+loopBtn.addEventListener('click',()=>{ audio.loop=!audio.loop; loopBtn.textContent=audio.loop?'Loop On':'Loop Off'; });
+
+bar.parentElement.addEventListener('mousedown',(e)=>{
+  const rect=e.currentTarget.getBoundingClientRect();
+  const onMove=(evt)=>{
+    const x=evt.clientX ?? evt.touches?.[0].clientX;
+    const ratio=Math.min(Math.max(0,(x-rect.left)/rect.width),1);
+    audio.currentTime=ratio*audio.duration;
+  };
+  onMove(e);
+  const up=()=>{
+    window.removeEventListener('mousemove',onMove);
+    window.removeEventListener('mouseup',up);
+  };
+  window.addEventListener('mousemove',onMove);
+  window.addEventListener('mouseup',up);
+});
+
+window.addEventListener('dragover',(e)=>{ e.preventDefault(); });
+window.addEventListener('drop',(e)=>{
+  e.preventDefault();
+  const files=e.dataTransfer?.files;
+  if(!files) return;
+  for(let f of files) addToPlaylist(f);
+  loadTrack(currentTrack);
+});
+
+audio.addEventListener('play',()=>playBtn.textContent='Pause');
+audio.addEventListener('pause',()=>playBtn.textContent='Play');
+
+window.addEventListener('keydown',(e)=>{ if(e.code==='Space'){ e.preventDefault(); togglePlay(); } });
+['click','touchstart'].forEach(ev=>window.addEventListener(ev,()=>{ if(ctx.state==='suspended') ctx.resume(); },{once:true}));
+</script>
+</body>
+</html>
