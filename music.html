@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Music Visualizer</title>
+<title>Beat‑Line Visualizer</title>
 <style>
   :root {
     --bg: #0b0f14;
@@ -71,13 +71,21 @@
       <button class="btn primary" id="play">Play</button>
       <label class="btn file">Load song<input id="file" type="file" accept="audio/*" multiple /></label>
       <button id="loop" class="btn">Loop Off</button>
+      <button id="shuffle" class="btn">Shuffle Off</button>
       <select id="mode" class="select" title="Visualizer mode">
         <option value="line">Line (oscilloscope)</option>
         <option value="bars">Bars (spectrum)</option>
       </select>
-      <div class="sl"><label for="smoothing">Smoothing</label><input id="smoothing" type="range" min="0" max="0.95" step="0.01" value="0.75"/></div>
-      <div class="sl"><label for="sensitivity">Beat Sensitivity</label><input id="sensitivity" type="range" min="1.05" max="2.0" step="0.01" value="1.30"/></div>
-      <div class="sl"><label for="volume">Volume</label><input id="volume" type="range" min="0" max="1" step="0.01" value="0.9"/></div>
+      
+      <button id="startRecording" class="btn" onclick="startRecording()">Start Recording</button>
+<button id="stopRecording" class="btn" onclick="stopRecording()">Stop & Download</button>
+
+
+
+      <div class="sl"><label for="smoothing">Smoothing</label><input id="smoothing" type="range" min="0" max="1" step="0.01" value="0.75"/></div>
+      <div class="sl"><label for="sensitivity">Beat Sensitivity</label><input id="sensitivity" type="range" min="1.05" max="2" step="0.01" value="1"/></div>
+      <div class="sl"><label for="volume">Volume</label><input id="volume" type="range" min="0" max="1" step="0.01" value="0.75"/></div>
+      <span id="recordingIndicator" style="color:red; font-weight:bold; margin-left:10px; display:none;">● Recording...</span>
     </div>
     <div class="row">
       <div class="meta" id="time">00:00 / 00:00</div>
@@ -213,13 +221,15 @@ function drawOscilloscope(isBeat){
   ctx2d.shadowColor='#4aa8ff';
   ctx2d.shadowBlur=isBeat?16:6;
   ctx2d.beginPath();
-  const slice=width/timeData.length;
-  const mid=height/2;
-  for(let i=0;i<timeData.length;i++){
-    const v=(timeData[i]-128)/128;
-    const x=i*slice;
-    const y=mid+v*(height*0.42*(isBeat?1.04:1));
-    i===0?ctx2d.moveTo(x,y):ctx2d.lineTo(x,y);
+  const slice = width / timeData.length;
+  const mid = height / 2;
+  const volumeFactor = parseFloat(volumeEl.value); // new: scale by volume
+  const sensitivityFactor = parseFloat(sensitivityEl.value); // new: scale by sensitivity
+  for(let i = 0; i < timeData.length; i++){
+    const v = (timeData[i] - 128)/128;
+    const x = i * slice;
+    const y = mid + v * (height * 0.42 * (isBeat ? 1.04 : 1) * volumeFactor * sensitivityFactor);
+    i === 0 ? ctx2d.moveTo(x,y) : ctx2d.lineTo(x,y);
   }
   ctx2d.stroke();
 }
@@ -268,6 +278,39 @@ prevBtn.addEventListener('click',()=>{ const prev=(currentTrack-1+playlist.lengt
 
 loopBtn.addEventListener('click',()=>{ audio.loop=!audio.loop; loopBtn.textContent=audio.loop?'Loop On':'Loop Off'; });
 
+let shuffleMode = false; // track shuffle state
+
+const shuffleBtn = document.getElementById('shuffle');
+shuffleBtn.addEventListener('click', () => {
+  shuffleMode = !shuffleMode;
+  shuffleBtn.textContent = shuffleMode ? 'Shuffle On' : 'Shuffle Off';
+});
+
+// Modify your next track logic to respect shuffle
+function playNext() {
+  if (shuffleMode) {
+    if (playlist.length > 1) {
+      let next;
+      do {
+        next = Math.floor(Math.random() * playlist.length);
+      } while (next === currentTrack); // avoid repeating the same track
+      loadTrack(next);
+    } else if (playlist.length === 1) {
+      loadTrack(0);
+    }
+  } else {
+    const next = (currentTrack + 1) % playlist.length;
+    loadTrack(next);
+  }
+}
+
+// Use the new function for your existing next button and audio end
+nextBtn.addEventListener('click', playNext);
+audio.addEventListener('ended', playNext);
+
+const recordingIndicator = document.getElementById('recordingIndicator');
+
+
 bar.parentElement.addEventListener('mousedown',(e)=>{
   const rect=e.currentTarget.getBoundingClientRect();
   const onMove=(evt)=>{
@@ -295,9 +338,53 @@ window.addEventListener('drop',(e)=>{
 
 audio.addEventListener('play',()=>playBtn.textContent='Pause');
 audio.addEventListener('pause',()=>playBtn.textContent='Play');
+audio.addEventListener('ended', () => {
+  if (!audio.loop && playlist.length > 0) {
+    const next = (currentTrack + 1) % playlist.length;
+    loadTrack(next);
+  }
+});
+
+
+ctx2d.shadowBlur = 0; // or reduce it
+ctx2d.globalAlpha = 1; 
+let recorder, chunks = [];
+let audioDest = ctx.createMediaStreamDestination();
+gain.connect(audioDest); // Connect your existing gain node to the recording destination
+
+startRecording.addEventListener('click', () => {
+    chunks = [];
+    const canvasStream = canvas.captureStream(60); // 60 FPS
+    const combinedStream = new MediaStream([
+        ...canvasStream.getVideoTracks(),
+        ...audioDest.stream.getAudioTracks()
+    ]);
+    recorder = new MediaRecorder(combinedStream);
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/mp4' });
+        const url = URL.createObjectURL(blob);
+          const trackName = playlist[currentTrack]?.name || 'track';
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${trackName} (Visualizer).mp4`; // <-- dynamically named
+        a.click();
+    };
+    recorder.start();
+     recordingIndicator.style.display = 'inline'; // show indicator
+    if(audio.src && audio.paused) audio.play();
+    console.log("Recording started");
+});
+
+stopRecording.addEventListener('click', () => {
+    recorder?.stop();
+    recordingIndicator.style.display = 'none'; // hide indicator
+    console.log("Recording stopped");
+});
 
 window.addEventListener('keydown',(e)=>{ if(e.code==='Space'){ e.preventDefault(); togglePlay(); } });
 ['click','touchstart'].forEach(ev=>window.addEventListener(ev,()=>{ if(ctx.state==='suspended') ctx.resume(); },{once:true}));
 </script>
+
 </body>
 </html>
