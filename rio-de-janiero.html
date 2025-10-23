@@ -27,8 +27,6 @@
 
   #imageContainer {
     position: relative;
-    width: 600px;
-    height: 600px;
     border-radius: 15px;
     overflow: hidden;
     margin-bottom: 30px;
@@ -140,43 +138,53 @@ const gradientURL = 'https://warrobotdoge.com/uploads/fc15b0ed4afb199452dc8cd3c6
 let photo = new Image();
 let gradient = new Image();
 let originalFileName = "";
+let originalExif = null;
+
 gradient.crossOrigin = "Anonymous";
 gradient.src = gradientURL;
 
-let originalExif = null;
-
-// Update font size label live
 fontSizeInput.addEventListener('input', () => {
   fontSizeLabel.textContent = fontSizeInput.value;
 });
 
-// Determine initial font size based on image width
-function determineFontSize(imageWidth) {
-  return Math.floor(imageWidth * 0.1); // 10% of image width
-}
-
+// Draw image + gradient
 function drawCanvas() {
   if (!photo.src) return;
 
-  const container = document.getElementById('imageContainer');
-  const maxWidth = container.clientWidth;
-  const maxHeight = container.clientHeight;
+  const maxHeight = 600;
+  let scale = 1;
 
-  const scale = Math.min(maxWidth / photo.width, maxHeight / photo.height);
+  // Scale down if image height exceeds maxHeight
+  if (photo.height > maxHeight) {
+    scale = maxHeight / photo.height;
+  }
+
   const width = photo.width * scale;
   const height = photo.height * scale;
 
+  // Resize canvas and container
   canvas.width = width;
   canvas.height = height;
+  const container = document.getElementById('imageContainer');
+  container.style.width = width + 'px';
+  container.style.height = height + 'px';
 
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // Draw photo
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(photo, 0, 0, width, height);
 
+  // Draw gradient overlay
   if (gradient.src) {
     ctx.globalAlpha = 0.5;
     ctx.drawImage(gradient, 0, 0, width, height);
     ctx.globalAlpha = 1;
   }
+}
+
+
+// Determine font size as ratio of image width
+function determineFontSize(imageWidth) {
+  return Math.floor(imageWidth * 0.1); // 10% of width
 }
 
 photoUpload.addEventListener('change', (e) => {
@@ -198,12 +206,10 @@ photoUpload.addEventListener('change', (e) => {
     originalExif = null;
   }
 
-  // Set initial font size once image loads
   photo.onload = () => {
     const initialSize = determineFontSize(photo.width);
     fontSizeInput.value = initialSize;
     fontSizeLabel.textContent = initialSize;
-
     drawCanvas();
   };
 });
@@ -212,9 +218,9 @@ gradient.onload = drawCanvas;
 
 // Add Text button
 applyTextBtn.addEventListener('click', () => {
-  drawCanvas(); // redraw image + gradient
-  const fontSize = fontSizeInput.value * 0.1; // uses slider value (auto-set if first click)
-  const text = textInput.value || "Rio De Janiero"; // fallback text
+  drawCanvas();
+  const fontSize = fontSizeInput.value * 0.1;
+  const text = textInput.value || "Rio De Janiero";
   ctx.font = `${fontSize}px 'Instagram Sans', sans-serif`;
   ctx.fillStyle = 'white';
   ctx.textAlign = 'center';
