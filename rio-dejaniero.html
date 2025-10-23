@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rio De Janiero Instagram Filter Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Instagram+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* Reset & basic styling */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Instagram Sans', sans-serif;
+    background: #121212;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+  }
+
+  h1 {
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  /* Container for photo */
+  #imageContainer {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  canvas { display: block; border-radius: 15px; }
+
+  /* Controls card */
+  .controls {
+    background: #1e1e1e;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 400px;
+    gap: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+  }
+
+  input[type="file"],
+  input[type="text"],
+  input[type="range"],
+  button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+  }
+
+  input[type="text"] { background: #2c2c2c; color: #fff; }
+  input[type="range"] {
+    -webkit-appearance: none;
+    height: 8px;
+    background: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #ff5e62;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  }
+
+  button {
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+  }
+
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  }
+
+  button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+</style>
+</head>
+<body>
+
+<h1>Rio De Janiero Instagram Filter Generator</h1>
+
+<div id="imageContainer">
+  <canvas id="canvas"></canvas>
+</div>
+
+<div class="controls">
+  <input type="file" id="photoUpload" accept="image/*">
+  <input type="text" id="textInput" placeholder="Enter text...">
+  <input type="range" id="fontSize" min="90" max="400" value="90">
+  <button id="applyText">Add Text</button>
+  <button id="download">Download Image</button>
+</div>
+
+<script>
+const photoUpload = document.getElementById('photoUpload');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const textInput = document.getElementById('textInput');
+const fontSizeInput = document.getElementById('fontSize');
+const applyTextBtn = document.getElementById('applyText');
+const downloadBtn = document.getElementById('download');
+
+// Gradient from URL
+const gradientURL = 'https://warrobotdoge.com/uploads/fc15b0ed4afb199452dc8cd3c667972b.jpg';
+let photo = new Image();
+let gradient = new Image();
+gradient.crossOrigin = "Anonymous";
+gradient.src = gradientURL;
+
+function drawCanvas() {
+  if (!photo.src) return;
+
+  // Keep original size
+  canvas.width = photo.width;
+  canvas.height = photo.height;
+
+  // Center in container
+  const container = document.getElementById('imageContainer');
+  const scale = Math.min(container.clientWidth / canvas.width, container.clientHeight / canvas.height);
+  canvas.style.width = canvas.width * scale + "px";
+  canvas.style.height = canvas.height * scale + "px";
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(photo, 0, 0);
+
+  if (gradient.src) {
+    ctx.globalAlpha = 0.5;
+    ctx.drawImage(gradient, 0, 0, canvas.width, canvas.height);
+    ctx.globalAlpha = 1;
+  }
+}
+
+photoUpload.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => { photo.src = event.target.result; };
+  reader.readAsDataURL(file);
+});
+
+photo.onload = drawCanvas;
+gradient.onload = drawCanvas;
+
+applyTextBtn.addEventListener('click', () => {
+  drawCanvas();
+  const fontSize = fontSizeInput.value;
+  const text = textInput.value;
+  ctx.font = `${fontSize}px 'Instagram Sans', sans-serif`;
+  ctx.fillStyle = 'white';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+});
+
+downloadBtn.addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = 'photo-gradient.png';
+  link.href = canvas.toDataURL();
+  link.click();
+});
+</script>
+
+</body>
+</html>
