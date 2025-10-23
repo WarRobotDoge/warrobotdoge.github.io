@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rio De Janiero Instagram Filter Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=Instagram+Sans:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/piexifjs"></script>
 <style>
-  /* Reset & basic styling */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: 'Instagram Sans', sans-serif;
@@ -25,7 +25,6 @@
     letter-spacing: 1px;
   }
 
-  /* Container for photo */
   #imageContainer {
     position: relative;
     width: 600px;
@@ -42,7 +41,6 @@
 
   canvas { display: block; border-radius: 15px; }
 
-  /* Controls card */
   .controls {
     background: #1e1e1e;
     border-radius: 15px;
@@ -97,14 +95,13 @@
     box-shadow: 0 5px 15px rgba(0,0,0,0.4);
   }
 
-  button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-  }
+  button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+  button:active { transform: translateY(0); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-  button:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  .range-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 </style>
 </head>
@@ -119,7 +116,12 @@
 <div class="controls">
   <input type="file" id="photoUpload" accept="image/*">
   <input type="text" id="textInput" placeholder="Rio De Janiero" value="Rio De Janiero">
-  <input type="range" id="fontSize" min="90" max="400" value="90">
+
+  <div class="range-container">
+    <input type="range" id="fontSize" min="10" max="1000" value="90">
+    <span id="fontSizeLabel">90</span>px
+  </div>
+
   <button id="applyText">Add Text</button>
   <button id="download">Download Image</button>
 </div>
@@ -130,35 +132,49 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const textInput = document.getElementById('textInput');
 const fontSizeInput = document.getElementById('fontSize');
+const fontSizeLabel = document.getElementById('fontSizeLabel');
 const applyTextBtn = document.getElementById('applyText');
 const downloadBtn = document.getElementById('download');
 
-// Gradient from URL
 const gradientURL = 'https://warrobotdoge.com/uploads/fc15b0ed4afb199452dc8cd3c667972b.jpg';
 let photo = new Image();
 let gradient = new Image();
+let originalFileName = "";
 gradient.crossOrigin = "Anonymous";
 gradient.src = gradientURL;
+
+let originalExif = null;
+
+// Update font size label live
+fontSizeInput.addEventListener('input', () => {
+  fontSizeLabel.textContent = fontSizeInput.value;
+});
+
+// Determine initial font size based on image width
+function determineFontSize(imageWidth) {
+  return Math.floor(imageWidth * 0.1); // 10% of image width
+}
 
 function drawCanvas() {
   if (!photo.src) return;
 
-  // Keep original size
-  canvas.width = photo.width;
-  canvas.height = photo.height;
-
-  // Center in container
   const container = document.getElementById('imageContainer');
-  const scale = Math.min(container.clientWidth / canvas.width, container.clientHeight / canvas.height);
-  canvas.style.width = canvas.width * scale + "px";
-  canvas.style.height = canvas.height * scale + "px";
+  const maxWidth = container.clientWidth;
+  const maxHeight = container.clientHeight;
+
+  const scale = Math.min(maxWidth / photo.width, maxHeight / photo.height);
+  const width = photo.width * scale;
+  const height = photo.height * scale;
+
+  canvas.width = width;
+  canvas.height = height;
 
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.drawImage(photo, 0, 0);
+  ctx.drawImage(photo, 0, 0, width, height);
 
   if (gradient.src) {
     ctx.globalAlpha = 0.5;
-    ctx.drawImage(gradient, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(gradient, 0, 0, width, height);
     ctx.globalAlpha = 1;
   }
 }
@@ -166,18 +182,39 @@ function drawCanvas() {
 photoUpload.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
+  originalFileName = file.name;
+
   const reader = new FileReader();
   reader.onload = (event) => { photo.src = event.target.result; };
   reader.readAsDataURL(file);
+
+  if (file.type === "image/jpeg") {
+    const exifReader = new FileReader();
+    exifReader.onload = function(e) {
+      originalExif = piexif.load(e.target.result);
+    }
+    exifReader.readAsBinaryString(file);
+  } else {
+    originalExif = null;
+  }
+
+  // Set initial font size once image loads
+  photo.onload = () => {
+    const initialSize = determineFontSize(photo.width);
+    fontSizeInput.value = initialSize;
+    fontSizeLabel.textContent = initialSize;
+
+    drawCanvas();
+  };
 });
 
-photo.onload = drawCanvas;
 gradient.onload = drawCanvas;
 
+// Add Text button
 applyTextBtn.addEventListener('click', () => {
-  drawCanvas();
-  const fontSize = fontSizeInput.value;
-  const text = textInput.value;
+  drawCanvas(); // redraw image + gradient
+  const fontSize = fontSizeInput.value; // uses slider value (auto-set if first click)
+  const text = textInput.value || "Rio De Janiero"; // fallback text
   ctx.font = `${fontSize}px 'Instagram Sans', sans-serif`;
   ctx.fillStyle = 'white';
   ctx.textAlign = 'center';
@@ -185,10 +222,22 @@ applyTextBtn.addEventListener('click', () => {
   ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 });
 
+// Download button
 downloadBtn.addEventListener('click', () => {
+  if (!originalFileName) return;
+
+  let downloadName = originalFileName.replace(/\.(jpg|jpeg)$/i, "_rio.$1");
+  if (originalFileName.toLowerCase().endsWith(".png")) downloadName = originalFileName.replace(/\.png$/i, "_rio.png");
+
+  let dataURL = canvas.toDataURL("image/jpeg");
+
+  if (originalExif) {
+    dataURL = piexif.insert(piexif.dump(originalExif), dataURL);
+  }
+
   const link = document.createElement('a');
-  link.download = 'photo-gradient.png';
-  link.href = canvas.toDataURL();
+  link.download = downloadName;
+  link.href = dataURL;
   link.click();
 });
 </script>
