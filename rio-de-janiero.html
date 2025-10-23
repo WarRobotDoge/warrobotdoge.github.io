@@ -213,7 +213,7 @@ gradient.onload = drawCanvas;
 // Add Text button
 applyTextBtn.addEventListener('click', () => {
   drawCanvas(); // redraw image + gradient
-  const fontSize = fontSizeInput.value; // uses slider value (auto-set if first click)
+  const fontSize = fontSizeInput.value * 0.1; // uses slider value (auto-set if first click)
   const text = textInput.value || "Rio De Janiero"; // fallback text
   ctx.font = `${fontSize}px 'Instagram Sans', sans-serif`;
   ctx.fillStyle = 'white';
