@@ -9,11 +9,14 @@
 body { margin:0; font-family:system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,sans-serif; background:#313338; color:#dbdee1; display:flex; height:100vh; }
 #sidebar { width:300px; background:#1e1f22; border-right:1px solid #111214; display:flex; flex-direction:column; }
 #folderInput { margin:12px; }
+#chatSearch { margin:8px 12px; padding:4px; border-radius:4px; border:none; width:calc(100% - 24px); }
 #sortSelect { margin:0 12px 12px 12px; padding:4px; }
 #fileList { flex:1; overflow-y:auto; padding:8px 12px; }
 .fileItem { padding:6px 8px; border-radius:6px; cursor:pointer; font-size:14px; }
 .fileItem:hover { background:#2b2d31; }
-#main { flex:1; overflow-y:auto; padding:16px; border-right:1px solid #111214; }
+#mainContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+#messageSearch { margin:8px 16px; padding:4px; border-radius:4px; border:none; width:calc(100% - 32px); }
+#main { flex:1; overflow-y:auto; padding:16px; border-top:1px solid #111214; }
 .message { display:flex; gap:12px; margin-bottom:14px; }
 .avatar { width:40px; height:40px; border-radius:50%; background:#5865f2; display:flex; align-items:center; justify-content:center; font-weight:bold; color:white; flex-shrink:0; }
 .header { display:flex; gap:8px; align-items:baseline; }
@@ -27,11 +30,14 @@ body { margin:0; font-family:system-ui, -apple-system, BlinkMacSystemFont,"Segoe
 .sectionHeader { font-weight:bold; margin-top:8px; margin-bottom:4px; color:#00a8fc; }
 #graphOptions { margin:8px 0 12px 0; }
 canvas { background:#2b2d31; border-radius:6px; width:100%; }
+img.embedded { max-width:200px; border-radius:6px; display:block; margin-top:4px; }
+iframe.embed { width:200px; height:200px; border:none; border-radius:6px; margin-top:4px; }
 </style>
 </head>
 <body>
 <div id="sidebar">
   <input type="file" id="folderInput" webkitdirectory multiple>
+  <input type="text" id="chatSearch" placeholder="Search chats...">
   <select id="sortSelect">
     <option value="recent">Most Recent</option>
     <option value="oldest">Oldest</option>
@@ -42,7 +48,10 @@ canvas { background:#2b2d31; border-radius:6px; width:100%; }
   <div id="fileList"></div>
 </div>
 
-<div id="main">Drop folder here or select using input.</div>
+<div id="mainContainer">
+  <input type="text" id="messageSearch" placeholder="Search messages...">
+  <div id="main">Drop folder here or select using input.</div>
+</div>
 <div id="statsPanel"></div>
 
 <script>
@@ -50,16 +59,20 @@ let indexMap = {};
 let conversations = [];
 let perChatChart=null, overallChart=null;
 let currentChat=null;
-const hourShift = 17; // bump messages 3 AM → 8 PM
+const hourShift = 17;
 
 const folderInput = document.getElementById('folderInput');
 const fileList = document.getElementById('fileList');
 const main = document.getElementById('main');
 const statsPanel = document.getElementById('statsPanel');
 const sortSelect = document.getElementById('sortSelect');
+const chatSearch = document.getElementById('chatSearch');
+const messageSearch = document.getElementById('messageSearch');
 
 folderInput.addEventListener('change', e => { processFolder([...e.target.files]); });
 sortSelect.addEventListener('change', renderSidebar);
+chatSearch.addEventListener('input', renderSidebar);
+messageSearch.addEventListener('input', ()=>{ if(currentChat) renderMessages(currentChat.messages); });
 
 function processFolder(files){
   const groupedChats = {};
@@ -101,15 +114,12 @@ function processFolder(files){
       const reader=new FileReader();
       reader.onload=()=>{
         const msgs=JSON.parse(reader.result);
-        // Adjust timestamps immediately
         msgs.forEach(m=>{
           if(m.Timestamp){
             const d=new Date(m.Timestamp);
             d.setUTCHours((d.getUTCHours()+hourShift)%24);
             m._shiftedTime=d;
-          } else {
-            m._shiftedTime=null;
-          }
+          } else m._shiftedTime=null;
         });
         chat.messages=msgs;
         resolve();
@@ -134,6 +144,7 @@ function isDM(conv){ return conv.channel && conv.channel.type==='DM'; }
 function renderSidebar(){
   fileList.innerHTML='';
   const sortBy=sortSelect.value;
+  const query = chatSearch.value.toLowerCase();
 
   function sortChats(arr){
     return arr.slice().sort((a,b)=>{
@@ -150,13 +161,15 @@ function renderSidebar(){
         case 'oldest': return firstA-firstB;
         case 'messages': return (b.messages.length||0)-(a.messages.length||0);
         case 'alpha': return getConversationLabel(a).localeCompare(getConversationLabel(b));
-        case 'duration': return durationB - durationA; // longest first
+        case 'duration': return durationB-durationA;
       }
     });
   }
 
-  const dms = sortChats(conversations.filter(isDM));
-  const servers = sortChats(conversations.filter(c=>!isDM(c)));
+  function filterChats(arr){ return sortChats(arr).filter(c => getConversationLabel(c).toLowerCase().includes(query)); }
+
+  const dms = filterChats(conversations.filter(isDM));
+  const servers = filterChats(conversations.filter(c=>!isDM(c)));
 
   if(dms.length>0){
     const dh=document.createElement('div'); dh.className='sectionHeader'; dh.textContent='Direct Messages'; fileList.appendChild(dh);
@@ -183,15 +196,16 @@ function renderSidebar(){
 
 function refreshLabels(){
   conversations.forEach(conv=>{
-    if(conv._el){
-      conv._el.textContent=getConversationLabel(conv);
-    }
+    if(conv._el) conv._el.textContent=getConversationLabel(conv);
   });
 }
 
 function renderMessages(messages){
   main.innerHTML='';
+  const searchQuery = messageSearch.value.toLowerCase();
   messages.slice().sort((a,b)=>b._shiftedTime - a._shiftedTime).forEach(msg=>{
+    if(searchQuery && !((msg.Contents||'').toLowerCase().includes(searchQuery))) return;
+
     const row=document.createElement('div'); row.className='message';
     const av=document.createElement('div'); av.className='avatar'; av.textContent='U';
     const body=document.createElement('div');
@@ -202,12 +216,51 @@ function renderMessages(messages){
     head.appendChild(user); head.appendChild(time);
     const text=document.createElement('div'); text.className='text'; text.textContent=msg.Contents||'';
     body.appendChild(head); body.appendChild(text);
-    if(msg.Attachments){ const att=document.createElement('div'); att.className='text'; att.style.color='#00a8fc'; att.textContent=`Attachment: ${msg.Attachments}`; body.appendChild(att);}
+
+    // Attachments clickable
+    if(msg.Attachments){ 
+      const att=document.createElement('a'); 
+      att.href=msg.Attachments; 
+      att.textContent=`Attachment: ${msg.Attachments}`;
+      att.target='_blank'; 
+      att.style.color='#00a8fc'; 
+      att.className='text';
+      body.appendChild(att);
+    }
+
+    // Detect URLs in message for embedding
+    if(msg.Contents){
+      const urls = msg.Contents.match(/https?:\/\/\S+/g) || [];
+      urls.forEach(url => {
+        if(url.match(/\.(gif|png|jpg|jpeg)$/i)){ 
+          const img=document.createElement('img'); 
+          img.src=url; 
+          img.className='embedded'; 
+          body.appendChild(img);
+        } else if(url.includes('tenor.com') || url.includes('giphy.com')) {
+          const iframe=document.createElement('iframe');
+          iframe.src=url;
+          iframe.className='embed';
+          iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+          iframe.allowFullscreen=true;
+          body.appendChild(iframe);
+        } else { 
+          const link=document.createElement('a'); 
+          link.href=url; 
+          link.textContent=url; 
+          link.target='_blank'; 
+          link.style.color='#00a8fc'; 
+          body.appendChild(link);
+        }
+      });
+    }
+
     row.appendChild(av); row.appendChild(body);
     main.appendChild(row);
   });
 }
 
+// --- Stats & graphs remain unchanged (use _shiftedTime for all) ---
 function showStats(conv){
   statsPanel.innerHTML='';
   if(!conv.messages||conv.messages.length===0){ statsPanel.textContent='No messages in this chat.'; return; }
