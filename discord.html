@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Discord Multi-Chat Viewer with Advanced Stats</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+body { margin:0; font-family:system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,sans-serif; background:#313338; color:#dbdee1; display:flex; height:100vh; }
+#sidebar { width:300px; background:#1e1f22; border-right:1px solid #111214; display:flex; flex-direction:column; }
+#folderInput { margin:12px; }
+#sortSelect { margin:0 12px 12px 12px; padding:4px; }
+#fileList { flex:1; overflow-y:auto; padding:8px 12px; }
+.fileItem { padding:6px 8px; border-radius:6px; cursor:pointer; font-size:14px; }
+.fileItem:hover { background:#2b2d31; }
+#main { flex:1; overflow-y:auto; padding:16px; border-right:1px solid #111214; }
+.message { display:flex; gap:12px; margin-bottom:14px; }
+.avatar { width:40px; height:40px; border-radius:50%; background:#5865f2; display:flex; align-items:center; justify-content:center; font-weight:bold; color:white; flex-shrink:0; }
+.header { display:flex; gap:8px; align-items:baseline; }
+.username { font-weight:600; color:#f2f3f5; }
+.timestamp { font-size:12px; color:#949ba4; }
+.text { white-space:pre-wrap; line-height:1.4; }
+#statsPanel { width:300px; background:#1e1f22; overflow-y:auto; padding:16px; }
+.statsSection { margin-bottom:16px; }
+.statsSection h3 { margin:0 0 8px 0; font-size:16px; border-bottom:1px solid #5865f2; padding-bottom:4px; }
+.statsItem { margin-bottom:4px; }
+.sectionHeader { font-weight:bold; margin-top:8px; margin-bottom:4px; color:#00a8fc; }
+</style>
+</head>
+<body>
+<div id="sidebar">
+  <input type="file" id="folderInput" webkitdirectory multiple>
+  <select id="sortSelect">
+    <option value="recent">Most Recent</option>
+    <option value="oldest">Oldest</option>
+    <option value="messages">Most Messages</option>
+    <option value="alpha">Alphabetical</option>
+  </select>
+  <div id="fileList"></div>
+</div>
+
+<div id="main">Drop folder here or select using input.</div>
+<div id="statsPanel">Stats will appear here.</div>
+
+<script>
+let indexMap = {};
+let conversations = [];
+
+const folderInput = document.getElementById('folderInput');
+const fileList = document.getElementById('fileList');
+const main = document.getElementById('main');
+const statsPanel = document.getElementById('statsPanel');
+const sortSelect = document.getElementById('sortSelect');
+
+folderInput.addEventListener('change', e => {
+  const files = [...e.target.files];
+  processFolder(files);
+});
+
+sortSelect.addEventListener('change', renderSidebar);
+
+function processFolder(files) {
+  const groupedChats = {};
+  files.forEach(file => {
+    const pathParts = file.webkitRelativePath.split('/');
+    if(pathParts.length < 2) return;
+    const folderName = pathParts[1];
+
+    if(file.name==='index.json'){
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        try {
+          const json = JSON.parse(reader.result);
+          indexMap = {...indexMap,...json};
+          console.log(`Loaded index.json with ${Object.keys(indexMap).length} entries.`);
+          refreshLabels();
+        }catch(err){console.error('Failed to parse index.json:',err);}
+      };
+      reader.readAsText(file);
+      return;
+    }
+
+    if(folderName.startsWith('c')){
+      if(!groupedChats[folderName]) groupedChats[folderName]={};
+      if(file.name==='channel.json') groupedChats[folderName].channel=file;
+      if(file.name==='messages.json') groupedChats[folderName].messages=file;
+    }
+  });
+
+  Object.entries(groupedChats).forEach(([folderName, filesObj])=>{
+    if(!filesObj.messages){ console.warn(`No messages.json in ${folderName}`); return; }
+    const chat={messages:null, channel:null};
+
+    const readChannel=filesObj.channel?new Promise(resolve=>{
+      const reader=new FileReader();
+      reader.onload=()=>{chat.channel=JSON.parse(reader.result); resolve();};
+      reader.readAsText(filesObj.channel);
+    }):Promise.resolve();
+
+    const readMessages=new Promise(resolve=>{
+      const reader=new FileReader();
+      reader.onload=()=>{chat.messages=JSON.parse(reader.result); resolve();};
+      reader.readAsText(filesObj.messages);
+    });
+
+    Promise.all([readChannel,readMessages]).then(()=>{
+      conversations.push(chat);
+      renderSidebar();
+      console.log(`Loaded chat folder ${folderName} with ${chat.messages.length} messages.`);
+    }).catch(err=>console.error(`Error loading chat ${folderName}:`,err));
+  });
+}
+
+function getConversationLabel(conv){
+  if(!conv.channel||!conv.channel.id) return 'Unknown Conversation';
+  return indexMap[conv.channel.id] || conv.channel.id;
+}
+
+function isDM(conv){ return conv.channel && conv.channel.type==='DM'; }
+
+function renderSidebar(){
+  fileList.innerHTML='';
+
+  const sortBy=sortSelect.value;
+
+  function sortChats(arr){
+    return arr.slice().sort((a,b)=>{
+      if(!a.messages||!b.messages) return 0;
+      const firstA=new Date(a.messages[0]?.Timestamp||0);
+      const firstB=new Date(b.messages[0]?.Timestamp||0);
+      const lastA=new Date(a.messages[a.messages.length-1]?.Timestamp||0);
+      const lastB=new Date(b.messages[b.messages.length-1]?.Timestamp||0);
+      switch(sortBy){
+        case 'recent': return lastB-lastA;
+        case 'oldest': return firstA-firstB;
+        case 'messages': return (b.messages.length||0)-(a.messages.length||0);
+        case 'alpha': return getConversationLabel(a).localeCompare(getConversationLabel(b));
+      }
+    });
+  }
+
+  const dms = sortChats(conversations.filter(isDM));
+  const servers = sortChats(conversations.filter(c=>!isDM(c)));
+
+  if(dms.length>0){
+    const dh=document.createElement('div'); dh.className='sectionHeader'; dh.textContent='Direct Messages'; fileList.appendChild(dh);
+    dms.forEach(conv=>{const item=document.createElement('div'); item.className='fileItem'; item.textContent=getConversationLabel(conv); item.onclick=()=>{renderMessages(conv.messages); showStats(conv);}; conv._el=item; fileList.appendChild(item);});
+  }
+
+  if(servers.length>0){
+    const sh=document.createElement('div'); sh.className='sectionHeader'; sh.textContent='Server / Channels'; fileList.appendChild(sh);
+    servers.forEach(conv=>{const item=document.createElement('div'); item.className='fileItem'; item.textContent=getConversationLabel(conv); item.onclick=()=>{renderMessages(conv.messages); showStats(conv);}; conv._el=item; fileList.appendChild(item);});
+  }
+}
+
+function refreshLabels(){
+  conversations.forEach(conv=>{
+    if(conv._el){
+      const old=conv._el.textContent;
+      const label=getConversationLabel(conv);
+      conv._el.textContent=label;
+      if(old!==label) console.log(`Conversation renamed: "${old}" -> "${label}"`);
+    }
+  });
+}
+
+function renderMessages(messages){
+  main.innerHTML='';
+  messages.slice().sort((a,b)=>new Date(a.Timestamp||0)-new Date(b.Timestamp||0)).forEach(msg=>{
+    const row=document.createElement('div'); row.className='message';
+    const av=document.createElement('div'); av.className='avatar'; av.textContent='U';
+    const body=document.createElement('div');
+    const head=document.createElement('div'); head.className='header';
+    const user=document.createElement('span'); user.className='username'; user.textContent=msg.Author||'User';
+    const time=document.createElement('span'); time.className='timestamp'; time.textContent=msg.Timestamp?new Date(msg.Timestamp).toLocaleString():'';
+    head.appendChild(user); head.appendChild(time);
+    const text=document.createElement('div'); text.className='text'; text.textContent=msg.Contents||'';
+    body.appendChild(head); body.appendChild(text);
+    if(msg.Attachments){
+      const att=document.createElement('div'); att.className='text'; att.style.color='#00a8fc'; att.textContent=`Attachment: ${msg.Attachments}`;
+      body.appendChild(att);
+    }
+    row.appendChild(av); row.appendChild(body);
+    main.appendChild(row);
+  });
+  console.log(`Rendered ${messages.length} messages.`);
+}
+
+// Stats remain the same as previous version, including % of total messages
+function showStats(conv){
+  statsPanel.innerHTML='';
+  if(!conv.messages||conv.messages.length===0){ statsPanel.textContent='No messages in this chat.'; return; }
+
+  const totalMessages=conv.messages.length;
+  const first=new Date(conv.messages[0].Timestamp||0);
+  const last=new Date(conv.messages[conv.messages.length-1].Timestamp||0);
+  const durationDays=Math.floor(Math.abs(last-first)/(1000*60*60*24));
+
+  // Count attachments
+  const attachmentsCount=conv.messages.filter(m=>m.Attachments).length;
+
+  // Per-user stats
+  const userCount={};
+  conv.messages.forEach(m=>{
+    const u=m.Author||'Unknown';
+    userCount[u]=(userCount[u]||0)+1;
+  });
+
+  // Overall messages count
+  const allMessages = conversations.flatMap(c=>c.messages||[]);
+  const overallTotal=allMessages.length;
+
+  // Chat % of total messages
+  const chatPct=((totalMessages/overallTotal)*100).toFixed(1);
+
+  // Average messages per day
+  const avgPerDay = durationDays>0 ? (totalMessages/durationDays).toFixed(1) : totalMessages;
+
+  const section=document.createElement('div'); section.className='statsSection';
+  section.innerHTML=`<h3>${getConversationLabel(conv)}</h3>
+    <div class="statsItem">Total Messages: ${totalMessages} (${chatPct}% of all messages)</div>
+    <div class="statsItem">Attachments: ${attachmentsCount}</div>
+    <div class="statsItem">First: ${first.toLocaleString()}</div>
+    <div class="statsItem">Last: ${last.toLocaleString()}</div>
+    <div class="statsItem">Duration: ~${durationDays} days</div>
+    <div class="statsItem">Avg messages/day: ${avgPerDay}</div>
+    <div class="statsItem"><strong>Messages by User:</strong></div>`;
+
+  Object.entries(userCount).sort((a,b)=>b[1]-a[1]).forEach(([user,count])=>{
+    const pct=((count/totalMessages)*100).toFixed(1);
+    const totalPct=((count/overallTotal)*100).toFixed(1);
+    const div=document.createElement('div'); div.className='statsItem';
+    div.textContent=`${user}: ${count} (${pct}% of chat, ${totalPct}% of all messages)`;
+    section.appendChild(div);
+  });
+
+  statsPanel.appendChild(section);
+
+  // Overall stats for all chats
+  const overallFirst=new Date(Math.min(...allMessages.map(m=>new Date(m.Timestamp||0))));
+  const overallLast=new Date(Math.max(...allMessages.map(m=>new Date(m.Timestamp||0))));
+  const overallDurationDays=Math.floor(Math.abs(overallLast-overallFirst)/(1000*60*60*24));
+  const overallAttachments=allMessages.filter(m=>m.Attachments).length;
+
+  const overallSection=document.createElement('div'); overallSection.className='statsSection';
+  overallSection.innerHTML=`<h3>Overall Stats (All Chats)</h3>
+    <div class="statsItem">Total Messages: ${overallTotal}</div>
+    <div class="statsItem">Attachments: ${overallAttachments}</div>
+    <div class="statsItem">First: ${overallFirst.toLocaleString()}</div>
+    <div class="statsItem">Last: ${overallLast.toLocaleString()}</div>
+    <div class="statsItem">Duration: ~${overallDurationDays} days</div>`;
+  statsPanel.appendChild(overallSection);
+}
+</script>
+</body>
+</html>
