@@ -211,8 +211,8 @@ function renderMessages(messages){
   main.innerHTML='';
   const searchQuery = messageSearch.value.toLowerCase();
   messages.slice().sort((a,b)=>b._shiftedTime - a._shiftedTime).forEach(msg=>{
-   const msgText = (msg.Contents || (msg.Attachments ? '' : '**A call was started**')).toLowerCase();
-if(searchQuery && !msgText.includes(searchQuery)) return;
+    const msgText = (msg.Contents || (msg.Attachments ? '' : '**A call was started**')).toLowerCase();
+    if(searchQuery && !msgText.includes(searchQuery)) return;
 
     const row=document.createElement('div'); row.className='message';
     const av=document.createElement('div'); av.className='avatar'; av.textContent='U';
@@ -268,9 +268,13 @@ if(searchQuery && !msgText.includes(searchQuery)) return;
       body.appendChild(text);
     }
 
-    row.appendChild(av); row.appendChild(body);
+    row.appendChild(av); 
+    row.appendChild(body);
     main.appendChild(row);
   });
+
+  // Scroll to bottom after rendering
+  main.scrollTop = main.scrollHeight;
 }
 
 // --- showStats and updateGraphs remain unchanged ---
@@ -373,7 +377,7 @@ function updateGraphs(conv, allMessages, interval){
   const overallCtx=document.getElementById('overallGraph').getContext('2d');
   const overallData=getLabelsAndCounts(allMessages);
   if(overallChart) overallChart.destroy();
-  overallChart=new Chart(overallCtx,{type:'bar',data:{labels:overallData.labels,datasets:[{label:'Messages',data:overallData.data,backgroundColor:'#00a8fc'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+  overallChart=new Chart(overallCtx,{type:'bar',data:{labels:overallData.labels,datasets:[{label:'Messages',data:overallData.data,backgroundColor:'#00a8fc'}]},options:{responsive:true,plugins:{legend:{display:false}}}}); 
 }
 </script>
 </body>
