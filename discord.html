@@ -109,7 +109,7 @@ function processFolder(files){
 
   Object.entries(groupedChats).forEach(([folderName, filesObj])=>{
     if(!filesObj.messages){ console.warn(`No messages.json in ${folderName}`); return; }
-    const chat={messages:null, channel:null};
+    const chat={messages:null, channel:null, folderName: folderName};
 
     const readChannel=filesObj.channel?new Promise(resolve=>{
       const reader=new FileReader();
@@ -211,7 +211,8 @@ function renderMessages(messages){
   main.innerHTML='';
   const searchQuery = messageSearch.value.toLowerCase();
   messages.slice().sort((a,b)=>b._shiftedTime - a._shiftedTime).forEach(msg=>{
-    if(searchQuery && !((msg.Contents||'').toLowerCase().includes(searchQuery))) return;
+   const msgText = (msg.Contents || (msg.Attachments ? '' : '**A call was started**')).toLowerCase();
+if(searchQuery && !msgText.includes(searchQuery)) return;
 
     const row=document.createElement('div'); row.className='message';
     const av=document.createElement('div'); av.className='avatar'; av.textContent='U';
@@ -231,32 +232,39 @@ function renderMessages(messages){
       body.appendChild(img);
     }
 
-    if(msg.Contents){
-      const urls = msg.Contents.match(/https?:\/\/\S+/g) || [];
-      urls.forEach(url => {
-        if(url.match(/\.(gif|png|jpg|jpeg)$/i)){ 
-          const img=document.createElement('img'); 
-          img.src=url; 
-          img.className='embedded'; 
-          body.appendChild(img);
-        } else if(url.includes('tenor.com') || url.includes('giphy.com')) {
-          const iframe=document.createElement('iframe');
-          iframe.src=url;
-          iframe.className='embed';
-          iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-          iframe.allowFullscreen=true;
-          body.appendChild(iframe);
-        } else { 
-          const link=document.createElement('a'); 
-          link.href=url; 
-          link.textContent=url; 
-          link.target='_blank'; 
-          link.style.color='#00a8fc'; 
-          body.appendChild(link);
-        }
-      });
+    // Show content, attachments, or call message
+    if(msg.Contents || msg.Attachments){
+      if(msg.Contents){
+        const urls = msg.Contents.match(/https?:\/\/\S+/g) || [];
+        urls.forEach(url => {
+          if(url.match(/\.(gif|png|jpg|jpeg)$/i)){ 
+            const img=document.createElement('img'); 
+            img.src=url; 
+            img.className='embedded'; 
+            body.appendChild(img);
+          } else if(url.includes('tenor.com') || url.includes('giphy.com')) {
+            const iframe=document.createElement('iframe');
+            iframe.src=url;
+            iframe.className='embed';
+            iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+            iframe.allowFullscreen=true;
+            body.appendChild(iframe);
+          } else { 
+            const link=document.createElement('a'); 
+            link.href=url; 
+            link.textContent=url; 
+            link.target='_blank'; 
+            link.style.color='#00a8fc'; 
+            body.appendChild(link);
+          }
+        });
 
-      const text=document.createElement('div'); text.className='text'; text.textContent=msg.Contents;
+        const text=document.createElement('div'); text.className='text'; text.textContent=msg.Contents;
+        body.appendChild(text);
+      }
+    } else {
+      const text=document.createElement('div'); text.className='text';
+      text.textContent="**A call was started**";
       body.appendChild(text);
     }
 
@@ -265,6 +273,7 @@ function renderMessages(messages){
   });
 }
 
+// --- showStats and updateGraphs remain unchanged ---
 function showStats(conv){
   statsPanel.innerHTML='';
   if(!conv.messages||conv.messages.length===0){ statsPanel.textContent='No messages in this chat.'; return; }
@@ -282,7 +291,7 @@ function showStats(conv){
   const avgPerDay = durationDays>0 ? (totalMessages/durationDays).toFixed(1) : totalMessages;
 
   const section=document.createElement('div'); section.className='statsSection';
-  section.innerHTML=`<h3>${getConversationLabel(conv)}</h3>
+  section.innerHTML=`<h3>${getConversationLabel(conv)} (${conv.folderName})</h3>
     <div class="statsItem">Total Messages: ${totalMessages} (${chatPct}% of all messages)</div>
     <div class="statsItem">Attachments: ${attachmentsCount}</div>
     <div class="statsItem">First: ${first.toLocaleString()}</div>
