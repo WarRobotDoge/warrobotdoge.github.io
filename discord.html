@@ -6,7 +6,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body { margin:0; font-family:system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,sans-serif; background:#313338; color:#dbdee1; display:flex; height:100vh; }
+body {
+  margin:0;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,sans-serif;
+  background:#313338;
+  color:#dbdee1;
+  display:flex;
+  height:100vh;
+}
+
+/* ===== Loading Overlay ===== */
+#loadingOverlay {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+#loadingBox {
+  background:#1e1f22;
+  padding:20px 26px;
+  border-radius:10px;
+  min-width:260px;
+  text-align:center;
+  box-shadow:0 0 20px rgba(0,0,0,0.6);
+}
+#loadingText {
+  font-size:15px;
+  margin-bottom:10px;
+}
+#loadingBar {
+  width:100%;
+  height:8px;
+  background:#2b2d31;
+  border-radius:6px;
+  overflow:hidden;
+}
+#loadingBarFill {
+  height:100%;
+  width:0%;
+  background:#5865f2;
+  transition:width 0.2s ease;
+}
+
 #sidebar { width:300px; background:#1e1f22; border-right:1px solid #111214; display:flex; flex-direction:column; }
 #folderInput { margin:12px; }
 #chatSearch { margin:8px 12px; padding:4px; border-radius:4px; border:none; width:calc(100% - 24px); }
@@ -14,34 +58,43 @@ body { margin:0; font-family:system-ui, -apple-system, BlinkMacSystemFont,"Segoe
 #fileList { flex:1; overflow-y:auto; padding:8px 12px; }
 .fileItem { padding:6px 8px; border-radius:6px; cursor:pointer; font-size:14px; }
 .fileItem:hover { background:#2b2d31; }
+.sectionHeader { font-weight:bold; margin-top:8px; margin-bottom:4px; color:#00a8fc; }
+
 #mainContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; }
 #messageSearch { margin:8px 16px; padding:4px; border-radius:4px; border:none; width:calc(100% - 32px); }
 #main { flex:1; overflow-y:auto; padding:16px; border-top:1px solid #111214; }
+
 .message { display:flex; gap:12px; margin-bottom:14px; }
 .avatar { width:40px; height:40px; border-radius:50%; background:#5865f2; display:flex; align-items:center; justify-content:center; font-weight:bold; color:white; flex-shrink:0; }
 .header { display:flex; gap:8px; align-items:baseline; }
 .username { font-weight:600; color:#f2f3f5; }
 .timestamp { font-size:12px; color:#949ba4; }
 .text { white-space:pre-wrap; line-height:1.4; }
+
 #statsPanel { width:400px; background:#1e1f22; overflow-y:auto; padding:16px; }
 .statsSection { margin-bottom:16px; }
 .statsSection h3 { margin:0 0 8px 0; font-size:16px; border-bottom:1px solid #5865f2; padding-bottom:4px; }
 .statsItem { margin-bottom:4px; }
-.sectionHeader { font-weight:bold; margin-top:8px; margin-bottom:4px; color:#00a8fc; }
 #graphOptions { margin:8px 0 12px 0; }
+
 canvas { background:#2b2d31; border-radius:6px; width:100%; }
-img.embedded { max-width:auto; max-height:100%; border-radius:6px; display:block; margin-top:4px; }
-iframe.embed { 
-  width:100%; 
-  max-width:100%; 
-  height:400px; 
-  border:none; 
-  border-radius:6px; 
-  margin-top:4px; 
-}
+img.embedded { max-width:400px; max-height:300px; border-radius:6px; display:block; margin-top:4px; object-fit:contain; }
+iframe.embed { width:100%; height:400px; border:none; border-radius:6px; margin-top:4px; }
 </style>
 </head>
+
 <body>
+
+<!-- ===== Loading Overlay ===== -->
+<div id="loadingOverlay">
+  <div id="loadingBox">
+    <div id="loadingText">Loading chats…</div>
+    <div id="loadingBar">
+      <div id="loadingBarFill"></div>
+    </div>
+  </div>
+</div>
+
 <div id="sidebar">
   <input type="file" id="folderInput" webkitdirectory multiple>
   <input type="text" id="chatSearch" placeholder="Search chats...">
@@ -59,14 +112,23 @@ iframe.embed {
   <input type="text" id="messageSearch" placeholder="Search messages...">
   <div id="main">Drop folder here or select using input.</div>
 </div>
+
 <div id="statsPanel"></div>
 
 <script>
 let indexMap = {};
 let conversations = [];
-let perChatChart=null, overallChart=null;
-let currentChat=null;
+let currentChat = null;
 const hourShift = 17;
+
+let totalChats = 0;
+let loadedChats = 0;
+const loadingOverlay = document.getElementById('loadingOverlay');
+const loadingText = document.getElementById('loadingText');
+const loadingBarFill = document.getElementById('loadingBarFill');
+function showLoader(total){ totalChats=total; loadedChats=0; loadingOverlay.style.display='flex'; updateLoader();}
+function updateLoader(){ const pct = totalChats ? Math.round((loadedChats/totalChats)*100) : 0; loadingText.textContent=`Chats loaded: ${loadedChats} / ${totalChats} (${pct}%)`; loadingBarFill.style.width=pct+'%';}
+function hideLoader(){ loadingOverlay.style.display='none';}
 
 const folderInput = document.getElementById('folderInput');
 const fileList = document.getElementById('fileList');
@@ -76,142 +138,106 @@ const sortSelect = document.getElementById('sortSelect');
 const chatSearch = document.getElementById('chatSearch');
 const messageSearch = document.getElementById('messageSearch');
 
-folderInput.addEventListener('change', e => { processFolder([...e.target.files]); });
+folderInput.addEventListener('change', e => processFolder([...e.target.files]));
 sortSelect.addEventListener('change', renderSidebar);
 chatSearch.addEventListener('input', renderSidebar);
 messageSearch.addEventListener('input', ()=>{ if(currentChat) renderMessages(currentChat.messages); });
 
 function processFolder(files){
+  conversations = [];
+  indexMap = {};
   const groupedChats = {};
+
   files.forEach(file => {
-    const pathParts=file.webkitRelativePath.split('/');
-    if(pathParts.length<2) return;
-    const folderName=pathParts[1];
-
-    if(file.name==='index.json'){
-      const reader=new FileReader();
-      reader.onload=()=>{ 
-        try{ 
-          indexMap=JSON.parse(reader.result); 
-          refreshLabels(); 
-        } catch(err){console.error('Failed to parse index.json:',err);} 
-      };
-      reader.readAsText(file);
-      return;
-    }
-
-    if(folderName.startsWith('c')){
-      if(!groupedChats[folderName]) groupedChats[folderName]={};
-      if(file.name==='channel.json') groupedChats[folderName].channel=file;
-      if(file.name==='messages.json') groupedChats[folderName].messages=file;
-    }
+    const path = file.webkitRelativePath.split('/');
+    if(path.length < 2) return;
+    const folder = path[1];
+    if(file.name==='index.json'){ const r = new FileReader(); r.onload=()=>indexMap=JSON.parse(r.result); r.readAsText(file); return;}
+    if(folder.startsWith('c')){ groupedChats[folder] ??= {}; if(file.name==='channel.json') groupedChats[folder].channel=file; if(file.name==='messages.json') groupedChats[folder].messages=file;}
   });
 
-  Object.entries(groupedChats).forEach(([folderName, filesObj])=>{
-    if(!filesObj.messages){ console.warn(`No messages.json in ${folderName}`); return; }
-    const chat={messages:null, channel:null, folderName: folderName};
+  const validChats = Object.entries(groupedChats).filter(([k,v])=>v.messages);
+  showLoader(validChats.length);
 
-    const readChannel=filesObj.channel?new Promise(resolve=>{
-      const reader=new FileReader();
-      reader.onload=()=>{ chat.channel=JSON.parse(reader.result); resolve(); };
-      reader.readAsText(filesObj.channel);
-    }):Promise.resolve();
+  validChats.forEach(([folderName, chatFiles])=>{
+    const chat = { messages:null, channel:null, folderName };
 
-    const readMessages=new Promise(resolve=>{
-      const reader=new FileReader();
-      reader.onload=()=>{
-        const msgs=JSON.parse(reader.result);
-        msgs.forEach(m=>{
-          if(m.Timestamp){
-            const d=new Date(m.Timestamp);
-            d.setUTCHours((d.getUTCHours()+hourShift)%24);
-            m._shiftedTime=d;
-          } else m._shiftedTime=null;
-        });
+    const readChannel = chatFiles.channel ? new Promise(res=>{
+      const r = new FileReader();
+      r.onload=()=>{ chat.channel=JSON.parse(r.result); res(); };
+      r.readAsText(chatFiles.channel);
+    }) : Promise.resolve();
+
+    const readMessages = new Promise(res=>{
+      const r = new FileReader();
+      r.onload=()=>{
+        const msgs = JSON.parse(r.result);
+        msgs.forEach(m=>{ if(m.Timestamp){ const d=new Date(m.Timestamp); d.setUTCHours((d.getUTCHours()+hourShift)%24); m._shiftedTime=d; }});
         chat.messages=msgs;
-        resolve();
+        res();
       };
-      reader.readAsText(filesObj.messages);
+      r.readAsText(chatFiles.messages);
     });
 
     Promise.all([readChannel, readMessages]).then(()=>{
       conversations.push(chat);
+      loadedChats++;
+      updateLoader();
+      if(loadedChats===totalChats){ setTimeout(hideLoader,300);}
       renderSidebar();
-    }).catch(err=>console.error(`Error loading chat ${folderName}:`,err));
+    });
   });
 }
 
-function getConversationLabel(conv){
-  if(!conv.channel||!conv.channel.id) return 'Unknown Conversation';
-  return indexMap[conv.channel.id] || conv.channel.id;
-}
-
-function isDM(conv){ return conv.channel && conv.channel.type==='DM'; }
+function getConversationLabel(conv){ return conv.channel?.id ? indexMap[conv.channel.id]||conv.channel.id : 'Unknown Conversation'; }
+function isDM(conv){ return conv.channel?.type==='DM'; }
 
 function renderSidebar(){
   fileList.innerHTML='';
   const sortBy=sortSelect.value;
-  const query = chatSearch.value.toLowerCase();
+  const query=chatSearch.value.toLowerCase();
 
   function sortChats(arr){
     return arr.slice().sort((a,b)=>{
       if(!a.messages||!b.messages) return 0;
-      const firstA=a.messages[0]?a.messages[0]._shiftedTime||new Date(a.messages[0].Timestamp) : new Date(0);
-      const firstB=b.messages[0]?b.messages[0]._shiftedTime||new Date(b.messages[0].Timestamp) : new Date(0);
-      const lastA=a.messages[a.messages.length-1]?a.messages[a.messages.length-1]._shiftedTime||new Date(a.messages[a.messages.length-1].Timestamp) : new Date(0);
-      const lastB=b.messages[b.messages.length-1]?b.messages[b.messages.length-1]._shiftedTime||new Date(b.messages[b.messages.length-1].Timestamp) : new Date(0);
+      const firstA=a.messages[0]?a.messages[0]._shiftedTime||new Date(a.messages[0].Timestamp):new Date(0);
+      const firstB=b.messages[0]?b.messages[0]._shiftedTime||new Date(b.messages[0].Timestamp):new Date(0);
+      const lastA=a.messages[a.messages.length-1]?a.messages[a.messages.length-1]._shiftedTime||new Date(a.messages[a.messages.length-1].Timestamp):new Date(0);
+      const lastB=b.messages[b.messages.length-1]?b.messages[b.messages.length-1]._shiftedTime||new Date(b.messages[b.messages.length-1].Timestamp):new Date(0);
       const durationA=Math.abs(lastA-firstA);
       const durationB=Math.abs(lastB-firstB);
 
       switch(sortBy){
-        case 'recent': return lastB-lastA;
-        case 'oldest': return firstA-firstB;
-        case 'messages': return (b.messages.length||0)-(a.messages.length||0);
-        case 'alpha': return getConversationLabel(a).localeCompare(getConversationLabel(b));
-        case 'duration': return durationB-durationA;
+        case'recent': return lastB-lastA;
+        case'oldest': return firstA-firstB;
+        case'messages': return (b.messages.length||0)-(a.messages.length||0);
+        case'alpha': return getConversationLabel(a).localeCompare(getConversationLabel(b));
+        case'duration': return durationB-durationA;
       }
     });
   }
 
-  function filterChats(arr){ return sortChats(arr).filter(c => getConversationLabel(c).toLowerCase().includes(query)); }
+  function filterChats(arr){ return sortChats(arr).filter(c=>getConversationLabel(c).toLowerCase().includes(query)); }
 
   const dms = filterChats(conversations.filter(isDM));
   const servers = filterChats(conversations.filter(c=>!isDM(c)));
 
   if(dms.length>0){
     const dh=document.createElement('div'); dh.className='sectionHeader'; dh.textContent='Direct Messages'; fileList.appendChild(dh);
-    dms.forEach(conv=>{
-      const item=document.createElement('div'); item.className='fileItem';
-      item.textContent=getConversationLabel(conv);
-      item.onclick=()=>{currentChat=conv; renderMessages(conv.messages); showStats(conv);};
-      conv._el=item;
-      fileList.appendChild(item);
-    });
+    dms.forEach(conv=>{ const item=document.createElement('div'); item.className='fileItem'; item.textContent=getConversationLabel(conv); item.onclick=()=>{currentChat=conv; renderMessages(conv.messages); showStats(conv);}; fileList.appendChild(item); });
   }
 
   if(servers.length>0){
     const sh=document.createElement('div'); sh.className='sectionHeader'; sh.textContent='Server / Channels'; fileList.appendChild(sh);
-    servers.forEach(conv=>{
-      const item=document.createElement('div'); item.className='fileItem';
-      item.textContent=getConversationLabel(conv);
-      item.onclick=()=>{currentChat=conv; renderMessages(conv.messages); showStats(conv);};
-      conv._el=item;
-      fileList.appendChild(item);
-    });
+    servers.forEach(conv=>{ const item=document.createElement('div'); item.className='fileItem'; item.textContent=getConversationLabel(conv); item.onclick=()=>{currentChat=conv; renderMessages(conv.messages); showStats(conv);}; fileList.appendChild(item); });
   }
-}
-
-function refreshLabels(){
-  conversations.forEach(conv=>{
-    if(conv._el) conv._el.textContent=getConversationLabel(conv);
-  });
 }
 
 function renderMessages(messages){
   main.innerHTML='';
-  const searchQuery = messageSearch.value.toLowerCase();
-  messages.slice().sort((a,b)=>b._shiftedTime - a._shiftedTime).forEach(msg=>{
-    const msgText = (msg.Contents || (msg.Attachments ? '' : '**A call was started**')).toLowerCase();
+  const searchQuery=messageSearch.value.toLowerCase();
+  messages.slice().sort((a,b)=>b._shiftedTime-a._shiftedTime).forEach(msg=>{
+    const msgText=(msg.Contents || (msg.Attachments?'**Discord attachment**':'**A call was started**')).toLowerCase();
     if(searchQuery && !msgText.includes(searchQuery)) return;
 
     const row=document.createElement('div'); row.className='message';
@@ -219,165 +245,105 @@ function renderMessages(messages){
     const body=document.createElement('div');
     const head=document.createElement('div'); head.className='header';
     const user=document.createElement('span'); user.className='username'; user.textContent=msg.Author||'User';
-    const time=document.createElement('span'); time.className='timestamp';
-    time.textContent=msg._shiftedTime ? msg._shiftedTime.toLocaleString() : '';
-    head.appendChild(user); head.appendChild(time);
-    body.appendChild(head);
+    const time=document.createElement('span'); time.className='timestamp'; time.textContent=msg._shiftedTime?msg._shiftedTime.toLocaleString():'';
+    head.appendChild(user); head.appendChild(time); body.appendChild(head);
 
-    // Attachments as scaled images
     if(msg.Attachments){
-      const img=document.createElement('img');
-      img.src=msg.Attachments;
-      img.className='embedded';
+      const attachmentLabel=document.createElement('div');
+      attachmentLabel.className='text';
+      attachmentLabel.textContent="**Discord attachment**";
+      body.appendChild(attachmentLabel);
+
+      const img=document.createElement('img'); img.src=msg.Attachments; img.className='embedded';
       body.appendChild(img);
     }
 
-    // Show content, attachments, or call message
-    if(msg.Contents || msg.Attachments){
-      if(msg.Contents){
-        const urls = msg.Contents.match(/https?:\/\/\S+/g) || [];
-        urls.forEach(url => {
-          if(url.match(/\.(gif|png|jpg|jpeg)$/i)){ 
-            const img=document.createElement('img'); 
-            img.src=url; 
-            img.className='embedded'; 
-            body.appendChild(img);
-          } else if(url.includes('tenor.com') || url.includes('giphy.com')) {
-            const iframe=document.createElement('iframe');
-            iframe.src=url;
-            iframe.className='embed';
-            iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-            iframe.allowFullscreen=true;
-            body.appendChild(iframe);
-          } else { 
-            const link=document.createElement('a'); 
-            link.href=url; 
-            link.textContent=url; 
-            link.target='_blank'; 
-            link.style.color='#00a8fc'; 
-            body.appendChild(link);
-          }
-        });
+    if(msg.Contents){ const text=document.createElement('div'); text.className='text'; text.textContent=msg.Contents; body.appendChild(text); }
+    if(!msg.Contents && !msg.Attachments){ const text=document.createElement('div'); text.className='text'; text.textContent="**A call was started**"; body.appendChild(text); }
 
-        const text=document.createElement('div'); text.className='text'; text.textContent=msg.Contents;
-        body.appendChild(text);
-      }
-    } else {
-      const text=document.createElement('div'); text.className='text';
-      text.textContent="**A call was started**";
-      body.appendChild(text);
-    }
-
-    row.appendChild(av); 
-    row.appendChild(body);
+    row.appendChild(av); row.appendChild(body);
     main.appendChild(row);
   });
-
-  // Scroll to bottom after rendering
-  main.scrollTop = main.scrollHeight;
+  main.scrollTop=main.scrollHeight;
 }
 
-// --- showStats and updateGraphs remain unchanged ---
+/* ===== Stats & Bar Graphs ===== */
+let perChatChart=null, overallChart=null;
 function showStats(conv){
   statsPanel.innerHTML='';
   if(!conv.messages||conv.messages.length===0){ statsPanel.textContent='No messages in this chat.'; return; }
-  const totalMessages=conv.messages.length;
   const allMessages = conversations.flatMap(c=>c.messages||[]);
 
-  const first=conv.messages[0]._shiftedTime;
-  const last=conv.messages[conv.messages.length-1]._shiftedTime;
-  const durationDays=Math.floor(Math.abs(last-first)/(1000*60*60*24));
-  const attachmentsCount=conv.messages.filter(m=>m.Attachments).length;
+  function createStatsSection(title, messages){
+    const first=messages[0]._shiftedTime;
+    const last=messages[messages.length-1]._shiftedTime;
+    const durationDays=Math.floor(Math.abs(last-first)/(1000*60*60*24));
+    const attachmentsCount=messages.filter(m=>m.Attachments).length;
+    const totalMessages=messages.length;
+    const avgPerDay = durationDays>0 ? (totalMessages/durationDays).toFixed(1) : totalMessages;
+    const userCount={}; messages.forEach(m=>{ const u=m.Author||'Unknown'; userCount[u]=(userCount[u]||0)+1; });
+    const chatPct=((totalMessages/allMessages.length)*100).toFixed(1);
 
-  const userCount={};
-  conv.messages.forEach(m=>{ const u=m.Author||'Unknown'; userCount[u]=(userCount[u]||0)+1; });
-  const chatPct=((totalMessages/allMessages.length)*100).toFixed(1);
-  const avgPerDay = durationDays>0 ? (totalMessages/durationDays).toFixed(1) : totalMessages;
+    const section=document.createElement('div'); section.className='statsSection';
+    let html=`<h3>${title}</h3>
+      <div class="statsItem">Total Messages: ${totalMessages} (${chatPct}% of all messages)</div>
+      <div class="statsItem">Attachments: ${attachmentsCount}</div>
+      <div class="statsItem">First: ${first.toLocaleString()}</div>
+      <div class="statsItem">Last: ${last.toLocaleString()}</div>
+      <div class="statsItem">Duration: ~${durationDays} days</div>
+      <div class="statsItem">Avg messages/day: ${avgPerDay}</div>
+      <div class="statsItem"><strong>Messages by User:</strong></div>`;
+    Object.entries(userCount).sort((a,b)=>b[1]-a[1]).forEach(([user,count])=>{
+      const pct=((count/totalMessages)*100).toFixed(1);
+      const totalPct=((count/allMessages.length)*100).toFixed(1);
+      html+=`<div class="statsItem">${user}: ${count} (${pct}% of chat, ${totalPct}% of all messages)</div>`;
+    });
+    html+=`<canvas class="barGraph" height=200></canvas>`;
+    section.innerHTML=html;
+    statsPanel.appendChild(section);
+    return section;
+  }
 
-  const section=document.createElement('div'); section.className='statsSection';
-  section.innerHTML=`<h3>${getConversationLabel(conv)} (${conv.folderName})</h3>
-    <div class="statsItem">Total Messages: ${totalMessages} (${chatPct}% of all messages)</div>
-    <div class="statsItem">Attachments: ${attachmentsCount}</div>
-    <div class="statsItem">First: ${first.toLocaleString()}</div>
-    <div class="statsItem">Last: ${last.toLocaleString()}</div>
-    <div class="statsItem">Duration: ~${durationDays} days</div>
-    <div class="statsItem">Avg messages/day: ${avgPerDay}</div>
-    <div class="statsItem"><strong>Messages by User:</strong></div>`;
-  Object.entries(userCount).sort((a,b)=>b[1]-a[1]).forEach(([user,count])=>{
-    const pct=((count/totalMessages)*100).toFixed(1);
-    const totalPct=((count/allMessages.length)*100).toFixed(1);
-    const div=document.createElement('div'); div.className='statsItem';
-    div.textContent=`${user}: ${count} (${pct}% of chat, ${totalPct}% of all messages)`;
-    section.appendChild(div);
-  });
+  const perSection=createStatsSection(`${getConversationLabel(conv)} (${conv.folderName})`, conv.messages);
+  const overallSection=createStatsSection(`Overall Stats (All Chats)`, allMessages);
 
-  const perCanvas=document.createElement('canvas'); perCanvas.id='perChatGraph'; perCanvas.height=200; section.appendChild(perCanvas);
-  const intervalDiv=document.createElement('div'); intervalDiv.id='graphOptions';
-  intervalDiv.innerHTML='Graph Interval: <select id="intervalSelectLocal"><option value="hour">Hourly</option><option value="day">Daily</option><option value="month">Monthly</option><option value="year">Yearly</option></select>';
-  section.appendChild(intervalDiv);
-  statsPanel.appendChild(section);
-
-  const overallSection=document.createElement('div'); overallSection.className='statsSection';
-  const overallFirst=new Date(Math.min(...allMessages.map(m=>m._shiftedTime?.getTime()||new Date(m.Timestamp).getTime())));
-  const overallLast=new Date(Math.max(...allMessages.map(m=>m._shiftedTime?.getTime()||new Date(m.Timestamp).getTime())));
-  const overallDurationDays=Math.floor(Math.abs(overallLast-overallFirst)/(1000*60*60*24));
-  const overallAttachments=allMessages.filter(m=>m.Attachments).length;
-  overallSection.innerHTML=`<h3>Overall Stats (All Chats)</h3>
-    <div class="statsItem">Total Messages: ${allMessages.length}</div>
-    <div class="statsItem">Attachments: ${overallAttachments}</div>
-    <div class="statsItem">First: ${overallFirst.toLocaleString()}</div>
-    <div class="statsItem">Last: ${overallLast.toLocaleString()}</div>
-    <div class="statsItem">Duration: ~${overallDurationDays} days</div>`;
-  const overallCanvas=document.createElement('canvas'); overallCanvas.id='overallGraph'; overallCanvas.height=200; overallSection.appendChild(overallCanvas);
-  statsPanel.appendChild(overallSection);
-
-  const intervalSelectLocal = document.getElementById('intervalSelectLocal');
-  intervalSelectLocal.addEventListener('change',()=>{ updateGraphs(conv, allMessages, intervalSelectLocal.value); });
-  updateGraphs(conv, allMessages, intervalSelectLocal.value);
+  const intervalSelect=document.createElement('select');
+  intervalSelect.innerHTML=`<option value="hour">Hourly</option><option value="day">Daily</option><option value="month">Monthly</option><option value="year">Yearly</option>`;
+  intervalSelect.addEventListener('change',()=>updateGraphs(conv, allMessages, intervalSelect.value));
+  perSection.appendChild(document.createElement('div')).appendChild(intervalSelect);
+  updateGraphs(conv, allMessages, 'hour');
 }
 
 function updateGraphs(conv, allMessages, interval){
   function getLabelsAndCounts(messages){
     const counts={};
-    messages.forEach(m=>{
-      const d=m._shiftedTime||new Date(m.Timestamp);
-      let key;
+    messages.forEach(m=>{ const d=m._shiftedTime||new Date(m.Timestamp); let key;
       if(interval==='hour') key=d.getHours();
       else if(interval==='day') key=d.getDay();
       else if(interval==='month') key=d.getMonth();
       else if(interval==='year') key=d.getFullYear();
       counts[key]=(counts[key]||0)+1;
     });
-
     let labels=[], data=[];
-    if(interval==='hour'){
-      labels=Array.from({length:24},(_,i)=>{ const h=i%12||12; return `${h} ${i<12?'AM':'PM'}`; });
-      data=labels.map((_,i)=>counts[i]||0);
-    } else if(interval==='day'){
-      const dayLabels=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      labels=dayLabels;
-      data=dayLabels.map((_,i)=>counts[i]||0);
-    } else if(interval==='month'){
-      const monthLabels=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      labels=monthLabels;
-      data=monthLabels.map((_,i)=>counts[i]||0);
-    } else if(interval==='year'){
-      const years=Array.from(new Set(messages.map(m=>m._shiftedTime?.getFullYear()||new Date(m.Timestamp).getFullYear()))).sort();
-      labels=years;
-      data=years.map(y=>counts[y]||0);
-    }
+    if(interval==='hour'){ labels=Array.from({length:24},(_,i)=>`${i%12||12} ${i<12?'AM':'PM'}`); data=labels.map((_,i)=>counts[i]||0); }
+    else if(interval==='day'){ const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; labels=days; data=days.map((_,i)=>counts[i]||0);}
+    else if(interval==='month'){ const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; labels=months; data=months.map((_,i)=>counts[i]||0);}
+    else if(interval==='year'){ const yrs=Array.from(new Set(messages.map(m=>m._shiftedTime?.getFullYear()||new Date(m.Timestamp).getFullYear()))).sort(); labels=yrs; data=yrs.map(y=>counts[y]||0);}
     return {labels,data};
   }
 
-  const perCtx=document.getElementById('perChatGraph').getContext('2d');
-  const perData=getLabelsAndCounts(conv.messages);
-  if(perChatChart) perChatChart.destroy();
-  perChatChart=new Chart(perCtx,{type:'bar',data:{labels:perData.labels,datasets:[{label:'Messages',data:perData.data,backgroundColor:'#5865f2'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+  const barGraphs=document.querySelectorAll('.barGraph');
+  if(barGraphs.length>=2){
+    const perCtx=barGraphs[0].getContext('2d');
+    const perData=getLabelsAndCounts(conv.messages);
+    if(perChatChart) perChatChart.destroy();
+    perChatChart=new Chart(perCtx,{type:'bar',data:{labels:perData.labels,datasets:[{label:'Messages',data:perData.data,backgroundColor:'#5865f2'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
 
-  const overallCtx=document.getElementById('overallGraph').getContext('2d');
-  const overallData=getLabelsAndCounts(allMessages);
-  if(overallChart) overallChart.destroy();
-  overallChart=new Chart(overallCtx,{type:'bar',data:{labels:overallData.labels,datasets:[{label:'Messages',data:overallData.data,backgroundColor:'#00a8fc'}]},options:{responsive:true,plugins:{legend:{display:false}}}}); 
+    const overallCtx=barGraphs[1].getContext('2d');
+    const overallData=getLabelsAndCounts(allMessages);
+    if(overallChart) overallChart.destroy();
+    overallChart=new Chart(overallCtx,{type:'bar',data:{labels:overallData.labels,datasets:[{label:'Messages',data:overallData.data,backgroundColor:'#00a8fc'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+  }
 }
 </script>
 </body>
