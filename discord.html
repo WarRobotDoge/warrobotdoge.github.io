@@ -36,6 +36,7 @@ body {
 #loadingText {
   font-size:15px;
   margin-bottom:10px;
+  white-space:pre-line;
 }
 #loadingBar {
   width:100%;
@@ -85,10 +86,9 @@ iframe.embed { width:100%; height:400px; border:none; border-radius:6px; margin-
 
 <body>
 
-<!-- ===== Loading Overlay ===== -->
 <div id="loadingOverlay">
   <div id="loadingBox">
-    <div id="loadingText">Loading chats…</div>
+    <div id="loadingText"></div>
     <div id="loadingBar">
       <div id="loadingBarFill"></div>
     </div>
@@ -121,14 +121,49 @@ let conversations = [];
 let currentChat = null;
 const hourShift = 17;
 
+/* ===== Loader state (ONLY CHANGE) ===== */
 let totalChats = 0;
 let loadedChats = 0;
+let targetMessages = 0;
+let displayedMessages = 0;
+
 const loadingOverlay = document.getElementById('loadingOverlay');
 const loadingText = document.getElementById('loadingText');
 const loadingBarFill = document.getElementById('loadingBarFill');
-function showLoader(total){ totalChats=total; loadedChats=0; loadingOverlay.style.display='flex'; updateLoader();}
-function updateLoader(){ const pct = totalChats ? Math.round((loadedChats/totalChats)*100) : 0; loadingText.textContent=`Chats loaded: ${loadedChats} / ${totalChats} (${pct}%)`; loadingBarFill.style.width=pct+'%';}
-function hideLoader(){ loadingOverlay.style.display='none';}
+
+function showLoader(total){
+  totalChats = total;
+  loadedChats = 0;
+  targetMessages = 0;
+  displayedMessages = 0;
+  loadingOverlay.style.display = 'flex';
+  updateLoader();
+}
+
+function updateLoader(){
+  displayedMessages += (targetMessages - displayedMessages) * 0.15;
+  if (Math.abs(targetMessages - displayedMessages) < 1) {
+    displayedMessages = targetMessages;
+  }
+
+  const pct = totalChats
+    ? Math.round((loadedChats / totalChats) * 100)
+    : 0;
+
+  loadingText.textContent =
+    `Chats loaded: ${loadedChats} / ${totalChats}\n` +
+    `Messages loaded: ${Math.floor(displayedMessages)}`;
+
+  loadingBarFill.style.width = pct + '%';
+
+  if (displayedMessages !== targetMessages) {
+    requestAnimationFrame(updateLoader);
+  }
+}
+
+function hideLoader(){
+  loadingOverlay.style.display = 'none';
+}
 
 const folderInput = document.getElementById('folderInput');
 const fileList = document.getElementById('fileList');
@@ -152,8 +187,17 @@ function processFolder(files){
     const path = file.webkitRelativePath.split('/');
     if(path.length < 2) return;
     const folder = path[1];
-    if(file.name==='index.json'){ const r = new FileReader(); r.onload=()=>indexMap=JSON.parse(r.result); r.readAsText(file); return;}
-    if(folder.startsWith('c')){ groupedChats[folder] ??= {}; if(file.name==='channel.json') groupedChats[folder].channel=file; if(file.name==='messages.json') groupedChats[folder].messages=file;}
+    if(file.name==='index.json'){
+      const r = new FileReader();
+      r.onload=()=>indexMap=JSON.parse(r.result);
+      r.readAsText(file);
+      return;
+    }
+    if(folder.startsWith('c')){
+      groupedChats[folder] ??= {};
+      if(file.name==='channel.json') groupedChats[folder].channel=file;
+      if(file.name==='messages.json') groupedChats[folder].messages=file;
+    }
   });
 
   const validChats = Object.entries(groupedChats).filter(([k,v])=>v.messages);
@@ -172,7 +216,17 @@ function processFolder(files){
       const r = new FileReader();
       r.onload=()=>{
         const msgs = JSON.parse(r.result);
-        msgs.forEach(m=>{ if(m.Timestamp){ const d=new Date(m.Timestamp); d.setUTCHours((d.getUTCHours()+hourShift)%24); m._shiftedTime=d; }});
+
+        targetMessages += msgs.length;
+        updateLoader();
+
+        msgs.forEach(m=>{
+          if(m.Timestamp){
+            const d=new Date(m.Timestamp);
+            d.setUTCHours((d.getUTCHours()+hourShift)%24);
+            m._shiftedTime=d;
+          }
+        });
         chat.messages=msgs;
         res();
       };
@@ -183,7 +237,7 @@ function processFolder(files){
       conversations.push(chat);
       loadedChats++;
       updateLoader();
-      if(loadedChats===totalChats){ setTimeout(hideLoader,300);}
+      if(loadedChats===totalChats){ setTimeout(hideLoader,300); }
       renderSidebar();
     });
   });
