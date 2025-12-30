@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Photo Library</title>
+<script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<style>
+* { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f11; color: #e6e6e6; margin: 0; padding: 20px; }
+h1 { font-weight: 500; margin-bottom: 10px; }
+input, select, button { margin: 6px; padding: 7px 12px; border-radius: 8px; border: none; background: #2a2a2e; color: #fff; }
+button:hover, select:hover { background: #3a3a40; }
+#gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; margin-top: 20px; }
+.photo-card img { width: 100%; border-radius: 10px; cursor: pointer; transition: transform .25s ease, box-shadow .25s ease; }
+.photo-card img:hover { transform: scale(1.035); box-shadow: 0 12px 28px rgba(0,0,0,.45); }
+
+/* VIEWER */
+#viewer { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.88); backdrop-filter: blur(8px); z-index: 1000; }
+#viewer-content { display: flex; height: 100%; position: relative; }
+#viewer-img { max-width: 62%; margin: auto; object-fit: contain; transition: opacity .25s ease; }
+#meta-panel { width: 38%; background: #16161a; padding: 26px; overflow-y: auto; border-left: 1px solid #2a2a2e; }
+.meta-section { margin-bottom: 18px; }
+.meta-title { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; opacity: .55; margin-bottom: 6px; }
+.meta-row { font-size: 14px; display: flex; justify-content: space-between; margin: 3px 0; }
+.meta-row span:last-child { opacity: .8; }
+#map { height: 180px; border-radius: 10px; margin-top: 8px; }
+
+.nav { position: absolute; top: 50%; font-size: 44px; cursor: pointer; opacity: 0; transition: opacity .2s; user-select: none; }
+#viewer-content:hover .nav { opacity: .6; }
+.nav:hover { opacity: 1; }
+#prev { left: 18px; }
+#next { right: 18px; }
+#close { position: absolute; top: 16px; right: 22px; font-size: 22px; cursor: pointer; }
+.year-label { font-size: 18px; opacity: 0.7; margin: 24px 0 6px 0; grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+<h1>📸 My Photo Library</h1>
+<input type="file" id="upload" multiple accept="image/*">
+<select id="sort">
+    <option value="default">Upload order</option>
+    <option value="name">File name</option>
+    <option value="size">File size</option>
+    <option value="dateNew">Date taken (newest)</option>
+    <option value="dateOld">Date taken (oldest)</option>
+</select>
+
+<div id="gallery"></div>
+
+<div id="viewer">
+    <div id="close">✖</div>
+    <div id="viewer-content">
+        <div id="prev" class="nav">‹</div>
+        <img id="viewer-img">
+        <div id="next" class="nav">›</div>
+        <div id="meta-panel"></div>
+    </div>
+</div>
+
+<script>
+const upload = document.getElementById("upload");
+const sort = document.getElementById("sort");
+const gallery = document.getElementById("gallery");
+const viewer = document.getElementById("viewer");
+const viewerImg = document.getElementById("viewer-img");
+const metaPanel = document.getElementById("meta-panel");
+let photos = [];
+let sorted = [];
+let index = 0;
+let mapInstance = null;
+
+upload.onchange = e => [...e.target.files].forEach(loadPhoto);
+sort.onchange = render;
+
+document.getElementById("close").onclick = closeViewer;
+document.getElementById("prev").onclick = () => nav(-1);
+document.getElementById("next").onclick = () => nav(1);
+
+document.onkeydown = e => {
+    if (viewer.style.display !== "block") return;
+    if (e.key === "ArrowLeft") nav(-1);
+    if (e.key === "ArrowRight") nav(1);
+    if (e.key === "Escape") closeViewer();
+};
+
+function loadPhoto(file) {
+    const r = new FileReader();
+    r.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+            EXIF.getData(img, function () {
+                photos.push({ file, src: ev.target.result, w: img.width, h: img.height, exif: EXIF.getAllTags(this) });
+                render();
+            });
+        };
+        img.src = ev.target.result;
+    };
+    r.readAsDataURL(file);
+}
+
+function parseDate(exifDate) {
+    if (!exifDate) return null;
+    if (typeof exifDate === "string" && exifDate.includes(":")) {
+        const [d,t] = exifDate.split(" ");
+        const [y,m,day] = d.split(":").map(Number);
+        const [h,min,s] = t.split(":").map(Number);
+        return new Date(y,m-1,day,h,min,s);
+    }
+    if (exifDate instanceof Date) return exifDate;
+    return null;
+}
+
+function render() {
+    sorted = [...photos];
+    if (sort.value === "name") sorted.sort((a,b)=>a.file.name.localeCompare(b.file.name));
+    if (sort.value === "size") sorted.sort((a,b)=>a.file.size-b.file.size);
+    if (sort.value === "dateNew") sorted.sort((a,b)=>(b.exif.DateTimeOriginal||"").localeCompare(a.exif.DateTimeOriginal||""));
+    if (sort.value === "dateOld") sorted.sort((a,b)=>(a.exif.DateTimeOriginal||"").localeCompare(b.exif.DateTimeOriginal||""));
+
+    // Group photos by year
+    const yearGroups = {};
+    sorted.forEach(p => {
+        let date = parseDate(p.exif.DateTimeOriginal || p.file.lastModifiedDate);
+        let year = date ? date.getFullYear() : "Unknown";
+        if (!yearGroups[year]) yearGroups[year] = [];
+        yearGroups[year].push(p);
+    });
+
+    // Sort years based on sort preference
+    let years = Object.keys(yearGroups).sort((a,b) => {
+        if (sort.value === "dateNew") return b - a;
+        if (sort.value === "dateOld") return a - b;
+        return 0; // default upload order keeps insertion order
+    });
+
+    gallery.innerHTML = "";
+
+    years.forEach(year => {
+        // Year label
+        const yDiv = document.createElement("div");
+        yDiv.textContent = year;
+        yDiv.className = "year-label";
+        gallery.appendChild(yDiv);
+
+        // Photos in that year
+        yearGroups[year].forEach((p,i) => {
+            const img = document.createElement("img");
+            img.src = p.src;
+            img.onclick = () => openViewer(sorted.indexOf(p));
+
+            const d = document.createElement("div");
+            d.className = "photo-card";
+            d.appendChild(img);
+            gallery.appendChild(d);
+        });
+    });
+}
+
+function openViewer(i) {
+    index = i;
+    viewer.style.display = "block";
+    loadViewer();
+}
+
+function loadViewer() {
+    const p = sorted[index];
+    viewerImg.style.opacity = 0;
+    setTimeout(() => {
+        viewerImg.src = p.src;
+        viewerImg.style.opacity = 1;
+        renderMeta(p);
+    }, 120);
+}
+
+function renderMeta(p) {
+    const mp = (p.w * p.h / 1e6).toFixed(1);
+
+    metaPanel.innerHTML = `
+        <div style="text-align:right; cursor:pointer; font-size:20px;" onclick="closeViewer()">✖</div>
+        <h2>${p.file.name}</h2>
+        ${section("File", rows({ "Size": (p.file.size/1024).toFixed(1)+" KB", "Type": p.file.type }))}
+        ${section("Image", rows({ "Resolution": `${p.w} × ${p.h}`, "Megapixels": mp, "Orientation": p.exif.Orientation || "—" }))}
+        ${section("Camera", rows({ "Make": p.exif.Make, "Model": p.exif.Model, "Lens": p.exif.LensModel, "Focal Length": p.exif.FocalLength }))}
+        ${section("Exposure", rows({ "ISO": p.exif.ISOSpeedRatings, "Aperture": p.exif.FNumber, "Shutter": p.exif.ExposureTime, "Bias": p.exif.ExposureBiasValue, "Flash": p.exif.Flash }))}
+        ${section("Time", rows({ "Taken": p.exif.DateTimeOriginal || "Unknown", "Digitized": p.exif.DateTimeDigitized || "Unknown" }))}
+        ${section("Location", `<div id="map"></div>`)}
+    `;
+    initMap(p.exif);
+}
+
+function section(title, content) {
+    return `<div class="meta-section"><div class="meta-title">${title}</div>${content}</div>`;
+}
+
+function rows(obj) {
+    return Object.entries(obj).map(([k,v]) => `<div class="meta-row"><span>${k}</span><span>${v||"—"}</span></div>`).join("");
+}
+
+function nav(d) {
+    index = (index + d + sorted.length) % sorted.length;
+    loadViewer();
+}
+
+function initMap(exif) {
+    if (mapInstance) mapInstance.remove();
+    const mapDiv = document.getElementById("map");
+    const lat = coord(exif.GPSLatitude, exif.GPSLatitudeRef);
+    const lon = coord(exif.GPSLongitude, exif.GPSLongitudeRef);
+    if (!lat || !lon) {
+        mapDiv.innerHTML = "<div style='opacity:.5'>No location data</div>";
+        return;
+    }
+    setTimeout(() => {
+        mapInstance = L.map(mapDiv).setView([lat, lon], 13);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapInstance);
+        L.marker([lat, lon]).addTo(mapInstance);
+    }, 50);
+}
+
+function coord(c,r) {
+    if (!c) return null;
+    let d = c[0] + c[1]/60 + c[2]/3600;
+    return (r==="S"||r==="W") ? -d : d;
+}
+
+function closeViewer() {
+    viewer.style.display = "none";
+    if (mapInstance) mapInstance.remove();
+}
+</script>
+</body>
+</html>
