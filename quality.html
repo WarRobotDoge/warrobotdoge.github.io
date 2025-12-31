@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixelate Image Viewer with Scaling Options</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #f5f5f5; }
+  #container { 
+    width: 90vw; 
+    max-width: 800px; 
+    height: 80vh; 
+    border: 2px solid #ccc; 
+    margin: 20px auto; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    background: white; 
+    overflow: hidden;
+  }
+  canvas { max-width: 100%; max-height: 100%; image-rendering: pixelated; }
+  input[type=range], select { width: 300px; margin-top: 20px; }
+  #pixels { margin-top: 10px; font-weight: bold; }
+  button { margin: 5px; padding: 8px 15px; font-size: 14px; }
+  .presets { margin-top: 15px; }
+</style>
+</head>
+<body>
+
+<h1>Pixelate Image Viewer & Presets</h1>
+<input type="file" id="upload" accept="image/*"><br>
+<label for="quality">Pixel Scale:</label>
+<input type="range" id="quality" min="1" max="500" value="100"><br>
+
+<label for="scaling">Scaling Method:</label>
+<select id="scaling">
+  <option value="pixelated">Nearest-Neighbor (blocky)</option>
+  <option value="smooth">Bilinear (smooth)</option>
+</select>
+
+<div id="pixels">Original: - x - | Current: - x -</div>
+
+<div class="presets">
+  <strong>Presets:</strong><br>
+  <button data-width="640" data-height="480">480p</button>
+  <button data-width="1920" data-height="1080">1080p</button>
+  <button data-width="3840" data-height="2160">4K</button>
+  <button data-width="15360" data-height="8640">16K</button>
+  <button id="originalBtn">Original Size</button>
+</div>
+
+<div id="container">
+  <canvas id="canvas"></canvas>
+</div>
+<button id="downloadBtn">Download Image</button>
+
+<script>
+const upload = document.getElementById('upload');
+const qualitySlider = document.getElementById('quality');
+const scalingSelect = document.getElementById('scaling');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const pixelsLabel = document.getElementById('pixels');
+const container = document.getElementById('container');
+const downloadBtn = document.getElementById('downloadBtn');
+const originalBtn = document.getElementById('originalBtn');
+const presetButtons = document.querySelectorAll('.presets button[data-width]');
+
+let img = new Image();
+let imgOriginalWidth = 0;
+let imgOriginalHeight = 0;
+let currentPixelWidth = 0;
+let currentPixelHeight = 0;
+
+upload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        img.src = event.target.result;
+    }
+    reader.readAsDataURL(file);
+});
+
+img.onload = () => {
+    imgOriginalWidth = img.width;
+    imgOriginalHeight = img.height;
+    drawImage(100); // start at 100%
+}
+
+qualitySlider.addEventListener('input', () => drawImage(qualitySlider.value));
+scalingSelect.addEventListener('change', () => drawImage(qualitySlider.value));
+
+function drawImage(scalePercent) {
+    if (!img.src) return;
+
+    const scale = scalePercent / 100;
+
+    // Calculate scaled pixel dimensions
+    currentPixelWidth = Math.max(1, Math.floor(imgOriginalWidth * scale));
+    currentPixelHeight = Math.max(1, Math.floor(imgOriginalHeight * scale));
+    pixelsLabel.textContent = `Original: ${imgOriginalWidth} x ${imgOriginalHeight} | Current: ${currentPixelWidth} x ${currentPixelHeight}`;
+
+    // Draw to offscreen canvas first
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = currentPixelWidth;
+    offCanvas.height = currentPixelHeight;
+    const offCtx = offCanvas.getContext('2d');
+
+    // Scaling method
+    offCtx.imageSmoothingEnabled = scalingSelect.value !== 'pixelated';
+    offCtx.drawImage(img, 0, 0, currentPixelWidth, currentPixelHeight);
+
+    // Fit to container while keeping aspect ratio
+    const containerRatio = container.clientWidth / container.clientHeight;
+    const imgRatio = imgOriginalWidth / imgOriginalHeight;
+    let displayWidth, displayHeight;
+    if (imgRatio > containerRatio) {
+        displayWidth = container.clientWidth;
+        displayHeight = container.clientWidth / imgRatio;
+    } else {
+        displayHeight = container.clientHeight;
+        displayWidth = container.clientHeight * imgRatio;
+    }
+
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
+
+    ctx.imageSmoothingEnabled = scalingSelect.value !== 'pixelated';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(offCanvas, 0, 0, canvas.width, canvas.height);
+}
+
+// Download at exact pixel size
+downloadBtn.addEventListener('click', () => {
+    if (!img.src) return;
+
+    const downloadCanvas = document.createElement('canvas');
+    downloadCanvas.width = currentPixelWidth;
+    downloadCanvas.height = currentPixelHeight;
+    const downloadCtx = downloadCanvas.getContext('2d');
+    downloadCtx.imageSmoothingEnabled = scalingSelect.value !== 'pixelated';
+    downloadCtx.drawImage(img, 0, 0, currentPixelWidth, currentPixelHeight);
+
+    const link = document.createElement('a');
+    link.download = `pixelated_${currentPixelWidth}x${currentPixelHeight}.png`;
+    link.href = downloadCanvas.toDataURL('image/png');
+    link.click();
+});
+
+// Preset buttons
+presetButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const presetWidth = parseInt(btn.dataset.width);
+        const presetHeight = parseInt(btn.dataset.height);
+        let scaleWidth = presetWidth / imgOriginalWidth * 100;
+        let scaleHeight = presetHeight / imgOriginalHeight * 100;
+        let scale = Math.min(scaleWidth, scaleHeight);
+        qualitySlider.value = scale;
+        drawImage(scale);
+    });
+});
+
+// Original size button
+originalBtn.addEventListener('click', () => {
+    qualitySlider.value = 100;
+    drawImage(100);
+});
+</script>
+
+</body>
+</html>
