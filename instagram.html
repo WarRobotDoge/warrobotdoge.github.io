@@ -1,0 +1,484 @@
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Instagram Archive Explorer</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#0f0f0f;
+color:white;
+}
+
+header{
+padding:15px;
+background:#111;
+border-bottom:1px solid #333;
+text-align:center;
+}
+
+#layout{
+display:flex;
+height:calc(100vh - 70px);
+}
+
+#convos{
+width:260px;
+background:#151515;
+border-right:1px solid #333;
+overflow-y:auto;
+}
+
+#sortBar{
+padding:10px;
+border-bottom:1px solid #333;
+background:#111;
+}
+
+.convo{
+padding:12px;
+border-bottom:1px solid #222;
+cursor:pointer;
+}
+
+.convo:hover{background:#1f1f1f}
+.convo.active{background:#262626}
+
+#chat{
+flex:3;
+overflow-y:auto;
+padding:20px;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+#stats{
+width:360px;
+background:#151515;
+border-left:1px solid #333;
+padding:20px;
+overflow-y:auto;
+}
+
+.msg{
+max-width:420px;
+padding:10px 14px;
+border-radius:16px;
+word-wrap:break-word;
+}
+
+.mine{
+background:#3797f0;
+align-self:flex-end;
+}
+
+.theirs{
+background:#262626;
+align-self:flex-start;
+}
+
+.time{
+font-size:11px;
+opacity:.6;
+margin-top:4px;
+}
+
+canvas{margin-top:10px}
+
+#legend div{
+font-size:13px;
+margin:4px 0;
+}
+
+#tooltip{
+position:absolute;
+background:#000;
+padding:6px 10px;
+border-radius:6px;
+font-size:12px;
+pointer-events:none;
+display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>Instagram Archive Explorer</h2>
+<input type="file" id="folderInput" webkitdirectory multiple>
+</header>
+
+<div id="layout">
+
+<div id="convos">
+
+<div id="sortBar">
+Sort by:
+<select id="sortSelect">
+<option value="alpha">Alphabetical</option>
+<option value="most">Most Messages</option>
+<option value="least">Least Messages</option>
+<option value="duration">Longest Duration</option>
+<option value="recent">Newest Activity</option>
+</select>
+</div>
+
+<div id="convoList"></div>
+
+</div>
+
+<div id="chat"></div>
+
+<div id="stats">
+<h3>Stats</h3>
+<div id="statContent">Upload your Instagram inbox folder</div>
+</div>
+
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+
+const folderInput=document.getElementById("folderInput")
+const convoList=document.getElementById("convoList")
+const chat=document.getElementById("chat")
+const statContent=document.getElementById("statContent")
+const sortSelect=document.getElementById("sortSelect")
+const tooltip=document.getElementById("tooltip")
+
+let conversations={}
+let myName=""
+let globalSenderCounts={}
+
+let globalStats={
+photos:0,
+videos:0,
+audio:0,
+reactions:0
+}
+
+const pieColors=[
+"#e74c3c","#3498db","#f1c40f","#2ecc71","#9b59b6",
+"#e67e22","#1abc9c","#ff66cc",
+"#34495e","#95a5a6","#d35400","#16a085",
+"#8e44ad","#2c3e50","#c0392b","#27ae60"
+]
+
+folderInput.addEventListener("change",async e=>{
+
+const files=[...e.target.files]
+
+conversations={}
+globalSenderCounts={}
+globalStats={photos:0,videos:0,audio:0,reactions:0}
+
+for(const file of files){
+
+const path=file.webkitRelativePath
+
+if(file.name.startsWith("message_") && file.name.endsWith(".json")){
+
+const folder=path.split("/")[path.split("/").length-2]
+
+if(!conversations[folder])
+conversations[folder]={messages:[]}
+
+const text=await file.text()
+const data=JSON.parse(text)
+
+conversations[folder].messages=
+conversations[folder].messages.concat(data.messages)
+
+data.messages.forEach(m=>{
+
+if(!globalSenderCounts[m.sender_name])
+globalSenderCounts[m.sender_name]=0
+
+globalSenderCounts[m.sender_name]++
+
+if(m.photos) globalStats.photos+=m.photos.length
+if(m.videos) globalStats.videos+=m.videos.length
+if(m.audio_files) globalStats.audio+=m.audio_files.length
+if(m.reactions) globalStats.reactions+=m.reactions.length
+
+})
+
+}
+
+}
+
+myName=Object.entries(globalSenderCounts)
+.sort((a,b)=>b[1]-a[1])[0][0]
+
+renderConversationList()
+
+})
+
+sortSelect.addEventListener("change",renderConversationList)
+
+function renderConversationList(){
+
+let entries=Object.entries(conversations)
+
+const mode=sortSelect.value
+
+if(mode==="alpha")
+entries.sort((a,b)=>a[0].localeCompare(b[0]))
+
+if(mode==="most")
+entries.sort((a,b)=>b[1].messages.length-a[1].messages.length)
+
+if(mode==="least")
+entries.sort((a,b)=>a[1].messages.length-b[1].messages.length)
+
+if(mode==="duration")
+entries.sort((a,b)=>getDuration(b[1].messages)-getDuration(a[1].messages))
+
+if(mode==="recent")
+entries.sort((a,b)=>
+Math.max(...b[1].messages.map(m=>m.timestamp_ms))-
+Math.max(...a[1].messages.map(m=>m.timestamp_ms))
+)
+
+convoList.innerHTML=""
+
+entries.forEach(([key,value])=>{
+
+const div=document.createElement("div")
+
+div.className="convo"
+div.innerText=key.replaceAll("_"," ")
+
+div.onclick=()=>openConversation(key,div)
+
+convoList.appendChild(div)
+
+})
+
+}
+
+function getDuration(messages){
+let min=Math.min(...messages.map(m=>m.timestamp_ms))
+let max=Math.max(...messages.map(m=>m.timestamp_ms))
+return max-min
+}
+
+function openConversation(name,element){
+
+document.querySelectorAll(".convo").forEach(c=>c.classList.remove("active"))
+element.classList.add("active")
+
+const messages=conversations[name].messages
+.sort((a,b)=>a.timestamp_ms-b.timestamp_ms)
+
+chat.innerHTML=""
+
+let stats={
+users:{},
+photos:0,
+videos:0,
+audio:0,
+reactions:0
+}
+
+messages.forEach(m=>{
+
+if(!stats.users[m.sender_name])
+stats.users[m.sender_name]=0
+
+stats.users[m.sender_name]++
+
+if(m.photos) stats.photos+=m.photos.length
+if(m.videos) stats.videos+=m.videos.length
+if(m.audio_files) stats.audio+=m.audio_files.length
+if(m.reactions) stats.reactions+=m.reactions.length
+
+const bubble=document.createElement("div")
+bubble.classList.add("msg")
+
+if(m.sender_name===myName)
+bubble.classList.add("mine")
+else
+bubble.classList.add("theirs")
+
+let html=""
+
+if(m.content)
+html+=`<div>${escapeHTML(m.content)}</div>`
+
+const time=new Date(m.timestamp_ms)
+html+=`<div class="time">${time.toLocaleString()}</div>`
+
+bubble.innerHTML=html
+chat.appendChild(bubble)
+
+})
+
+generateStats(name,stats)
+
+}
+
+function generateStats(chatName,stats){
+
+let totalMessages=0
+
+Object.values(conversations).forEach(c=>{
+totalMessages+=c.messages.length
+})
+
+let html=""
+
+html+="<h3>Conversation Stats</h3>"
+
+const currentCount=conversations[chatName].messages.length
+const percent=((currentCount/totalMessages)*100).toFixed(2)
+
+html+=`Messages: ${currentCount}<br>`
+html+=`Percent of archive: ${percent}%<br>`
+html+=`Photos: ${stats.photos}<br>`
+html+=`Videos: ${stats.videos}<br>`
+html+=`Audio: ${stats.audio}<br>`
+html+=`Reactions: ${stats.reactions}<br><br>`
+
+html+="<b>Messages by user</b><br>"
+
+for(const user in stats.users){
+
+const count=stats.users[user]
+const pct=((count/currentCount)*100).toFixed(1)
+
+html+=`${user}: ${count} (${pct}%)<br>`
+
+}
+
+html+="<hr>"
+
+html+="<h3>Global Stats</h3>"
+
+html+=`Total chats: ${Object.keys(conversations).length}<br>`
+html+=`Total messages: ${totalMessages}<br>`
+
+const sent=globalSenderCounts[myName]
+const sentPct=((sent/totalMessages)*100).toFixed(1)
+
+html+=`Messages you sent: ${sent} (${sentPct}%)<br>`
+
+html+=`Photos: ${globalStats.photos}<br>`
+html+=`Videos: ${globalStats.videos}<br>`
+html+=`Audio: ${globalStats.audio}<br>`
+html+=`Reactions: ${globalStats.reactions}<br>`
+
+html+=`<canvas id="pieChart" width="250" height="250"></canvas>`
+html+=`<div id="legend"></div>`
+
+statContent.innerHTML=html
+
+drawPie(totalMessages)
+
+}
+
+function drawPie(total){
+
+const canvas=document.getElementById("pieChart")
+const ctx=canvas.getContext("2d")
+
+let chats=Object.entries(conversations)
+.map(([name,data])=>({name,count:data.messages.length}))
+
+chats.sort((a,b)=>b.count-a.count)
+
+let slices=[]
+let other=0
+
+chats.forEach(c=>{
+const pct=(c.count/total)*100
+if(pct<1) other+=c.count
+else slices.push(c)
+})
+
+if(other>0)
+slices.push({name:"Other",count:other})
+
+let start=0
+
+slices.forEach((c,i)=>{
+
+let color=c.name==="Other"?"#000000":pieColors[i%pieColors.length]
+
+const slice=(c.count/total)*Math.PI*2
+
+ctx.beginPath()
+ctx.moveTo(125,125)
+ctx.arc(125,125,120,start,start+slice)
+ctx.fillStyle=color
+ctx.fill()
+
+c.start=start
+c.end=start+slice
+c.color=color
+c.percent=((c.count/total)*100).toFixed(2)
+
+start+=slice
+
+})
+
+const legend=document.getElementById("legend")
+legend.innerHTML=""
+
+slices.forEach(s=>{
+legend.innerHTML+=
+`<div><span style="color:${s.color}">■</span> ${s.name} (${s.percent}%) - ${s.count}</div>`
+})
+
+canvas.onmousemove=e=>{
+
+const rect=canvas.getBoundingClientRect()
+const x=e.clientX-rect.left-125
+const y=e.clientY-rect.top-125
+
+const angle=Math.atan2(y,x)
+let a=angle<0?angle+Math.PI*2:angle
+
+for(const s of slices){
+
+if(a>=s.start && a<=s.end){
+
+tooltip.style.display="block"
+tooltip.style.left=e.pageX+10+"px"
+tooltip.style.top=e.pageY+10+"px"
+
+tooltip.innerHTML=
+`${s.name}<br>${s.percent}%<br>${s.count} messages`
+
+return
+
+}
+
+}
+
+tooltip.style.display="none"
+
+}
+
+}
+
+function escapeHTML(str){
+return str.replace(/[&<>'"]/g,c=>{
+const m={"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}
+return m[c]
+})
+}
+
+</script>
+
+</body>
+</html>
+```
