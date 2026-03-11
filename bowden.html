@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Speech Archive</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#0f0f0f;
+color:white;
+display:flex;
+height:100vh;
+}
+
+#sidebar{
+width:300px;
+background:#151515;
+border-right:1px solid #333;
+overflow-y:auto;
+}
+
+#sidebar h2{
+padding:12px;
+margin:0;
+border-bottom:1px solid #333;
+}
+
+.category{
+padding:8px 12px;
+background:#1d1d1d;
+font-weight:bold;
+}
+
+.speech{
+padding:10px 16px;
+cursor:pointer;
+border-bottom:1px solid #222;
+}
+
+.speech:hover{
+background:#222;
+}
+
+#main{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+#topbar{
+display:flex;
+flex-direction:column;
+padding:10px;
+border-bottom:1px solid #333;
+background:#1a1a1a;
+gap:6px;
+}
+
+#topControls{
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+#search{
+flex:1;
+padding:8px;
+background:#111;
+border:none;
+color:white;
+}
+
+#counter{
+font-size:14px;
+opacity:.7;
+}
+
+#resultsInfo{
+font-size:13px;
+opacity:.85;
+}
+
+.resultSpeech{
+cursor:pointer;
+color:#8ecaff;
+}
+
+.resultSpeech:hover{
+text-decoration:underline;
+}
+
+#content{
+padding:20px;
+overflow-y:auto;
+}
+
+audio,video{
+width:100%;
+margin-top:15px;
+}
+
+#transcript{
+margin-top:20px;
+white-space:pre-wrap;
+line-height:1.6;
+}
+
+.highlight{
+background:yellow;
+color:black;
+}
+
+.activeHighlight{
+background:orange;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="sidebar">
+<h2>Speech Archive</h2>
+<div id="speechList"></div>
+</div>
+
+<div id="main">
+
+<div id="topbar">
+
+<div id="topControls">
+<input type="file" id="folderUpload" webkitdirectory multiple>
+<input id="search" placeholder="Search transcripts...">
+<div id="counter">0 / 0</div>
+</div>
+
+<div id="resultsInfo"></div>
+
+</div>
+
+<div id="content">
+
+<h1 id="title">Upload your speech folder</h1>
+
+<video id="videoPlayer" controls style="display:none"></video>
+<audio id="audioPlayer" controls style="display:none"></audio>
+
+<div id="transcript"></div>
+
+</div>
+
+</div>
+
+<script>
+
+let speeches=[]
+let currentSpeechIndex=null
+
+let results=[]
+let speechMatches={}
+let currentResult=-1
+
+const speechList=document.getElementById("speechList")
+const transcriptDiv=document.getElementById("transcript")
+const title=document.getElementById("title")
+const audio=document.getElementById("audioPlayer")
+const video=document.getElementById("videoPlayer")
+const counter=document.getElementById("counter")
+const searchInput=document.getElementById("search")
+const resultsInfo=document.getElementById("resultsInfo")
+
+document.getElementById("folderUpload").addEventListener("change",async function(e){
+
+const files=[...e.target.files]
+
+let map={}
+
+for(let file of files){
+
+let path=file.webkitRelativePath.split("/")
+
+if(path.length<3) continue
+
+let category=path[1]
+let speechName=path[2]
+
+if(!map[category]) map[category]={}
+
+if(!map[category][speechName]){
+
+map[category][speechName]={
+title:speechName,
+category:category,
+audio:null,
+video:null,
+transcript:""
+}
+
+}
+
+if(file.type.startsWith("audio")){
+map[category][speechName].audio=URL.createObjectURL(file)
+}
+
+else if(file.type.startsWith("video")){
+map[category][speechName].video=URL.createObjectURL(file)
+}
+
+else if(file.name.endsWith(".txt")){
+map[category][speechName].transcript=await file.text()
+}
+
+}
+
+speeches=[]
+
+for(let cat in map){
+for(let s in map[cat]){
+speeches.push(map[cat][s])
+}
+}
+
+buildSidebar()
+
+})
+
+function buildSidebar(){
+
+speechList.innerHTML=""
+
+let categories={}
+
+speeches.forEach((speech,i)=>{
+
+if(!categories[speech.category]){
+categories[speech.category]=[]
+}
+
+categories[speech.category].push({speech,index:i})
+
+})
+
+for(let cat in categories){
+
+let catDiv=document.createElement("div")
+catDiv.className="category"
+catDiv.innerText=cat
+speechList.appendChild(catDiv)
+
+categories[cat].forEach(obj=>{
+
+let div=document.createElement("div")
+div.className="speech"
+div.innerText=obj.speech.title
+div.dataset.index=obj.index
+
+div.onclick=()=>loadSpeech(obj.index)
+
+speechList.appendChild(div)
+
+})
+
+}
+
+}
+
+function loadSpeech(index){
+
+const speech=speeches[index]
+currentSpeechIndex=index
+
+title.innerText=speech.title
+transcriptDiv.innerText=speech.transcript
+
+if(speech.audio){
+audio.src=speech.audio
+audio.style.display="block"
+}else{
+audio.style.display="none"
+}
+
+if(speech.video){
+video.src=speech.video
+video.style.display="block"
+}else{
+video.style.display="none"
+}
+
+}
+
+function performSearch(){
+
+let q=searchInput.value.toLowerCase()
+
+results=[]
+speechMatches={}
+currentResult=-1
+
+if(!q){
+
+document.querySelectorAll(".speech").forEach(el=>{
+el.style.display="block"
+})
+
+counter.innerText="0 / 0"
+resultsInfo.innerHTML=""
+return
+}
+
+speeches.forEach((speech,i)=>{
+
+let text=speech.transcript.toLowerCase()
+let pos=text.indexOf(q)
+let count=0
+
+while(pos!==-1){
+
+results.push({
+speechIndex:i,
+position:pos
+})
+
+count++
+pos=text.indexOf(q,pos+1)
+
+}
+
+if(count>0){
+speechMatches[i]=count
+}
+
+})
+
+filterSidebar()
+updateResultsInfo()
+
+counter.innerText="0 / "+results.length
+
+if(results.length>0){
+jumpToResult(0)
+}
+
+}
+
+function filterSidebar(){
+
+document.querySelectorAll(".speech").forEach(el=>{
+
+let index=el.dataset.index
+
+if(speechMatches[index]){
+el.style.display="block"
+}else{
+el.style.display="none"
+}
+
+})
+
+}
+
+function updateResultsInfo(){
+
+let html="Matches in speeches:<br>"
+
+for(let i in speechMatches){
+
+html+=`<span class="resultSpeech" onclick="jumpToSpeech(${i})">
+${speeches[i].title} (${speechMatches[i]})
+</span><br>`
+
+}
+
+resultsInfo.innerHTML=html
+
+}
+
+function jumpToSpeech(index){
+
+loadSpeech(index)
+highlightTranscript()
+
+}
+
+function highlightTranscript(){
+
+let q=searchInput.value
+if(!q) return
+
+let speech=speeches[currentSpeechIndex]
+
+let regex=new RegExp(`(${q})`,"gi")
+
+transcriptDiv.innerHTML=speech.transcript.replace(regex,
+'<span class="highlight">$1</span>'
+)
+
+}
+
+function jumpToResult(index){
+
+if(results.length===0) return
+
+currentResult=index
+
+let result=results[currentResult]
+
+if(currentSpeechIndex!==result.speechIndex){
+
+loadSpeech(result.speechIndex)
+
+setTimeout(()=>{
+highlightTranscript()
+scrollToHighlight()
+},60)
+
+}else{
+
+highlightTranscript()
+scrollToHighlight()
+
+}
+
+counter.innerText=(currentResult+1)+" / "+results.length
+
+}
+
+function scrollToHighlight(){
+
+let highlights=document.querySelectorAll(".highlight")
+
+if(highlights.length===0) return
+
+highlights.forEach(h=>h.classList.remove("activeHighlight"))
+
+let localIndex=-1
+let count=-1
+
+for(let i=0;i<=currentResult;i++){
+
+if(results[i].speechIndex===currentSpeechIndex){
+count++
+}
+
+}
+
+localIndex=count
+
+let target=highlights[localIndex]
+
+if(!target) return
+
+target.classList.add("activeHighlight")
+
+target.scrollIntoView({
+behavior:"smooth",
+block:"center"
+})
+
+}
+
+searchInput.addEventListener("input",performSearch)
+
+searchInput.addEventListener("keydown",function(e){
+
+if(results.length===0) return
+
+if(e.key==="Enter"){
+
+if(e.shiftKey){
+currentResult--
+if(currentResult<0) currentResult=results.length-1
+}else{
+currentResult++
+if(currentResult>=results.length) currentResult=0
+}
+
+jumpToResult(currentResult)
+
+}
+
+})
+
+</script>
+
+</body>
+</html>
