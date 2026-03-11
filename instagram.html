@@ -104,6 +104,15 @@ pointer-events:none;
 display:none;
 }
 
+a{
+color:#8ab4ff;
+text-decoration:none;
+}
+
+a:hover{
+text-decoration:underline;
+}
+
 </style>
 </head>
 
@@ -310,8 +319,33 @@ bubble.classList.add("theirs")
 
 let html=""
 
-if(m.content)
+if(m.share && m.share.link){
+
+let caption=m.share.share_text ? escapeHTML(m.share.share_text) : ""
+
+html+=`
+<div>
+📎 <a href="${m.share.link}" target="_blank">
+Open Instagram Reel/Post
+</a>
+</div>
+`
+
+if(caption)
+html+=`<div style="opacity:.8;font-size:13px">${caption}</div>`
+
+if(m.share.original_content_owner)
+html+=`<div style="font-size:12px;opacity:.6">
+by ${escapeHTML(m.share.original_content_owner)}
+</div>`
+
+}
+
+else if(m.content){
+
 html+=`<div>${escapeHTML(m.content)}</div>`
+
+}
 
 const time=new Date(m.timestamp_ms)
 html+=`<div class="time">${time.toLocaleString()}</div>`
@@ -436,36 +470,6 @@ slices.forEach(s=>{
 legend.innerHTML+=
 `<div><span style="color:${s.color}">■</span> ${s.name} (${s.percent}%) - ${s.count}</div>`
 })
-
-canvas.onmousemove=e=>{
-
-const rect=canvas.getBoundingClientRect()
-const x=e.clientX-rect.left-125
-const y=e.clientY-rect.top-125
-
-const angle=Math.atan2(y,x)
-let a=angle<0?angle+Math.PI*2:angle
-
-for(const s of slices){
-
-if(a>=s.start && a<=s.end){
-
-tooltip.style.display="block"
-tooltip.style.left=e.pageX+10+"px"
-tooltip.style.top=e.pageY+10+"px"
-
-tooltip.innerHTML=
-`${s.name}<br>${s.percent}%<br>${s.count} messages`
-
-return
-
-}
-
-}
-
-tooltip.style.display="none"
-
-}
 
 }
 
