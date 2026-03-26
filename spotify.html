@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist Vitalist | Ultimate Analysis Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'JetBrains Mono', monospace; background-color: #020617; color: #f1f5f9; }
+        .card { background: #0f172a; border: 1px solid #1e293b; border-radius: 0.75rem; padding: 1.5rem; transition: transform 0.2s; }
+        .card:hover { border-color: #3b82f6; }
+        .accent-text { color: #3b82f6; }
+        .grid-header { border-bottom: 1px solid #1e293b; margin-bottom: 2rem; padding-bottom: 1rem; }
+        .chart-container { position: relative; height: 320px; width: 100%; }
+        .upload-section { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 2px dashed #334155; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-12">
+            <h1 class="text-4xl font-extrabold mb-2"><span class="accent-text">PLAYLIST VITALIST</span> ULTIMATE</h1>
+            <p class="text-slate-400">Structural & Aesthetic Audit of 1,100+ Days of Listening.</p>
+        </div>
+
+        <!-- Initial State: Upload -->
+        <div id="uploadContainer" class="upload-section rounded-2xl p-16 text-center cursor-pointer mb-12">
+            <input type="file" id="csvFile" accept=".csv" class="hidden">
+            <div id="dropZone">
+                <div class="text-5xl mb-4">📂</div>
+                <h2 class="text-2xl font-bold mb-2">Initialize Analysis</h2>
+                <p class="text-slate-500">Drop your CSV here or click to browse</p>
+                <p class="text-xs text-slate-600 mt-4 uppercase tracking-widest">Client-Side Only • Private • Secure</p>
+            </div>
+        </div>
+
+        <!-- Error Box -->
+        <div id="errorBox" class="hidden bg-red-950 border border-red-500 text-red-200 p-4 rounded-lg mb-8"></div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard" class="hidden space-y-12">
+            
+            <!-- Summary Tiles -->
+            <div id="summaryStats" class="grid grid-cols-2 lg:grid-cols-4 gap-6"></div>
+
+            <!-- 1. The Distributions (8 Graphs) -->
+            <div>
+                <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">I. Sonic Landscapes (Distributions)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="distGrid"></div>
+            </div>
+
+            <!-- 2. The Mood Maps (Scatter Plots) -->
+            <div>
+                <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">II. Relational Geographies (Scatters)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="scatterGrid"></div>
+            </div>
+
+            <!-- 3. Time & Obsessions (Evolution) -->
+            <div>
+                <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">III. Temporal Evolution</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="timeGrid"></div>
+            </div>
+
+            <!-- 4. Cultural Markers (Artists & Genres) -->
+            <div>
+                <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">IV. Cultural Identity</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="identityGrid"></div>
+            </div>
+
+            <!-- 5. Technical DNA -->
+            <div>
+                <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">V. Technical Architecture</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="dnaGrid"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('csvFile');
+        const uploadZone = document.getElementById('uploadContainer');
+        const dashboard = document.getElementById('dashboard');
+        const errorBox = document.getElementById('errorBox');
+
+        uploadZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => processFile(e.target.files[0]);
+
+        function processFile(file) {
+            Papa.parse(file, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                complete: (results) => {
+                    const data = results.data;
+                    if (data.length === 0) {
+                        showError("The file appears to be empty.");
+                        return;
+                    }
+                    try {
+                        generateDashboard(data);
+                        uploadZone.classList.add('hidden');
+                        dashboard.classList.remove('hidden');
+                        errorBox.classList.add('hidden');
+                    } catch (err) {
+                        console.error(err);
+                        showError("Error generating graphs: " + err.message);
+                    }
+                }
+            });
+        }
+
+        function showError(msg) {
+            errorBox.innerText = msg;
+            errorBox.classList.remove('hidden');
+        }
+
+        function generateDashboard(data) {
+            // Helpers
+            const mean = (arr) => arr.length ? arr.reduce((a, b) => a + (b || 0), 0) / arr.length : 0;
+            const getCol = (col) => data.map(d => d[col]).filter(v => v != null);
+            
+            // Summary Stats
+            const statsGrid = document.getElementById('summaryStats');
+            const metrics = [
+                { label: 'Total Tracks', val: data.length, accent: '#3b82f6' },
+                { label: 'Avg Popularity', val: mean(getCol('Popularity')).toFixed(1), accent: '#818cf8' },
+                { label: 'Avg Energy', val: mean(getCol('Energy')).toFixed(2), accent: '#f43f5e' },
+                { label: 'Avg Valence', val: mean(getCol('Valence')).toFixed(2), accent: '#10b981' }
+            ];
+            statsGrid.innerHTML = metrics.map(m => `
+                <div class="card text-center">
+                    <div class="text-slate-500 text-xs mb-1 uppercase">${m.label}</div>
+                    <div class="text-3xl font-black" style="color: ${m.accent}">${m.val}</div>
+                </div>
+            `).join('');
+
+            // I. Distributions
+            const distGrid = document.getElementById('distGrid');
+            const featureList = ['Energy', 'Valence', 'Danceability', 'Popularity', 'Acousticness', 'Loudness', 'Speechiness', 'Instrumentalness'];
+            featureList.forEach(f => {
+                createHistogram(distGrid, data, f, '#3b82f6');
+            });
+
+            // II. Scatters
+            const scatterGrid = document.getElementById('scatterGrid');
+            const pairs = [
+                ['Valence', 'Energy'], ['Popularity', 'Energy'], ['Loudness', 'Energy'],
+                ['Tempo', 'Energy'], ['Duration (ms)', 'Danceability'], ['Popularity', 'Valence']
+            ];
+            pairs.forEach(p => {
+                createScatter(scatterGrid, data, p[0], p[1]);
+            });
+
+            // III. Time
+            const timeGrid = document.getElementById('timeGrid');
+            const sorted = [...data].sort((a,b) => new Date(a['Added At']) - new Date(b['Added At']));
+            createTimeChart(timeGrid, sorted, 'Energy', '#f43f5e');
+            createTimeChart(timeGrid, sorted, 'Valence', '#10b981');
+            createTimeChart(timeGrid, sorted, 'Popularity', '#818cf8');
+            createTimeChart(timeGrid, sorted, 'Loudness', '#94a3b8');
+
+            // IV. Identity
+            const identityGrid = document.getElementById('identityGrid');
+            createTopBar(identityGrid, data, 'Genres', 15);
+            createTopBar(identityGrid, data, 'Artist Name(s)', 10);
+            createTopBar(identityGrid, data, 'Album Name', 10);
+
+            // V. DNA
+            const dnaGrid = document.getElementById('dnaGrid');
+            createCategoryChart(dnaGrid, data, 'Key', 'Key Signature');
+            createCategoryChart(dnaGrid, data, 'Mode', 'Major (1) vs Minor (0)');
+            createCategoryChart(dnaGrid, data, 'Explicit', 'Explicit Status');
+            createTimeAnalysis(dnaGrid, data, 'Added At', 'Hour');
+            createTimeAnalysis(dnaGrid, data, 'Added At', 'Day');
+            createCategoryChart(dnaGrid, data, 'Time Signature', 'Time Signature');
+        }
+
+        // --- CHART FACTORIES ---
+
+        function createHistogram(container, data, col, color) {
+            const wrap = document.createElement('div');
+            wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${col}</div><div class="chart-container"><canvas></canvas></div>`;
+            container.appendChild(wrap);
+            
+            const raw = data.map(d => d[col]).filter(v => v != null);
+            const bins = 10;
+            const min = Math.min(...raw);
+            const max = Math.max(...raw);
+            const counts = Array(bins).fill(0);
+            raw.forEach(v => {
+                let b = Math.floor(((v - min) / (max - min || 1)) * bins);
+                if (b >= bins) b = bins - 1;
+                counts[b]++;
+            });
+
+            new Chart(wrap.querySelector('canvas'), {
+                type: 'bar',
+                data: {
+                    labels: Array.from({length: bins}, (_, i) => (min + (i * (max-min)/bins)).toFixed(2)),
+                    datasets: [{ data: counts, backgroundColor: color, borderRadius: 4 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+            });
+        }
+
+        function createScatter(container, data, xCol, yCol) {
+            const wrap = document.createElement('div');
+            wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${xCol} vs ${yCol}</div><div class="chart-container"><canvas></canvas></div>`;
+            container.appendChild(wrap);
+
+            const points = data.map(d => ({ x: d[xCol], y: d[yCol] })).filter(p => p.x != null && p.y != null);
+            new Chart(wrap.querySelector('canvas'), {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Tracks',
+                        data: points,
+                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                        pointRadius: 3
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { grid: { color: '#1e293b' }, title: { display: true, text: xCol, color: '#475569' } },
+                        y: { grid: { color: '#1e293b' }, title: { display: true, text: yCol, color: '#475569' } }
+                    }
+                }
+            });
+        }
+
+        function createTimeChart(container, sortedData, col, color) {
+            const wrap = document.createElement('div');
+            wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${col} over Timeline</div><div class="chart-container"><canvas></canvas></div>`;
+            container.appendChild(wrap);
+
+            new Chart(wrap.querySelector('canvas'), {
+                type: 'line',
+                data: {
+                    labels: sortedData.map(d => d['Added At']),
+                    datasets: [{
+                        data: sortedData.map(d => d[col]),
+                        borderColor: color,
+                        borderWidth: 1,
+                        pointRadius: 0,
+                        tension: 0.1
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } },
+                    scales: { x: { display: false }, y: { grid: { color: '#1e293b' } } }
+                }
+            });
+        }
+
+        function createTopBar(container, data, col, limit) {
+            const counts = {};
+            data.forEach(d => {
+                if (!d[col]) return;
+                const items = col === 'Genres' ? d[col].split(',').map(i => i.trim()) : [d[col]];
+                items.forEach(i => counts[i] = (counts[i] || 0) + 1);
+            });
+            const top = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, limit);
+
+            const wrap = document.createElement('div');
+            wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Top ${limit} ${col}</div><div class="chart-container"><canvas></canvas></div>`;
+            container.appendChild(wrap);
+
+            new Chart(wrap.querySelector('canvas'), {
+                type: 'bar',
+                data: {
+                    labels: top.map(x => x[0]),
+                    datasets: [{ data: top.map(x => x[1]), backgroundColor: '#6366f1' }]
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#1e293b' } }, y: { grid: { display: false } } } }
+            });
+        }
+
+        function createCategoryChart(container, data, col, title) {
+            const counts = {};
+            data.forEach(d => counts[d[col]] = (counts[d[col]] || 0) + 1);
+            
+            const wrap = document.createElement('div');
+            wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${title}</div><div class="chart-container"><canvas></canvas></div>`;
+            container.appendChild(wrap);
+
+            const labels = Object.keys(counts);
+            new Chart(wrap.querySelector('canvas'), {
+                type: labels.length > 5 ? 'bar' : 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{ data: Object.values(counts), backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1','#ef4444','#f59e0b'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: labels.length < 5 } } }
+            });
+        }
+
+        function createTimeAnalysis(container, data, col, mode) {
+            const counts = {};
+            data.forEach(d => {
+                const date = new Date(d[col]);
+                if (isNaN(date)) return;
+                const key = mode === 'Hour' ? date.getHours() : date.toLocaleDateString('en-US', {weekday: 'long'});
+                counts[key] = (counts[key] || 0) + 1;
+            });
+
+            const wrap = document.createElement('div');
+            wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${mode} Added</div><div class="chart-container"><canvas></canvas></div>`;
+            container.appendChild(wrap);
+
+            let labels = Object.keys(counts);
+            if(mode === 'Hour') labels = Array.from({length: 24}, (_, i) => i);
+            if(mode === 'Day') labels = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+            new Chart(wrap.querySelector('canvas'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{ data: labels.map(l => counts[l] || 0), backgroundColor: '#0ea5e9' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+    </script>
+</body>
+</html>
