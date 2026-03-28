@@ -20,13 +20,11 @@
 </head>
 <body class="p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
-        <!-- Header -->
         <div class="mb-12">
             <h1 class="text-4xl font-extrabold mb-2"><span class="accent-text">PLAYLIST VITALIST</span> ULTIMATE</h1>
             <p class="text-slate-400">Structural & Aesthetic Audit of 1,100+ Days of Listening.</p>
         </div>
 
-        <!-- Initial State: Upload -->
         <div id="uploadContainer" class="upload-section rounded-2xl p-16 text-center cursor-pointer mb-12">
             <input type="file" id="csvFile" accept=".csv" class="hidden">
             <div id="dropZone">
@@ -37,43 +35,40 @@
             </div>
         </div>
 
-        <!-- Error Box -->
         <div id="errorBox" class="hidden bg-red-950 border border-red-500 text-red-200 p-4 rounded-lg mb-8"></div>
 
-        <!-- Dashboard Content -->
         <div id="dashboard" class="hidden space-y-12">
             
-            <!-- Summary Tiles -->
             <div id="summaryStats" class="grid grid-cols-2 lg:grid-cols-4 gap-6"></div>
 
-            <!-- 1. The Distributions (8 Graphs) -->
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">I. Sonic Landscapes (Distributions)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="distGrid"></div>
             </div>
 
-            <!-- 2. The Mood Maps (Scatter Plots) -->
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">II. Relational Geographies (Scatters)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="scatterGrid"></div>
             </div>
 
-            <!-- 3. Time & Obsessions (Evolution) -->
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">III. Temporal Evolution</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="timeGrid"></div>
             </div>
 
-            <!-- 4. Cultural Markers (Artists & Genres) -->
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">IV. Cultural Identity</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="identityGrid"></div>
             </div>
 
-            <!-- 5. Technical DNA -->
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">V. Technical Architecture</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="dnaGrid"></div>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">VI. Miscellaneous Insights</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="miscGrid"></div>
             </div>
 
         </div>
@@ -165,8 +160,8 @@
             // IV. Identity
             const identityGrid = document.getElementById('identityGrid');
             createTopBar(identityGrid, data, 'Genres', 15);
-            createTopBar(identityGrid, data, 'Artist Name(s)', 10);
-            createTopBar(identityGrid, data, 'Album Name', 10);
+            createTopBar(identityGrid, data, 'Artist Name(s)', 15);
+            createTopBar(identityGrid, data, 'Album Name', 15);
 
             // V. DNA
             const dnaGrid = document.getElementById('dnaGrid');
@@ -176,6 +171,13 @@
             createTimeAnalysis(dnaGrid, data, 'Added At', 'Hour');
             createTimeAnalysis(dnaGrid, data, 'Added At', 'Day');
             createCategoryChart(dnaGrid, data, 'Time Signature', 'Time Signature');
+
+            // VI. Miscellaneous
+            const miscGrid = document.getElementById('miscGrid');
+            createCumulativeTimeChart(miscGrid, data, '#f59e0b'); // Cumulative songs added
+            createDurationHistogram(miscGrid, data, '#a855f7');   // Duration in minutes
+            createRadarChart(miscGrid, data, '#10b981');          // Audio Feature Footprint
+            createHistogram(miscGrid, data, 'Tempo', '#06b6d4');  // Tempo distribution (reusing existing factory)
         }
 
         // --- CHART FACTORIES ---
@@ -332,6 +334,138 @@
                     datasets: [{ data: labels.map(l => counts[l] || 0), backgroundColor: '#0ea5e9' }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        // --- SECTION VI FACTORIES ---
+        
+        function createCumulativeTimeChart(container, data, color) {
+            const counts = {};
+            data.forEach(d => {
+                if (!d['Added At']) return;
+                const date = new Date(d['Added At']);
+                if (isNaN(date)) return;
+                const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                counts[monthYear] = (counts[monthYear] || 0) + 1;
+            });
+
+            const labels = Object.keys(counts).sort();
+            let cumulative = 0;
+            const cumulativeData = labels.map(label => {
+                cumulative += counts[label];
+                return cumulative;
+            });
+
+            const wrap = document.createElement('div');
+            wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Cumulative Tracks Added (Monthly)</div><div class="chart-container"><canvas></canvas></div>`;
+            container.appendChild(wrap);
+
+            new Chart(wrap.querySelector('canvas'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: cumulativeData,
+                        borderColor: color,
+                        backgroundColor: color + '33',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        pointBackgroundColor: color
+                    }]
+                },
+                options: {
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { grid: { color: '#1e293b' } }, 
+                        y: { grid: { color: '#1e293b' } } 
+                    }
+                }
+            });
+        }
+
+        function createDurationHistogram(container, data, color) {
+            const wrap = document.createElement('div');
+            wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Track Duration Distribution (Minutes)</div><div class="chart-container"><canvas></canvas></div>`;
+            container.appendChild(wrap);
+
+            const raw = data.map(d => d['Duration (ms)']).filter(v => v != null).map(ms => ms / 60000);
+            const filtered = raw.filter(m => m > 0 && m <= 10); 
+            
+            if(filtered.length === 0) return; 
+
+            const bins = 15;
+            const min = Math.min(...filtered);
+            const max = Math.max(...filtered);
+            const counts = Array(bins).fill(0);
+
+            filtered.forEach(v => {
+                let b = Math.floor(((v - min) / (max - min || 1)) * bins);
+                if (b >= bins) b = bins - 1;
+                counts[b]++;
+            });
+
+            new Chart(wrap.querySelector('canvas'), {
+                type: 'bar',
+                data: {
+                    labels: Array.from({length: bins}, (_, i) => (min + (i * (max-min)/bins)).toFixed(1) + 'm'),
+                    datasets: [{ data: counts, backgroundColor: color, borderRadius: 4 }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } }, 
+                    scales: { 
+                        y: { display: false }, 
+                        x: { grid: { display: false } } 
+                    } 
+                }
+            });
+        }
+
+        function createRadarChart(container, data, color) {
+            const wrap = document.createElement('div');
+            wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Average Audio Footprint</div><div class="chart-container"><canvas></canvas></div>`;
+            container.appendChild(wrap);
+
+            // Grouping features that typically sit on a 0.0 to 1.0 scale
+            const features = ['Danceability', 'Energy', 'Valence', 'Acousticness', 'Instrumentalness', 'Speechiness'];
+            const averages = features.map(f => {
+                const vals = data.map(d => d[f]).filter(v => typeof v === 'number');
+                return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+            });
+
+            new Chart(wrap.querySelector('canvas'), {
+                type: 'radar',
+                data: {
+                    labels: features,
+                    datasets: [{
+                        data: averages,
+                        backgroundColor: color + '40', // 25% opacity
+                        borderColor: color,
+                        pointBackgroundColor: color,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        r: {
+                            angleLines: { color: '#1e293b' },
+                            grid: { color: '#1e293b' },
+                            pointLabels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } },
+                            ticks: { display: false, min: 0, max: 1 }
+                        }
+                    }
+                }
             });
         }
     </script>
