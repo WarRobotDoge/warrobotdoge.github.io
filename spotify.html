@@ -160,7 +160,7 @@
             // IV. Identity
             const identityGrid = document.getElementById('identityGrid');
             createTopBar(identityGrid, data, 'Genres', 15);
-            createTopBar(identityGrid, data, 'Artist Name(s)', 15);
+            createTopBar(identityGrid, data, 'Artist Name(s)', 155);
             createTopBar(identityGrid, data, 'Album Name', 15);
 
             // V. DNA
@@ -174,10 +174,12 @@
 
             // VI. Miscellaneous
             const miscGrid = document.getElementById('miscGrid');
-            createCumulativeTimeChart(miscGrid, data, '#f59e0b'); // Cumulative songs added
-            createDurationHistogram(miscGrid, data, '#a855f7');   // Duration in minutes
-            createRadarChart(miscGrid, data, '#10b981');          // Audio Feature Footprint
-            createHistogram(miscGrid, data, 'Tempo', '#06b6d4');  // Tempo distribution (reusing existing factory)
+            createCumulativeTimeChart(miscGrid, data, '#f59e0b');        // Cumulative songs added
+            createDurationHistogram(miscGrid, data, '#a855f7');          // Duration in minutes
+            createRadarChart(miscGrid, data, '#10b981');                 // Audio Feature Footprint
+            createHistogram(miscGrid, data, 'Tempo', '#06b6d4');         // Tempo distribution
+            createReleaseYearChart(miscGrid, data, '#ef4444');           // Release Era
+            createTitleWordCountChart(miscGrid, data, '#ec4899');        // Track Title Length
         }
 
         // --- CHART FACTORIES ---
@@ -189,6 +191,7 @@
             container.appendChild(wrap);
             
             const raw = data.map(d => d[col]).filter(v => v != null);
+            if (raw.length === 0) return;
             const bins = 10;
             const min = Math.min(...raw);
             const max = Math.max(...raw);
@@ -358,7 +361,7 @@
 
             const wrap = document.createElement('div');
             wrap.className = 'card';
-            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Cumulative Tracks Added (Monthly)</div><div class="chart-container"><canvas></canvas></div>`;
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Cumulative Tracks Added</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
 
             new Chart(wrap.querySelector('canvas'), {
@@ -391,12 +394,11 @@
         function createDurationHistogram(container, data, color) {
             const wrap = document.createElement('div');
             wrap.className = 'card';
-            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Track Duration Distribution (Minutes)</div><div class="chart-container"><canvas></canvas></div>`;
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Duration (Minutes)</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
 
             const raw = data.map(d => d['Duration (ms)']).filter(v => v != null).map(ms => ms / 60000);
             const filtered = raw.filter(m => m > 0 && m <= 10); 
-            
             if(filtered.length === 0) return; 
 
             const bins = 15;
@@ -434,7 +436,6 @@
             wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Average Audio Footprint</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
 
-            // Grouping features that typically sit on a 0.0 to 1.0 scale
             const features = ['Danceability', 'Energy', 'Valence', 'Acousticness', 'Instrumentalness', 'Speechiness'];
             const averages = features.map(f => {
                 const vals = data.map(d => d[f]).filter(v => typeof v === 'number');
@@ -447,7 +448,7 @@
                     labels: features,
                     datasets: [{
                         data: averages,
-                        backgroundColor: color + '40', // 25% opacity
+                        backgroundColor: color + '40',
                         borderColor: color,
                         pointBackgroundColor: color,
                         borderWidth: 2
@@ -464,6 +465,86 @@
                             pointLabels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } },
                             ticks: { display: false, min: 0, max: 1 }
                         }
+                    }
+                }
+            });
+        }
+
+        function createReleaseYearChart(container, data, color) {
+            const counts = {};
+            data.forEach(d => {
+                if (!d['Release Date']) return;
+                // Safely grab the first 4 characters for the Year
+                const year = String(d['Release Date']).substring(0, 4); 
+                if (isNaN(year) || year < 1900 || year > 2100) return;
+                counts[year] = (counts[year] || 0) + 1;
+            });
+
+            const labels = Object.keys(counts).sort();
+            if (labels.length === 0) return;
+
+            const wrap = document.createElement('div');
+            wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Release Era (Year)</div><div class="chart-container"><canvas></canvas></div>`;
+            container.appendChild(wrap);
+
+            new Chart(wrap.querySelector('canvas'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: labels.map(l => counts[l]),
+                        backgroundColor: color,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { grid: { display: false } }, 
+                        y: { display: false } 
+                    }
+                }
+            });
+        }
+
+        function createTitleWordCountChart(container, data, color) {
+            const counts = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8+': 0 };
+            
+            data.forEach(d => {
+                if (!d['Track Name']) return;
+                const wordCount = String(d['Track Name']).trim().split(/\s+/).length;
+                if (wordCount >= 8) {
+                    counts['8+']++;
+                } else if (wordCount > 0) {
+                    counts[wordCount.toString()]++;
+                }
+            });
+
+            const wrap = document.createElement('div');
+            wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Track Title Length (Words)</div><div class="chart-container"><canvas></canvas></div>`;
+            container.appendChild(wrap);
+
+            new Chart(wrap.querySelector('canvas'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(counts),
+                    datasets: [{
+                        data: Object.values(counts),
+                        backgroundColor: color,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { grid: { display: false } }, 
+                        y: { display: false } 
                     }
                 }
             });
