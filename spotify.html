@@ -15,7 +15,9 @@
         .accent-text { color: #3b82f6; }
         .grid-header { border-bottom: 1px solid #1e293b; margin-bottom: 2rem; padding-bottom: 1rem; }
         .chart-container { position: relative; height: 320px; width: 100%; }
+        .chart-container-large { position: relative; height: 500px; width: 100%; }
         .upload-section { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 2px dashed #334155; }
+        select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -38,7 +40,6 @@
         <div id="errorBox" class="hidden bg-red-950 border border-red-500 text-red-200 p-4 rounded-lg mb-8"></div>
 
         <div id="dashboard" class="hidden space-y-12">
-            
             <div id="summaryStats" class="grid grid-cols-2 lg:grid-cols-4 gap-6"></div>
 
             <div>
@@ -71,6 +72,25 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="miscGrid"></div>
             </div>
 
+            <div>
+                <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">VII. Interactive Explorer</h2>
+                <div class="card w-full">
+                    <div class="flex flex-wrap gap-6 mb-6">
+                        <div>
+                            <label class="text-xs text-slate-500 mb-2 uppercase tracking-widest block">X-Axis Variable</label>
+                            <select id="interactiveX" class="bg-[#020617] border border-slate-700 text-slate-200 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer min-w-[150px]"></select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-500 mb-2 uppercase tracking-widest block">Y-Axis Variable</label>
+                            <select id="interactiveY" class="bg-[#020617] border border-slate-700 text-slate-200 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer min-w-[150px]"></select>
+                        </div>
+                    </div>
+                    <div class="chart-container-large">
+                        <canvas id="interactiveCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -79,6 +99,8 @@
         const uploadZone = document.getElementById('uploadContainer');
         const dashboard = document.getElementById('dashboard');
         const errorBox = document.getElementById('errorBox');
+        
+        let interactiveChartInstance = null;
 
         uploadZone.onclick = () => fileInput.click();
         fileInput.onchange = (e) => processFile(e.target.files[0]);
@@ -113,11 +135,9 @@
         }
 
         function generateDashboard(data) {
-            // Helpers
             const mean = (arr) => arr.length ? arr.reduce((a, b) => a + (b || 0), 0) / arr.length : 0;
             const getCol = (col) => data.map(d => d[col]).filter(v => v != null);
             
-            // Summary Stats
             const statsGrid = document.getElementById('summaryStats');
             const metrics = [
                 { label: 'Total Tracks', val: data.length, accent: '#3b82f6' },
@@ -132,14 +152,12 @@
                 </div>
             `).join('');
 
-            // I. Distributions
             const distGrid = document.getElementById('distGrid');
             const featureList = ['Energy', 'Valence', 'Danceability', 'Popularity', 'Acousticness', 'Loudness', 'Speechiness', 'Instrumentalness'];
             featureList.forEach(f => {
                 createHistogram(distGrid, data, f, '#3b82f6');
             });
 
-            // II. Scatters
             const scatterGrid = document.getElementById('scatterGrid');
             const pairs = [
                 ['Valence', 'Energy'], ['Popularity', 'Energy'], ['Loudness', 'Energy'],
@@ -149,7 +167,6 @@
                 createScatter(scatterGrid, data, p[0], p[1]);
             });
 
-            // III. Time
             const timeGrid = document.getElementById('timeGrid');
             const sorted = [...data].sort((a,b) => new Date(a['Added At']) - new Date(b['Added At']));
             createTimeChart(timeGrid, sorted, 'Energy', '#f43f5e');
@@ -157,13 +174,11 @@
             createTimeChart(timeGrid, sorted, 'Popularity', '#818cf8');
             createTimeChart(timeGrid, sorted, 'Loudness', '#94a3b8');
 
-            // IV. Identity
             const identityGrid = document.getElementById('identityGrid');
             createTopBar(identityGrid, data, 'Genres', 15);
             createTopBar(identityGrid, data, 'Artist Name(s)', 15);
             createTopBar(identityGrid, data, 'Album Name', 15);
 
-            // V. DNA
             const dnaGrid = document.getElementById('dnaGrid');
             createCategoryChart(dnaGrid, data, 'Key', 'Key Signature');
             createCategoryChart(dnaGrid, data, 'Mode', 'Major (1) vs Minor (0)');
@@ -172,14 +187,26 @@
             createTimeAnalysis(dnaGrid, data, 'Added At', 'Day');
             createCategoryChart(dnaGrid, data, 'Time Signature', 'Time Signature');
 
-            // VI. Miscellaneous
             const miscGrid = document.getElementById('miscGrid');
-            createCumulativeTimeChart(miscGrid, data, '#f59e0b');        // Cumulative songs added
-            createDurationHistogram(miscGrid, data, '#a855f7');          // Duration in minutes
-            createRadarChart(miscGrid, data, '#10b981');                 // Audio Feature Footprint
-            createHistogram(miscGrid, data, 'Tempo', '#06b6d4');         // Tempo distribution
-            createReleaseYearChart(miscGrid, data, '#ef4444');           // Release Era
-            createTitleWordCountChart(miscGrid, data, '#ec4899');        // Track Title Length
+            createCumulativeTimeChart(miscGrid, data, '#f59e0b');        
+            createDurationHistogram(miscGrid, data, '#a855f7');          
+            createRadarChart(miscGrid, data, '#10b981');                 
+            createHistogram(miscGrid, data, 'Tempo', '#06b6d4');         
+            createReleaseYearChart(miscGrid, data, '#ef4444');           
+            createTitleWordCountChart(miscGrid, data, '#ec4899');        
+
+            // VII. Interactive Explorer Initialization
+            const numericFeatures = ['Energy', 'Valence', 'Danceability', 'Popularity', 'Acousticness', 'Loudness', 'Speechiness', 'Instrumentalness', 'Tempo', 'Duration (ms)'];
+            const selectX = document.getElementById('interactiveX');
+            const selectY = document.getElementById('interactiveY');
+
+            selectX.innerHTML = numericFeatures.map(f => `<option value="${f}" ${f === 'Danceability' ? 'selected' : ''}>${f}</option>`).join('');
+            selectY.innerHTML = numericFeatures.map(f => `<option value="${f}" ${f === 'Energy' ? 'selected' : ''}>${f}</option>`).join('');
+
+            drawInteractiveChart(data, selectX.value, selectY.value);
+
+            selectX.addEventListener('change', () => drawInteractiveChart(data, selectX.value, selectY.value));
+            selectY.addEventListener('change', () => drawInteractiveChart(data, selectX.value, selectY.value));
         }
 
         // --- CHART FACTORIES ---
@@ -190,7 +217,7 @@
             wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${col}</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
             
-            const raw = data.map(d => d[col]).filter(v => v != null);
+            const raw = data.map(d => d[col]).filter(v => typeof v === 'number');
             if (raw.length === 0) return;
             const bins = 10;
             const min = Math.min(...raw);
@@ -218,7 +245,7 @@
             wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${xCol} vs ${yCol}</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
 
-            const points = data.map(d => ({ x: d[xCol], y: d[yCol] })).filter(p => p.x != null && p.y != null);
+            const points = data.map(d => ({ x: d[xCol], y: d[yCol] })).filter(p => typeof p.x === 'number' && typeof p.y === 'number');
             new Chart(wrap.querySelector('canvas'), {
                 type: 'scatter',
                 data: {
@@ -340,8 +367,6 @@
             });
         }
 
-        // --- SECTION VI FACTORIES ---
-        
         function createCumulativeTimeChart(container, data, color) {
             const counts = {};
             data.forEach(d => {
@@ -397,7 +422,7 @@
             wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Duration (Minutes)</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
 
-            const raw = data.map(d => d['Duration (ms)']).filter(v => v != null).map(ms => ms / 60000);
+            const raw = data.map(d => d['Duration (ms)']).filter(v => typeof v === 'number').map(ms => ms / 60000);
             const filtered = raw.filter(m => m > 0 && m <= 10); 
             if(filtered.length === 0) return; 
 
@@ -474,7 +499,6 @@
             const counts = {};
             data.forEach(d => {
                 if (!d['Release Date']) return;
-                // Safely grab the first 4 characters for the Year
                 const year = String(d['Release Date']).substring(0, 4); 
                 if (isNaN(year) || year < 1900 || year > 2100) return;
                 counts[year] = (counts[year] || 0) + 1;
@@ -545,6 +569,123 @@
                     scales: { 
                         x: { grid: { display: false } }, 
                         y: { display: false } 
+                    }
+                }
+            });
+        }
+
+        // --- SECTION VII FACTORIES ---
+
+        // Helper function to calculate linear regression (y = mx + b)
+        function calculateTrendLine(points) {
+            if (points.length < 2) return null;
+            
+            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+            let count = points.length;
+            let minX = Infinity, maxX = -Infinity;
+
+            for (let p of points) {
+                sumX += p.x;
+                sumY += p.y;
+                sumXY += p.x * p.y;
+                sumXX += p.x * p.x;
+                if (p.x < minX) minX = p.x;
+                if (p.x > maxX) maxX = p.x;
+            }
+
+            let denominator = (count * sumXX) - (sumX * sumX);
+            if (denominator === 0) return null;
+
+            let m = ((count * sumXY) - (sumX * sumY)) / denominator;
+            let b = (sumY - (m * sumX)) / count;
+
+            return [
+                { x: minX, y: m * minX + b },
+                { x: maxX, y: m * maxX + b }
+            ];
+        }
+
+        function drawInteractiveChart(data, xCol, yCol) {
+            const ctx = document.getElementById('interactiveCanvas').getContext('2d');
+            
+            if (interactiveChartInstance) {
+                interactiveChartInstance.destroy();
+            }
+
+            // Extract points for scatter plot
+            const points = data.map(d => ({ 
+                x: Number(d[xCol]), 
+                y: Number(d[yCol]), 
+                trackName: d['Track Name'] || 'Unknown Track' 
+            })).filter(p => !isNaN(p.x) && !isNaN(p.y));
+
+            // Generate trend line data
+            const trendData = calculateTrendLine(points);
+
+            // Construct datasets
+            const datasets = [
+                {
+                    type: 'scatter',
+                    label: 'Interactive Tracks',
+                    data: points,
+                    backgroundColor: 'rgba(168, 85, 247, 0.6)', 
+                    pointRadius: 4,
+                    pointHoverRadius: 7,
+                    borderColor: 'rgba(168, 85, 247, 1)',
+                    borderWidth: 1,
+                    order: 2 // Draws below the line
+                }
+            ];
+
+            if (trendData) {
+                datasets.push({
+                    type: 'line',
+                    label: 'Trend Line',
+                    data: trendData,
+                    borderColor: '#10b981', // Emerald green for contrast
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false,
+                    order: 1 // Draws on top
+                });
+            }
+
+            interactiveChartInstance = new Chart(ctx, {
+                type: 'scatter', // Keep main type as scatter so axes behave natively
+                data: {
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#94a3b8',
+                            callbacks: {
+                                label: function(context) {
+                                    // Don't show tooltip for the trend line
+                                    if (context.dataset.label === 'Trend Line') return null;
+                                    const point = context.raw;
+                                    return `${point.trackName}: (${point.x}, ${point.y})`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            type: 'linear', // Explicitly declare linear for mixed charts
+                            position: 'bottom',
+                            grid: { color: '#1e293b' }, 
+                            title: { display: true, text: xCol, color: '#94a3b8', font: { family: 'JetBrains Mono', size: 14 } } 
+                        },
+                        y: { 
+                            grid: { color: '#1e293b' }, 
+                            title: { display: true, text: yCol, color: '#94a3b8', font: { family: 'JetBrains Mono', size: 14 } } 
+                        }
                     }
                 }
             });
