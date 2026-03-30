@@ -18,6 +18,9 @@
         .chart-container-large { position: relative; height: 500px; width: 100%; }
         .upload-section { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 2px dashed #334155; }
         select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+        
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        .legend-item { display: flex; align-items: center; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -43,12 +46,12 @@
             <div id="summaryStats" class="grid grid-cols-2 lg:grid-cols-4 gap-6"></div>
 
             <div>
-                <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">I. Sonic Landscapes (Distributions)</h2>
+                <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">I. Sonic Landscapes</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="distGrid"></div>
             </div>
 
             <div>
-                <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">II. Relational Geographies (Scatters)</h2>
+                <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">II. Relational Geographies</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="scatterGrid"></div>
             </div>
 
@@ -75,22 +78,24 @@
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">VII. Interactive Explorer</h2>
                 <div class="card w-full">
-                    <div class="flex flex-wrap gap-6 mb-6">
-                        <div>
-                            <label class="text-xs text-slate-500 mb-2 uppercase tracking-widest block">X-Axis Variable</label>
-                            <select id="interactiveX" class="bg-[#020617] border border-slate-700 text-slate-200 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer min-w-[150px]"></select>
+                    <div class="flex flex-col gap-6 mb-6">
+                        <div class="flex flex-wrap gap-6 items-end">
+                            <div>
+                                <label class="text-xs text-slate-500 mb-2 uppercase tracking-widest block">X-Axis Variable</label>
+                                <select id="interactiveX" class="bg-[#020617] border border-slate-700 text-slate-200 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer min-w-[180px]"></select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-500 mb-2 uppercase tracking-widest block">Y-Axis Variable</label>
+                                <select id="interactiveY" class="bg-[#020617] border border-slate-700 text-slate-200 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer min-w-[180px]"></select>
+                            </div>
                         </div>
-                        <div>
-                            <label class="text-xs text-slate-500 mb-2 uppercase tracking-widest block">Y-Axis Variable</label>
-                            <select id="interactiveY" class="bg-[#020617] border border-slate-700 text-slate-200 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer min-w-[150px]"></select>
-                        </div>
+                        <div id="genreLegend" class="flex flex-wrap gap-x-6 gap-y-3 p-4 bg-[#020617] rounded-xl border border-slate-800/50"></div>
                     </div>
                     <div class="chart-container-large">
                         <canvas id="interactiveCanvas"></canvas>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -99,8 +104,11 @@
         const uploadZone = document.getElementById('uploadContainer');
         const dashboard = document.getElementById('dashboard');
         const errorBox = document.getElementById('errorBox');
-        
         let interactiveChartInstance = null;
+        let globalData = [];
+
+        // Global Helper Functions
+        const mean = (arr) => arr.length ? arr.reduce((a, b) => a + (b || 0), 0) / arr.length : 0;
 
         uploadZone.onclick = () => fileInput.click();
         fileInput.onchange = (e) => processFile(e.target.files[0]);
@@ -111,581 +119,278 @@
                 dynamicTyping: true,
                 skipEmptyLines: true,
                 complete: (results) => {
-                    const data = results.data;
-                    if (data.length === 0) {
-                        showError("The file appears to be empty.");
-                        return;
-                    }
+                    globalData = results.data;
+                    if (globalData.length === 0) { showError("File is empty."); return; }
                     try {
-                        generateDashboard(data);
+                        generateDashboard(globalData);
                         uploadZone.classList.add('hidden');
                         dashboard.classList.remove('hidden');
                         errorBox.classList.add('hidden');
-                    } catch (err) {
-                        console.error(err);
-                        showError("Error generating graphs: " + err.message);
-                    }
+                    } catch (err) { showError("Error: " + err.message); }
                 }
             });
         }
 
-        function showError(msg) {
-            errorBox.innerText = msg;
-            errorBox.classList.remove('hidden');
-        }
+        function showError(msg) { errorBox.innerText = msg; errorBox.classList.remove('hidden'); }
 
         function generateDashboard(data) {
-            const mean = (arr) => arr.length ? arr.reduce((a, b) => a + (b || 0), 0) / arr.length : 0;
             const getCol = (col) => data.map(d => d[col]).filter(v => v != null);
             
-            const statsGrid = document.getElementById('summaryStats');
-            const metrics = [
+            // Summary Stats
+            document.getElementById('summaryStats').innerHTML = [
                 { label: 'Total Tracks', val: data.length, accent: '#3b82f6' },
                 { label: 'Avg Popularity', val: mean(getCol('Popularity')).toFixed(1), accent: '#818cf8' },
                 { label: 'Avg Energy', val: mean(getCol('Energy')).toFixed(2), accent: '#f43f5e' },
                 { label: 'Avg Valence', val: mean(getCol('Valence')).toFixed(2), accent: '#10b981' }
-            ];
-            statsGrid.innerHTML = metrics.map(m => `
-                <div class="card text-center">
-                    <div class="text-slate-500 text-xs mb-1 uppercase">${m.label}</div>
-                    <div class="text-3xl font-black" style="color: ${m.accent}">${m.val}</div>
-                </div>
-            `).join('');
+            ].map(m => `<div class="card text-center"><div class="text-slate-500 text-xs mb-1 uppercase">${m.label}</div><div class="text-3xl font-black" style="color: ${m.accent}">${m.val}</div></div>`).join('');
 
-            const distGrid = document.getElementById('distGrid');
-            const featureList = ['Energy', 'Valence', 'Danceability', 'Popularity', 'Acousticness', 'Loudness', 'Speechiness', 'Instrumentalness'];
-            featureList.forEach(f => {
-                createHistogram(distGrid, data, f, '#3b82f6');
-            });
+            // I. Distributions
+            const distGrid = document.getElementById('distGrid'); distGrid.innerHTML = '';
+            ['Energy', 'Valence', 'Danceability', 'Popularity', 'Acousticness', 'Loudness', 'Speechiness', 'Instrumentalness'].forEach(f => createHistogram(distGrid, data, f, '#3b82f6'));
 
-            const scatterGrid = document.getElementById('scatterGrid');
-            const pairs = [
-                ['Valence', 'Energy'], ['Popularity', 'Energy'], ['Loudness', 'Energy'],
-                ['Tempo', 'Energy'], ['Duration (ms)', 'Danceability'], ['Popularity', 'Valence']
-            ];
-            pairs.forEach(p => {
-                createScatter(scatterGrid, data, p[0], p[1]);
-            });
+            // II. Scatters
+            const scatterGrid = document.getElementById('scatterGrid'); scatterGrid.innerHTML = '';
+            [['Valence', 'Energy'], ['Popularity', 'Energy'], ['Loudness', 'Energy'], ['Tempo', 'Energy'], ['Duration (ms)', 'Danceability'], ['Popularity', 'Valence']].forEach(p => createScatter(scatterGrid, data, p[0], p[1]));
 
-            const timeGrid = document.getElementById('timeGrid');
+            // III. Temporal
+            const timeGrid = document.getElementById('timeGrid'); timeGrid.innerHTML = '';
             const sorted = [...data].sort((a,b) => new Date(a['Added At']) - new Date(b['Added At']));
             createTimeChart(timeGrid, sorted, 'Energy', '#f43f5e');
             createTimeChart(timeGrid, sorted, 'Valence', '#10b981');
             createTimeChart(timeGrid, sorted, 'Popularity', '#818cf8');
             createTimeChart(timeGrid, sorted, 'Loudness', '#94a3b8');
 
-            const identityGrid = document.getElementById('identityGrid');
+            // IV. Identity
+            const identityGrid = document.getElementById('identityGrid'); identityGrid.innerHTML = '';
             createTopBar(identityGrid, data, 'Genres', 15);
             createTopBar(identityGrid, data, 'Artist Name(s)', 15);
             createTopBar(identityGrid, data, 'Album Name', 15);
 
-            const dnaGrid = document.getElementById('dnaGrid');
+            // V. DNA
+            const dnaGrid = document.getElementById('dnaGrid'); dnaGrid.innerHTML = '';
             createCategoryChart(dnaGrid, data, 'Key', 'Key Signature');
-            createCategoryChart(dnaGrid, data, 'Mode', 'Major (1) vs Minor (0)');
-            createCategoryChart(dnaGrid, data, 'Explicit', 'Explicit Status');
+            createCategoryChart(dnaGrid, data, 'Mode', 'Mode');
+            createCategoryChart(dnaGrid, data, 'Explicit', 'Explicit');
             createTimeAnalysis(dnaGrid, data, 'Added At', 'Hour');
             createTimeAnalysis(dnaGrid, data, 'Added At', 'Day');
-            createCategoryChart(dnaGrid, data, 'Time Signature', 'Time Signature');
+            createCategoryChart(dnaGrid, data, 'Time Signature', 'Time Sig');
 
-            const miscGrid = document.getElementById('miscGrid');
-            createCumulativeTimeChart(miscGrid, data, '#f59e0b');        
-            createDurationHistogram(miscGrid, data, '#a855f7');          
-            createRadarChart(miscGrid, data, '#10b981');                 
-            createHistogram(miscGrid, data, 'Tempo', '#06b6d4');         
-            createReleaseYearChart(miscGrid, data, '#ef4444');           
-            createTitleWordCountChart(miscGrid, data, '#ec4899');        
+            // VI. Misc
+            const miscGrid = document.getElementById('miscGrid'); miscGrid.innerHTML = '';
+            createCumulativeTimeChart(miscGrid, data, '#f59e0b');
+            createDurationHistogram(miscGrid, data, '#a855f7');
+            createRadarChart(miscGrid, data, '#10b981');
+            createHistogram(miscGrid, data, 'Tempo', '#06b6d4');
+            createReleaseYearChart(miscGrid, data, '#ef4444');
+            createTitleWordCountChart(miscGrid, data, '#ec4899');
 
-            // VII. Interactive Explorer Initialization
+            // VII. Interactive Explorer
             const numericFeatures = ['Energy', 'Valence', 'Danceability', 'Popularity', 'Acousticness', 'Loudness', 'Speechiness', 'Instrumentalness', 'Tempo', 'Duration (ms)'];
             const selectX = document.getElementById('interactiveX');
             const selectY = document.getElementById('interactiveY');
-
             selectX.innerHTML = numericFeatures.map(f => `<option value="${f}" ${f === 'Danceability' ? 'selected' : ''}>${f}</option>`).join('');
             selectY.innerHTML = numericFeatures.map(f => `<option value="${f}" ${f === 'Energy' ? 'selected' : ''}>${f}</option>`).join('');
 
             drawInteractiveChart(data, selectX.value, selectY.value);
-
-            selectX.addEventListener('change', () => drawInteractiveChart(data, selectX.value, selectY.value));
-            selectY.addEventListener('change', () => drawInteractiveChart(data, selectX.value, selectY.value));
+            selectX.onchange = () => drawInteractiveChart(data, selectX.value, selectY.value);
+            selectY.onchange = () => drawInteractiveChart(data, selectX.value, selectY.value);
         }
 
         // --- CHART FACTORIES ---
-
         function createHistogram(container, data, col, color) {
-            const wrap = document.createElement('div');
-            wrap.className = 'card';
+            const wrap = document.createElement('div'); wrap.className = 'card';
             wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${col}</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
-            
             const raw = data.map(d => d[col]).filter(v => typeof v === 'number');
-            if (raw.length === 0) return;
-            const bins = 10;
-            const min = Math.min(...raw);
-            const max = Math.max(...raw);
-            const counts = Array(bins).fill(0);
-            raw.forEach(v => {
-                let b = Math.floor(((v - min) / (max - min || 1)) * bins);
-                if (b >= bins) b = bins - 1;
-                counts[b]++;
-            });
-
-            new Chart(wrap.querySelector('canvas'), {
-                type: 'bar',
-                data: {
-                    labels: Array.from({length: bins}, (_, i) => (min + (i * (max-min)/bins)).toFixed(2)),
-                    datasets: [{ data: counts, backgroundColor: color, borderRadius: 4 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-            });
+            if (!raw.length) return;
+            const bins = 10, min = Math.min(...raw), max = Math.max(...raw), counts = Array(bins).fill(0);
+            raw.forEach(v => { let b = Math.floor(((v - min) / (max - min || 1)) * bins); if (b >= bins) b = bins - 1; counts[b]++; });
+            new Chart(wrap.querySelector('canvas'), { type: 'bar', data: { labels: Array.from({length: bins}, (_, i) => (min + (i * (max-min)/bins)).toFixed(2)), datasets: [{ data: counts, backgroundColor: color, borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } } });
         }
 
         function createScatter(container, data, xCol, yCol) {
-            const wrap = document.createElement('div');
-            wrap.className = 'card';
+            const wrap = document.createElement('div'); wrap.className = 'card';
             wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${xCol} vs ${yCol}</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
-
             const points = data.map(d => ({ x: d[xCol], y: d[yCol] })).filter(p => typeof p.x === 'number' && typeof p.y === 'number');
-            new Chart(wrap.querySelector('canvas'), {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: 'Tracks',
-                        data: points,
-                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                        pointRadius: 3
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        x: { grid: { color: '#1e293b' }, title: { display: true, text: xCol, color: '#475569' } },
-                        y: { grid: { color: '#1e293b' }, title: { display: true, text: yCol, color: '#475569' } }
-                    }
-                }
-            });
+            new Chart(wrap.querySelector('canvas'), { type: 'scatter', data: { datasets: [{ label: 'Tracks', data: points, backgroundColor: 'rgba(59, 130, 246, 0.4)', pointRadius: 3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#1e293b' } }, y: { grid: { color: '#1e293b' } } } } });
         }
 
         function createTimeChart(container, sortedData, col, color) {
-            const wrap = document.createElement('div');
-            wrap.className = 'card';
+            const wrap = document.createElement('div'); wrap.className = 'card';
             wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${col} over Timeline</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
-
-            new Chart(wrap.querySelector('canvas'), {
-                type: 'line',
-                data: {
-                    labels: sortedData.map(d => d['Added At']),
-                    datasets: [{
-                        data: sortedData.map(d => d[col]),
-                        borderColor: color,
-                        borderWidth: 1,
-                        pointRadius: 0,
-                        tension: 0.1
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } },
-                    scales: { x: { display: false }, y: { grid: { color: '#1e293b' } } }
-                }
-            });
+            new Chart(wrap.querySelector('canvas'), { type: 'line', data: { labels: sortedData.map(d => d['Added At']), datasets: [{ data: sortedData.map(d => d[col]), borderColor: color, borderWidth: 1, pointRadius: 0, tension: 0.1 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: '#1e293b' } } } } });
         }
 
         function createTopBar(container, data, col, limit) {
             const counts = {};
-            data.forEach(d => {
-                if (!d[col]) return;
-                const items = col === 'Genres' ? d[col].split(',').map(i => i.trim()) : [d[col]];
-                items.forEach(i => counts[i] = (counts[i] || 0) + 1);
-            });
+            data.forEach(d => { if (!d[col]) return; const items = col === 'Genres' ? d[col].split(',').map(i => i.trim()) : [d[col]]; items.forEach(i => counts[i] = (counts[i] || 0) + 1); });
             const top = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, limit);
-
-            const wrap = document.createElement('div');
-            wrap.className = 'card';
+            const wrap = document.createElement('div'); wrap.className = 'card';
             wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Top ${limit} ${col}</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
-
-            new Chart(wrap.querySelector('canvas'), {
-                type: 'bar',
-                data: {
-                    labels: top.map(x => x[0]),
-                    datasets: [{ data: top.map(x => x[1]), backgroundColor: '#6366f1' }]
-                },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#1e293b' } }, y: { grid: { display: false } } } }
-            });
+            new Chart(wrap.querySelector('canvas'), { type: 'bar', data: { labels: top.map(x => x[0]), datasets: [{ data: top.map(x => x[1]), backgroundColor: '#6366f1' }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#1e293b' } }, y: { grid: { display: false } } } } });
         }
 
         function createCategoryChart(container, data, col, title) {
-            const counts = {};
-            data.forEach(d => counts[d[col]] = (counts[d[col]] || 0) + 1);
-            
-            const wrap = document.createElement('div');
-            wrap.className = 'card';
+            const counts = {}; data.forEach(d => counts[d[col]] = (counts[d[col]] || 0) + 1);
+            const wrap = document.createElement('div'); wrap.className = 'card';
             wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${title}</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
-
             const labels = Object.keys(counts);
-            new Chart(wrap.querySelector('canvas'), {
-                type: labels.length > 5 ? 'bar' : 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{ data: Object.values(counts), backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1','#ef4444','#f59e0b'] }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: labels.length < 5 } } }
-            });
+            new Chart(wrap.querySelector('canvas'), { type: labels.length > 5 ? 'bar' : 'pie', data: { labels: labels, datasets: [{ data: Object.values(counts), backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: labels.length < 5 } } } });
         }
 
         function createTimeAnalysis(container, data, col, mode) {
             const counts = {};
-            data.forEach(d => {
-                const date = new Date(d[col]);
-                if (isNaN(date)) return;
-                const key = mode === 'Hour' ? date.getHours() : date.toLocaleDateString('en-US', {weekday: 'long'});
-                counts[key] = (counts[key] || 0) + 1;
-            });
-
-            const wrap = document.createElement('div');
-            wrap.className = 'card';
+            data.forEach(d => { const date = new Date(d[col]); if (isNaN(date)) return; const key = mode === 'Hour' ? date.getHours() : date.toLocaleDateString('en-US', {weekday: 'long'}); counts[key] = (counts[key] || 0) + 1; });
+            const wrap = document.createElement('div'); wrap.className = 'card';
             wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${mode} Added</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
-
-            let labels = Object.keys(counts);
-            if(mode === 'Hour') labels = Array.from({length: 24}, (_, i) => i);
-            if(mode === 'Day') labels = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-
-            new Chart(wrap.querySelector('canvas'), {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{ data: labels.map(l => counts[l] || 0), backgroundColor: '#0ea5e9' }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
+            let labels = mode === 'Hour' ? Array.from({length: 24}, (_, i) => i) : ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+            new Chart(wrap.querySelector('canvas'), { type: 'bar', data: { labels: labels, datasets: [{ data: labels.map(l => counts[l] || 0), backgroundColor: '#0ea5e9' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
         }
 
         function createCumulativeTimeChart(container, data, color) {
             const counts = {};
-            data.forEach(d => {
-                if (!d['Added At']) return;
-                const date = new Date(d['Added At']);
-                if (isNaN(date)) return;
-                const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                counts[monthYear] = (counts[monthYear] || 0) + 1;
-            });
-
-            const labels = Object.keys(counts).sort();
-            let cumulative = 0;
-            const cumulativeData = labels.map(label => {
-                cumulative += counts[label];
-                return cumulative;
-            });
-
-            const wrap = document.createElement('div');
-            wrap.className = 'card';
-            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Cumulative Tracks Added</div><div class="chart-container"><canvas></canvas></div>`;
+            data.forEach(d => { if (!d['Added At']) return; const date = new Date(d['Added At']); if (isNaN(date)) return; const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`; counts[monthYear] = (counts[monthYear] || 0) + 1; });
+            const labels = Object.keys(counts).sort(); let cumulative = 0; const cumulativeData = labels.map(label => { cumulative += counts[label]; return cumulative; });
+            const wrap = document.createElement('div'); wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Cumulative Tracks</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
-
-            new Chart(wrap.querySelector('canvas'), {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: cumulativeData,
-                        borderColor: color,
-                        backgroundColor: color + '33',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 2,
-                        pointBackgroundColor: color
-                    }]
-                },
-                options: {
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        x: { grid: { color: '#1e293b' } }, 
-                        y: { grid: { color: '#1e293b' } } 
-                    }
-                }
-            });
+            new Chart(wrap.querySelector('canvas'), { type: 'line', data: { labels: labels, datasets: [{ data: cumulativeData, borderColor: color, backgroundColor: color + '33', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#1e293b' } }, y: { grid: { color: '#1e293b' } } } } });
         }
 
         function createDurationHistogram(container, data, color) {
-            const wrap = document.createElement('div');
-            wrap.className = 'card';
-            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Duration (Minutes)</div><div class="chart-container"><canvas></canvas></div>`;
+            const wrap = document.createElement('div'); wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Duration (Min)</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
-
-            const raw = data.map(d => d['Duration (ms)']).filter(v => typeof v === 'number').map(ms => ms / 60000);
-            const filtered = raw.filter(m => m > 0 && m <= 10); 
-            if(filtered.length === 0) return; 
-
-            const bins = 15;
-            const min = Math.min(...filtered);
-            const max = Math.max(...filtered);
-            const counts = Array(bins).fill(0);
-
-            filtered.forEach(v => {
-                let b = Math.floor(((v - min) / (max - min || 1)) * bins);
-                if (b >= bins) b = bins - 1;
-                counts[b]++;
-            });
-
-            new Chart(wrap.querySelector('canvas'), {
-                type: 'bar',
-                data: {
-                    labels: Array.from({length: bins}, (_, i) => (min + (i * (max-min)/bins)).toFixed(1) + 'm'),
-                    datasets: [{ data: counts, backgroundColor: color, borderRadius: 4 }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } }, 
-                    scales: { 
-                        y: { display: false }, 
-                        x: { grid: { display: false } } 
-                    } 
-                }
-            });
+            const filtered = data.map(d => d['Duration (ms)'] / 60000).filter(m => m > 0 && m <= 10);
+            if(!filtered.length) return;
+            const bins = 15, min = Math.min(...filtered), max = Math.max(...filtered), counts = Array(bins).fill(0);
+            filtered.forEach(v => { let b = Math.floor(((v - min) / (max - min || 1)) * bins); if (b >= bins) b = bins - 1; counts[b]++; });
+            new Chart(wrap.querySelector('canvas'), { type: 'bar', data: { labels: Array.from({length: bins}, (_, i) => (min + (i * (max-min)/bins)).toFixed(1) + 'm'), datasets: [{ data: counts, backgroundColor: color, borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
         }
 
         function createRadarChart(container, data, color) {
-            const wrap = document.createElement('div');
-            wrap.className = 'card';
-            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Average Audio Footprint</div><div class="chart-container"><canvas></canvas></div>`;
+            const wrap = document.createElement('div'); wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Audio Footprint</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
-
             const features = ['Danceability', 'Energy', 'Valence', 'Acousticness', 'Instrumentalness', 'Speechiness'];
-            const averages = features.map(f => {
-                const vals = data.map(d => d[f]).filter(v => typeof v === 'number');
-                return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
-            });
-
-            new Chart(wrap.querySelector('canvas'), {
-                type: 'radar',
-                data: {
-                    labels: features,
-                    datasets: [{
-                        data: averages,
-                        backgroundColor: color + '40',
-                        borderColor: color,
-                        pointBackgroundColor: color,
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        r: {
-                            angleLines: { color: '#1e293b' },
-                            grid: { color: '#1e293b' },
-                            pointLabels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } },
-                            ticks: { display: false, min: 0, max: 1 }
-                        }
-                    }
-                }
-            });
+            const averages = features.map(f => mean(data.map(d => d[f]).filter(v => typeof v === 'number')));
+            new Chart(wrap.querySelector('canvas'), { type: 'radar', data: { labels: features, datasets: [{ data: averages, backgroundColor: color + '40', borderColor: color, pointBackgroundColor: color, borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { angleLines: { color: '#1e293b' }, grid: { color: '#1e293b' }, pointLabels: { color: '#94a3b8', font: { size: 10 } }, ticks: { display: false } } } } });
         }
 
         function createReleaseYearChart(container, data, color) {
-            const counts = {};
-            data.forEach(d => {
-                if (!d['Release Date']) return;
-                const year = String(d['Release Date']).substring(0, 4); 
-                if (isNaN(year) || year < 1900 || year > 2100) return;
-                counts[year] = (counts[year] || 0) + 1;
-            });
-
-            const labels = Object.keys(counts).sort();
-            if (labels.length === 0) return;
-
-            const wrap = document.createElement('div');
-            wrap.className = 'card';
-            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Release Era (Year)</div><div class="chart-container"><canvas></canvas></div>`;
+            const counts = {}; data.forEach(d => { if (!d['Release Date']) return; const year = String(d['Release Date']).substring(0, 4); if (!isNaN(year) && year > 1900) counts[year] = (counts[year] || 0) + 1; });
+            const labels = Object.keys(counts).sort(); if (!labels.length) return;
+            const wrap = document.createElement('div'); wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Release Era</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
-
-            new Chart(wrap.querySelector('canvas'), {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: labels.map(l => counts[l]),
-                        backgroundColor: color,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        x: { grid: { display: false } }, 
-                        y: { display: false } 
-                    }
-                }
-            });
+            new Chart(wrap.querySelector('canvas'), { type: 'bar', data: { labels: labels, datasets: [{ data: labels.map(l => counts[l]), backgroundColor: color, borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
         }
 
         function createTitleWordCountChart(container, data, color) {
             const counts = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8+': 0 };
-            
-            data.forEach(d => {
-                if (!d['Track Name']) return;
-                const wordCount = String(d['Track Name']).trim().split(/\s+/).length;
-                if (wordCount >= 8) {
-                    counts['8+']++;
-                } else if (wordCount > 0) {
-                    counts[wordCount.toString()]++;
-                }
-            });
-
-            const wrap = document.createElement('div');
-            wrap.className = 'card';
-            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Track Title Length (Words)</div><div class="chart-container"><canvas></canvas></div>`;
+            data.forEach(d => { if (!d['Track Name']) return; const wc = String(d['Track Name']).trim().split(/\s+/).length; if (wc >= 8) counts['8+']++; else if (wc > 0) counts[wc.toString()]++; });
+            const wrap = document.createElement('div'); wrap.className = 'card';
+            wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">Title Length</div><div class="chart-container"><canvas></canvas></div>`;
             container.appendChild(wrap);
-
-            new Chart(wrap.querySelector('canvas'), {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(counts),
-                    datasets: [{
-                        data: Object.values(counts),
-                        backgroundColor: color,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        x: { grid: { display: false } }, 
-                        y: { display: false } 
-                    }
-                }
-            });
+            new Chart(wrap.querySelector('canvas'), { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts), backgroundColor: color, borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
         }
 
-        // --- SECTION VII FACTORIES ---
-
-        // Helper function to calculate linear regression (y = mx + b)
+        // --- CHAPTER VII: DYNAMIC TOP 10 EXPLORER ---
         function calculateTrendLine(points) {
             if (points.length < 2) return null;
-            
-            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-            let count = points.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0, count = points.length;
             let minX = Infinity, maxX = -Infinity;
-
             for (let p of points) {
-                sumX += p.x;
-                sumY += p.y;
-                sumXY += p.x * p.y;
-                sumXX += p.x * p.x;
-                if (p.x < minX) minX = p.x;
-                if (p.x > maxX) maxX = p.x;
+                sumX += p.x; sumY += p.y; sumXY += p.x * p.y; sumXX += p.x * p.x;
+                if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
             }
-
             let denominator = (count * sumXX) - (sumX * sumX);
             if (denominator === 0) return null;
-
             let m = ((count * sumXY) - (sumX * sumY)) / denominator;
             let b = (sumY - (m * sumX)) / count;
-
-            return [
-                { x: minX, y: m * minX + b },
-                { x: maxX, y: m * maxX + b }
-            ];
+            return [{ x: minX, y: m * minX + b }, { x: maxX, y: m * maxX + b }];
         }
 
         function drawInteractiveChart(data, xCol, yCol) {
             const ctx = document.getElementById('interactiveCanvas').getContext('2d');
-            
-            if (interactiveChartInstance) {
-                interactiveChartInstance.destroy();
+            const legendDiv = document.getElementById('genreLegend');
+            if (interactiveChartInstance) interactiveChartInstance.destroy();
+
+            // 1. Identify Top 10 Genres
+            const genreCount = {};
+            data.forEach(d => {
+                if (!d['Genres']) return;
+                const items = d['Genres'].split(',').map(g => g.trim().toLowerCase());
+                items.forEach(g => genreCount[g] = (genreCount[g] || 0) + 1);
+            });
+            const top10 = Object.entries(genreCount).sort((a,b) => b[1] - a[1]).slice(0, 10).map(x => x[0]);
+
+            // 2. High-Contrast Palette
+            const colors = ['#3b82f6', '#f43f5e', '#10b981', '#ff00eb', '#8b5cf6', '#06b6d4', '#f59e0b', '#ec4899', '#a855f7', '#14b8a6'];
+            const genreColors = {};
+            top10.forEach((g, i) => genreColors[g] = colors[i]);
+
+            // 3. Group Points
+            const groups = {};
+            top10.forEach(g => groups[g] = []);
+            groups['other'] = [];
+
+            data.forEach(d => {
+                const x = Number(d[xCol]), y = Number(d[yCol]);
+                if (isNaN(x) || isNaN(y)) return;
+                const trackGenres = (d['Genres'] || '').toLowerCase();
+                const match = top10.find(g => trackGenres.includes(g));
+                const category = match || 'other';
+                groups[category].push({ x, y, name: d['Track Name'], artist: d['Artist Name(s)'] });
+            });
+
+            // 4. Datasets
+            const datasets = Object.keys(groups).map(key => ({
+                label: key === 'other' ? 'Other' : key,
+                data: groups[key],
+                backgroundColor: (key === 'other' ? '#475569' : genreColors[key]) + '99',
+                borderColor: (key === 'other' ? '#475569' : genreColors[key]),
+                borderWidth: 1,
+                pointRadius: 5,
+                pointHoverRadius: 8
+            })).filter(ds => ds.data.length > 0);
+
+            // 5. Trend Line
+            const allPoints = datasets.flatMap(ds => ds.data);
+            const trend = calculateTrendLine(allPoints);
+            if (trend) {
+                datasets.push({ label: 'Trend', data: trend, type: 'line', borderColor: '#ffffff', borderDash: [5, 5], pointRadius: 0, fill: false, borderWidth: 1 });
             }
 
-            // Extract points for scatter plot
-            const points = data.map(d => ({ 
-                x: Number(d[xCol]), 
-                y: Number(d[yCol]), 
-                trackName: d['Track Name'] || 'Unknown Track' 
-            })).filter(p => !isNaN(p.x) && !isNaN(p.y));
-
-            // Generate trend line data
-            const trendData = calculateTrendLine(points);
-
-            // Construct datasets
-            const datasets = [
-                {
-                    type: 'scatter',
-                    label: 'Interactive Tracks',
-                    data: points,
-                    backgroundColor: 'rgba(168, 85, 247, 0.6)', 
-                    pointRadius: 4,
-                    pointHoverRadius: 7,
-                    borderColor: 'rgba(168, 85, 247, 1)',
-                    borderWidth: 1,
-                    order: 2 // Draws below the line
-                }
-            ];
-
-            if (trendData) {
-                datasets.push({
-                    type: 'line',
-                    label: 'Trend Line',
-                    data: trendData,
-                    borderColor: '#10b981', // Emerald green for contrast
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    pointRadius: 0,
-                    fill: false,
-                    order: 1 // Draws on top
-                });
-            }
+            // 6. Legend UI
+            legendDiv.innerHTML = datasets.filter(ds => ds.label !== 'Trend').map(ds => `
+                <div class="legend-item">
+                    <span class="legend-dot" style="background: ${ds.borderColor}"></span>
+                    ${ds.label}
+                </div>
+            `).join('');
 
             interactiveChartInstance = new Chart(ctx, {
-                type: 'scatter', // Keep main type as scatter so axes behave natively
-                data: {
-                    datasets: datasets
-                },
+                type: 'scatter',
+                data: { datasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#f1f5f9',
-                            bodyColor: '#94a3b8',
-                            callbacks: {
-                                label: function(context) {
-                                    // Don't show tooltip for the trend line
-                                    if (context.dataset.label === 'Trend Line') return null;
-                                    const point = context.raw;
-                                    return `${point.trackName}: (${point.x}, ${point.y})`;
-                                }
-                            }
+                            backgroundColor: '#0f172a',
+                            callbacks: { label: (c) => c.dataset.label === 'Trend' ? null : `${c.raw.name} - ${c.raw.artist} [${c.raw.x}, ${c.raw.y}]` }
                         }
                     },
                     scales: {
-                        x: { 
-                            type: 'linear', // Explicitly declare linear for mixed charts
-                            position: 'bottom',
-                            grid: { color: '#1e293b' }, 
-                            title: { display: true, text: xCol, color: '#94a3b8', font: { family: 'JetBrains Mono', size: 14 } } 
-                        },
-                        y: { 
-                            grid: { color: '#1e293b' }, 
-                            title: { display: true, text: yCol, color: '#94a3b8', font: { family: 'JetBrains Mono', size: 14 } } 
-                        }
+                        x: { grid: { color: '#1e293b' }, title: { display: true, text: xCol, color: '#94a3b8' } },
+                        y: { grid: { color: '#1e293b' }, title: { display: true, text: yCol, color: '#94a3b8' } }
                     }
                 }
             });
