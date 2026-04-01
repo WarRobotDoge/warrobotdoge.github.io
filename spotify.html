@@ -392,7 +392,14 @@
                 if (isNaN(x) || isNaN(y)) return; 
                 const trackGenres = (d['Genres'] || '').toLowerCase();
                 const match = topGenres.find(g => trackGenres.includes(g));
-                const point = { x, y, name: d['Track Name'] || 'Unknown', artist: d['Artist Name(s)'] || 'Unknown' };
+                const point = { 
+                    x, 
+                    y, 
+                    name: d['Track Name'] || 'Unknown', 
+                    artist: d['Artist Name(s)'] || 'Unknown',
+                    popularity: Number(d['Popularity']) || 0,
+                    loudness: Number(d['Loudness']) || 0
+                };
                 if (match) groups[match].push(point); else groups['other'].push(point);
             });
 
@@ -431,8 +438,9 @@
                 const label = isOther ? 'other' : key;
                 const color = isOther ? 'rgba(71, 85, 105, 1)' : genreColors[key];
                 
-                const avgX = (groupData.reduce((sum, p) => sum + p.x, 0) / groupData.length).toFixed(2);
-                const avgY = (groupData.reduce((sum, p) => sum + p.y, 0) / groupData.length).toFixed(2);
+                // Calculating Popularity and Loudness specifically instead of reflecting axis variables
+                const avgPop = (groupData.reduce((sum, p) => sum + p.popularity, 0) / groupData.length).toFixed(1);
+                const avgLoud = (groupData.reduce((sum, p) => sum + p.loudness, 0) / groupData.length).toFixed(1);
                 
                 const artists = {};
                 groupData.forEach(p => { artists[p.artist] = (artists[p.artist] || 0) + 1; });
@@ -452,8 +460,8 @@
                             <span class="text-xs font-bold text-white uppercase truncate">${label}</span>
                         </div>
                         <div class="text-[10px] text-slate-500 font-mono">Tracks: <span class="text-slate-300">${groupData.length}</span></div>
-                        <div class="text-[10px] text-slate-500 font-mono truncate">Avg ${xCol}: <span class="text-slate-300">${avgX}</span></div>
-                        <div class="text-[10px] text-slate-500 font-mono truncate">Avg ${yCol}: <span class="text-slate-300">${avgY}</span></div>
+                        <div class="text-[10px] text-slate-500 font-mono truncate">Avg Popularity: <span class="text-slate-300">${avgPop}</span></div>
+                        <div class="text-[10px] text-slate-500 font-mono truncate">Avg Loudness: <span class="text-slate-300">${avgLoud}</span></div>
                         <div class="text-[10px] text-blue-400 font-mono truncate mt-1" title="${topArtist}">Top: ${topArtist}</div>
                     </div>
                 `;
