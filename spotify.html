@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,17 +17,21 @@
         .chart-container { position: relative; height: 320px; width: 100%; }
         .chart-container-large { position: relative; height: 500px; width: 100%; }
         .upload-section { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 2px dashed #334155; }
-        select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
-        
+        select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; }        
         .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .legend-item { display: flex; align-items: center; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+        
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #3b82f6; cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
+        input[type=range]:focus { outline: none; }
     </style>
 </head>
 <body class="p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
         <div class="mb-12">
             <h1 class="text-4xl font-extrabold mb-2"><span class="accent-text">PLAYLIST VITALIST</span> ULTIMATE</h1>
-            <p class="text-slate-400">Structural & Aesthetic Audit of 1,100+ Days of Listening.</p>
+            <p class="text-slate-400">Structural & Aesthetic Audit of Listening History.</p>
         </div>
 
         <div id="uploadContainer" class="upload-section rounded-2xl p-16 text-center cursor-pointer mb-12">
@@ -90,6 +93,18 @@
                                 <select id="interactiveY" class="bg-[#020617] border border-slate-700 text-slate-200 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer min-w-[180px]"></select>
                             </div>
                         </div>
+
+                        <div class="w-full bg-[#020617] p-5 rounded-xl border border-slate-800/50">
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="text-xs text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    Weekly Growth Timeline
+                                </label>
+                                <span id="timelineDisplay" class="text-sm font-bold text-blue-400 bg-blue-900/30 px-3 py-1 rounded-full border border-blue-500/30">Present Day</span>
+                            </div>
+                            <input type="range" id="timeSlider" class="w-full" min="0" max="100" value="100">
+                        </div>
+
                         <div id="genreLegend" class="flex flex-wrap gap-x-6 gap-y-3 p-4 bg-[#020617] rounded-xl border border-slate-800/50"></div>
                     </div>
                     <div class="chart-container-large">
@@ -107,8 +122,8 @@
         const errorBox = document.getElementById('errorBox');
         let interactiveChartInstance = null;
         let globalData = [];
+        let globalWeeks = [];
 
-        // Global Helper Functions
         const mean = (arr) => arr.length ? arr.reduce((a, b) => a + (b || 0), 0) / arr.length : 0;
 
         uploadZone.onclick = () => fileInput.click();
@@ -134,10 +149,17 @@
 
         function showError(msg) { errorBox.innerText = msg; errorBox.classList.remove('hidden'); }
 
+        const getWeekStart = (dateString) => {
+            const date = new Date(dateString);
+            if (isNaN(date)) return null;
+            const day = date.getDay();
+            const diff = date.getDate() - day;
+            const weekStart = new Date(date.setDate(diff));
+            return `${weekStart.getFullYear()}-${String(weekStart.getMonth() + 1).padStart(2, '0')}-${String(weekStart.getDate()).padStart(2, '0')}`;
+        };
+
         function generateDashboard(data) {
             const getCol = (col) => data.map(d => d[col]).filter(v => v != null);
-            
-            // Summary Stats
             document.getElementById('summaryStats').innerHTML = [
                 { label: 'Total Tracks', val: data.length, accent: '#3b82f6' },
                 { label: 'Avg Popularity', val: mean(getCol('Popularity')).toFixed(1), accent: '#818cf8' },
@@ -145,15 +167,12 @@
                 { label: 'Avg Valence', val: mean(getCol('Valence')).toFixed(2), accent: '#10b981' }
             ].map(m => `<div class="card text-center"><div class="text-slate-500 text-xs mb-1 uppercase">${m.label}</div><div class="text-3xl font-black" style="color: ${m.accent}">${m.val}</div></div>`).join('');
 
-            // I. Distributions
             const distGrid = document.getElementById('distGrid'); distGrid.innerHTML = '';
             ['Energy', 'Valence', 'Danceability', 'Popularity', 'Acousticness', 'Loudness', 'Speechiness', 'Instrumentalness'].forEach(f => createHistogram(distGrid, data, f, '#3b82f6'));
 
-            // II. Scatters
             const scatterGrid = document.getElementById('scatterGrid'); scatterGrid.innerHTML = '';
             [['Valence', 'Energy'], ['Popularity', 'Energy'], ['Loudness', 'Energy'], ['Tempo', 'Energy'], ['Duration (ms)', 'Danceability'], ['Popularity', 'Valence']].forEach(p => createScatter(scatterGrid, data, p[0], p[1]));
 
-            // III. Temporal
             const timeGrid = document.getElementById('timeGrid'); timeGrid.innerHTML = '';
             const sorted = [...data].sort((a,b) => new Date(a['Added At']) - new Date(b['Added At']));
             createTimeChart(timeGrid, sorted, 'Energy', '#f43f5e');
@@ -161,13 +180,11 @@
             createTimeChart(timeGrid, sorted, 'Popularity', '#818cf8');
             createTimeChart(timeGrid, sorted, 'Loudness', '#94a3b8');
 
-            // IV. Identity
             const identityGrid = document.getElementById('identityGrid'); identityGrid.innerHTML = '';
             createTopBar(identityGrid, data, 'Genres', 15);
             createTopBar(identityGrid, data, 'Artist Name(s)', 15);
             createTopBar(identityGrid, data, 'Album Name', 15);
 
-            // V. DNA
             const dnaGrid = document.getElementById('dnaGrid'); dnaGrid.innerHTML = '';
             createCategoryChart(dnaGrid, data, 'Key', 'Key Signature');
             createCategoryChart(dnaGrid, data, 'Mode', 'Mode');
@@ -176,7 +193,6 @@
             createTimeAnalysis(dnaGrid, data, 'Added At', 'Day');
             createCategoryChart(dnaGrid, data, 'Time Signature', 'Time Sig');
 
-            // VI. Misc
             const miscGrid = document.getElementById('miscGrid'); miscGrid.innerHTML = '';
             createCumulativeTimeChart(miscGrid, data, '#f59e0b');
             createDurationHistogram(miscGrid, data, '#a855f7');
@@ -185,19 +201,52 @@
             createReleaseYearChart(miscGrid, data, '#ef4444');
             createTitleWordCountChart(miscGrid, data, '#ec4899');
 
-            // VII. Interactive Explorer
             const numericFeatures = ['Energy', 'Valence', 'Danceability', 'Popularity', 'Acousticness', 'Loudness', 'Speechiness', 'Instrumentalness', 'Tempo', 'Duration (ms)'];
             const selectX = document.getElementById('interactiveX');
             const selectY = document.getElementById('interactiveY');
             selectX.innerHTML = numericFeatures.map(f => `<option value="${f}" ${f === 'Danceability' ? 'selected' : ''}>${f}</option>`).join('');
             selectY.innerHTML = numericFeatures.map(f => `<option value="${f}" ${f === 'Energy' ? 'selected' : ''}>${f}</option>`).join('');
 
-            drawInteractiveChart(data, selectX.value, selectY.value);
-            selectX.onchange = () => drawInteractiveChart(data, selectX.value, selectY.value);
-            selectY.onchange = () => drawInteractiveChart(data, selectX.value, selectY.value);
+            const weeksSet = new Set();
+            data.forEach(d => {
+                const ws = getWeekStart(d['Added At']);
+                if (ws) weeksSet.add(ws);
+            });
+            globalWeeks = Array.from(weeksSet).sort();
+
+            const slider = document.getElementById('timeSlider');
+            const display = document.getElementById('timelineDisplay');
+
+            if (globalWeeks.length > 0) {
+                slider.max = globalWeeks.length; 
+                slider.value = globalWeeks.length;
+                const formatWeek = (ymd) => {
+                    const [y, m, d] = ymd.split('-');
+                    return `Week of ${new Date(y, parseInt(m)-1, d).toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+                };
+
+                const updateChartTimeline = () => {
+                    const val = parseInt(slider.value);
+                    if (val >= globalWeeks.length) {
+                        display.innerText = "Present Day (All Data)";
+                        drawInteractiveChart(data, selectX.value, selectY.value);
+                    } else {
+                        const maxWeek = globalWeeks[val];
+                        display.innerText = `Up to ${formatWeek(maxWeek)}`;
+                        const filtered = data.filter(d => {
+                            const ws = getWeekStart(d['Added At']);
+                            return ws && ws <= maxWeek;
+                        });
+                        drawInteractiveChart(filtered, selectX.value, selectY.value);
+                    }
+                };
+                slider.oninput = updateChartTimeline;
+                selectX.onchange = updateChartTimeline;
+                selectY.onchange = updateChartTimeline;
+                updateChartTimeline();
+            }
         }
 
-        // --- CHART FACTORIES ---
         function createHistogram(container, data, col, color) {
             const wrap = document.createElement('div'); wrap.className = 'card';
             wrap.innerHTML = `<div class="text-xs text-slate-500 mb-4 uppercase">${col}</div><div class="chart-container"><canvas></canvas></div>`;
@@ -301,8 +350,6 @@
             new Chart(wrap.querySelector('canvas'), { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts), backgroundColor: color, borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
         }
 
-        // --- CHAPTER VII: DYNAMIC TOP 10 EXPLORER ---
-// --- CHAPTER VII: DYNAMIC EXPLORER (FIXED) ---
         function calculateTrendLine(points) {
             const validPoints = points.filter(p => typeof p.x === 'number' && typeof p.y === 'number');
             if (validPoints.length < 2) return null;
@@ -319,46 +366,36 @@
             return [{ x: minX, y: (m * minX + b) }, { x: maxX, y: (m * maxX + b) }];
         }
 
-        function drawInteractiveChart(data, xCol, yCol) {
+        function drawInteractiveChart(dataToDraw, xCol, yCol) {
             const ctx = document.getElementById('interactiveCanvas').getContext('2d');
             const legendDiv = document.getElementById('genreLegend');
             if (interactiveChartInstance) interactiveChartInstance.destroy();
 
-            // 1. Identify Top 12 Genres for better coverage
             const genreCount = {};
-            data.forEach(d => {
+            dataToDraw.forEach(d => {
                 if (!d['Genres']) return;
                 const items = d['Genres'].split(',').map(g => g.trim().toLowerCase());
                 items.forEach(g => genreCount[g] = (genreCount[g] || 0) + 1);
             });
             const topGenres = Object.entries(genreCount).sort((a,b) => b[1] - a[1]).slice(0, 12).map(x => x[0]);
 
-            // 2. Expanded Palette
             const colors = ['#3b82f6', '#f43f5e', '#10b981', '#ff00eb', '#8b5cf6', '#06b6d4', '#f59e0b', '#a855f7', '#fb923c', '#2dd4bf', '#facc15', '#6366f1'];
             const genreColors = {};
             topGenres.forEach((g, i) => genreColors[g] = colors[i]);
 
-            // 3. Robust Grouping
             const groups = { 'other': [] };
             topGenres.forEach(g => groups[g] = []);
 
-            data.forEach(d => {
+            dataToDraw.forEach(d => {
                 const x = Number(d[xCol]);
                 const y = Number(d[yCol]);
-                if (isNaN(x) || isNaN(y)) return; // Only skip if data is actually missing
-
+                if (isNaN(x) || isNaN(y)) return; 
                 const trackGenres = (d['Genres'] || '').toLowerCase();
                 const match = topGenres.find(g => trackGenres.includes(g));
-                
                 const point = { x, y, name: d['Track Name'] || 'Unknown', artist: d['Artist Name(s)'] || 'Unknown' };
-                if (match) {
-                    groups[match].push(point);
-                } else {
-                    groups['other'].push(point);
-                }
+                if (match) groups[match].push(point); else groups['other'].push(point);
             });
 
-            // 4. Create Datasets (Ensuring 'Other' is last so it's in the background)
             const datasets = [...topGenres, 'other'].map(key => {
                 const isOther = key === 'other';
                 return {
@@ -369,34 +406,18 @@
                     borderWidth: isOther ? 0.5 : 1,
                     pointRadius: isOther ? 3 : 5,
                     pointHoverRadius: 8,
-                    order: isOther ? 10 : 1 // High order moves to background
+                    order: isOther ? 10 : 1 
                 };
             }).filter(ds => ds.data.length > 0);
 
-            // 5. Add Global Trend Line
-            const allPoints = data.map(d => ({ x: Number(d[xCol]), y: Number(d[yCol]) }));
+            const allPoints = dataToDraw.map(d => ({ x: Number(d[xCol]), y: Number(d[yCol]) }));
             const trend = calculateTrendLine(allPoints);
             if (trend) {
-                datasets.push({
-                    label: 'Global Trend',
-                    data: trend,
-                    type: 'line',
-                    borderColor: 'rgba(255, 255, 255, 0.6)',
-                    borderDash: [8, 4],
-                    pointRadius: 0,
-                    fill: false,
-                    borderWidth: 2,
-                    showLine: true,
-                    order: 0
-                });
+                datasets.push({ label: 'Global Trend', data: trend, type: 'line', borderColor: 'rgba(255, 255, 255, 0.6)', borderDash: [8, 4], pointRadius: 0, fill: false, borderWidth: 2, showLine: true, order: 0 });
             }
 
-            // 6. Update Legend UI
             legendDiv.innerHTML = datasets.filter(ds => ds.label !== 'Global Trend').map(ds => `
-                <div class="legend-item">
-                    <span class="legend-dot" style="background: ${ds.borderColor}"></span>
-                    ${ds.label} (${ds.data.length})
-                </div>
+                <div class="legend-item"><span class="legend-dot" style="background: ${ds.borderColor}"></span>${ds.label} (${ds.data.length})</div>
             `).join('');
 
             interactiveChartInstance = new Chart(ctx, {
@@ -405,19 +426,14 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: { duration: 400 },
+                    animation: { duration: 0 },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: '#0f172a',
                             titleFont: { family: 'JetBrains Mono' },
                             bodyFont: { family: 'JetBrains Mono' },
-                            callbacks: { 
-                                label: (c) => {
-                                    if (c.dataset.label === 'Global Trend') return null;
-                                    return `${c.raw.name} - ${c.raw.artist} (${xCol}: ${c.raw.x}, ${yCol}: ${c.raw.y})`;
-                                }
-                            }
+                            callbacks: { label: (c) => c.dataset.label === 'Global Trend' ? null : `${c.raw.name} - ${c.raw.artist} (${xCol}: ${c.raw.x}, ${yCol}: ${c.raw.y})` }
                         }
                     },
                     scales: {
