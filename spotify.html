@@ -18,8 +18,7 @@
         .chart-container-large { position: relative; height: 500px; width: 100%; }
         .upload-section { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 2px dashed #334155; }
         select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; }        
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-        .legend-item { display: flex; align-items: center; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; flex-shrink: 0; }
         
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #3b82f6; cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
@@ -105,7 +104,7 @@
                             <input type="range" id="timeSlider" class="w-full" min="0" max="100" value="100">
                         </div>
 
-                        <div id="genreLegend" class="flex flex-wrap gap-x-6 gap-y-3 p-4 bg-[#020617] rounded-xl border border-slate-800/50"></div>
+                        <div id="genreLegend" class="flex flex-wrap gap-4 p-4 bg-[#020617] rounded-xl border border-slate-800/50"></div>
                     </div>
                     <div class="chart-container-large">
                         <canvas id="interactiveCanvas"></canvas>
@@ -371,6 +370,7 @@
             const legendDiv = document.getElementById('genreLegend');
             if (interactiveChartInstance) interactiveChartInstance.destroy();
 
+            // Find top genres in the currently filtered timeline set
             const genreCount = {};
             dataToDraw.forEach(d => {
                 if (!d['Genres']) return;
@@ -416,9 +416,61 @@
                 datasets.push({ label: 'Global Trend', data: trend, type: 'line', borderColor: 'rgba(255, 255, 255, 0.6)', borderDash: [8, 4], pointRadius: 0, fill: false, borderWidth: 2, showLine: true, order: 0 });
             }
 
-            legendDiv.innerHTML = datasets.filter(ds => ds.label !== 'Global Trend').map(ds => `
-                <div class="legend-item"><span class="legend-dot" style="background: ${ds.borderColor}"></span>${ds.label} (${ds.data.length})</div>
-            `).join('');
+            // Calculate Dynamic Global Averages for ALL tracks currently visible on the chart
+            const globalAvgPop = mean(dataToDraw.map(d => Number(d['Popularity'])).filter(v => !isNaN(v))).toFixed(2);
+            const globalAvgEnergy = mean(dataToDraw.map(d => Number(d['Energy'])).filter(v => !isNaN(v))).toFixed(2);
+            const globalAvgValence = mean(dataToDraw.map(d => Number(d['Valence'])).filter(v => !isNaN(v))).toFixed(2);
+            const globalAvgDance = mean(dataToDraw.map(d => Number(d['Danceability'])).filter(v => !isNaN(v))).toFixed(2);
+
+            // 1. Build the Genre Cards
+            const genreCardsHtml = [...topGenres, 'other'].map(key => {
+                const groupData = groups[key];
+                if (!groupData || groupData.length === 0) return '';
+                
+                const isOther = key === 'other';
+                const label = isOther ? 'other' : key;
+                const color = isOther ? 'rgba(71, 85, 105, 1)' : genreColors[key];
+                
+                const avgX = (groupData.reduce((sum, p) => sum + p.x, 0) / groupData.length).toFixed(2);
+                const avgY = (groupData.reduce((sum, p) => sum + p.y, 0) / groupData.length).toFixed(2);
+                
+                const artists = {};
+                groupData.forEach(p => { artists[p.artist] = (artists[p.artist] || 0) + 1; });
+                let topArtist = 'N/A';
+                let maxCount = 0;
+                for (const [art, count] of Object.entries(artists)) {
+                    if (count > maxCount && art !== 'Unknown') {
+                        topArtist = art;
+                        maxCount = count;
+                    }
+                }
+                
+                return `
+                    <div class="bg-[#0f172a] border border-slate-800 rounded-lg p-3 w-[165px] flex-shrink-0">
+                        <div class="flex items-center mb-1">
+                            <span class="legend-dot" style="background: ${color}"></span>
+                            <span class="text-xs font-bold text-white uppercase truncate">${label}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-500 font-mono">Tracks: <span class="text-slate-300">${groupData.length}</span></div>
+                        <div class="text-[10px] text-slate-500 font-mono truncate">Avg ${xCol}: <span class="text-slate-300">${avgX}</span></div>
+                        <div class="text-[10px] text-slate-500 font-mono truncate">Avg ${yCol}: <span class="text-slate-300">${avgY}</span></div>
+                        <div class="text-[10px] text-blue-400 font-mono truncate mt-1" title="${topArtist}">Top: ${topArtist}</div>
+                    </div>
+                `;
+            }).join('');
+
+            // 2. Build the Global Stats Footer (Added Under)
+            const globalStatsHtml = `
+                <div class="w-full mt-2 pt-3 border-t border-slate-800/50 flex flex-wrap gap-x-8 gap-y-2 items-center">
+                    <div class="text-xs font-bold text-blue-400 uppercase">Timeline Averages (${dataToDraw.length} Active Tracks):</div>
+                    <div class="text-xs font-mono text-slate-400">Avg Popularity: <span class="text-white font-bold">${globalAvgPop}</span></div>
+                    <div class="text-xs font-mono text-slate-400">Avg Energy: <span class="text-white font-bold">${globalAvgEnergy}</span></div>
+                    <div class="text-xs font-mono text-slate-400">Avg Valence: <span class="text-white font-bold">${globalAvgValence}</span></div>
+                    <div class="text-xs font-mono text-slate-400">Avg Danceability: <span class="text-white font-bold">${globalAvgDance}</span></div>
+                </div>
+            `;
+
+            legendDiv.innerHTML = genreCardsHtml + globalStatsHtml;
 
             interactiveChartInstance = new Chart(ctx, {
                 type: 'scatter',
