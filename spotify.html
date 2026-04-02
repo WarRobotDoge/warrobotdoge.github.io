@@ -17,9 +17,8 @@
         .chart-container { position: relative; height: 320px; width: 100%; }
         .chart-container-large { position: relative; height: 500px; width: 100%; }
         .upload-section { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 2px dashed #334155; }
-        select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; }        
+        select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
         .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; flex-shrink: 0; }
-        
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #3b82f6; cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
@@ -92,7 +91,6 @@
                                 <select id="interactiveY" class="bg-[#020617] border border-slate-700 text-slate-200 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer min-w-[180px]"></select>
                             </div>
                         </div>
-
                         <div class="w-full bg-[#020617] p-5 rounded-xl border border-slate-800/50">
                             <div class="flex justify-between items-center mb-4">
                                 <label class="text-xs text-slate-500 uppercase tracking-widest flex items-center gap-2">
@@ -103,11 +101,31 @@
                             </div>
                             <input type="range" id="timeSlider" class="w-full" min="0" max="100" value="100">
                         </div>
-
                         <div id="genreLegend" class="flex flex-wrap gap-4 p-4 bg-[#020617] rounded-xl border border-slate-800/50"></div>
                     </div>
                     <div class="chart-container-large">
                         <canvas id="interactiveCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">VIII. Metric Trajectory</h2>
+                <div class="card w-full">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="text-xs text-slate-500 uppercase tracking-widest">Cumulative Average Over Time</div>
+                        <select id="trajectoryMetric" class="bg-[#020617] border border-slate-700 text-slate-200 rounded-md px-3 py-1 text-sm focus:outline-none focus:border-blue-500 transition-colors cursor-pointer min-w-[150px]">
+                            <option value="Popularity" selected>Popularity</option>
+                            <option value="Energy">Energy</option>
+                            <option value="Valence">Valence</option>
+                            <option value="Danceability">Danceability</option>
+                            <option value="Acousticness">Acousticness</option>
+                            <option value="Loudness">Loudness</option>
+                            <option value="Tempo">Tempo</option>
+                        </select>
+                    </div>
+                    <div class="chart-container-large">
+                        <canvas id="trajectoryCanvas"></canvas>
                     </div>
                 </div>
             </div>
@@ -120,6 +138,7 @@
         const dashboard = document.getElementById('dashboard');
         const errorBox = document.getElementById('errorBox');
         let interactiveChartInstance = null;
+        let trajectoryChartInstance = null;
         let globalData = [];
         let globalWeeks = [];
 
@@ -200,6 +219,11 @@
             createReleaseYearChart(miscGrid, data, '#ef4444');
             createTitleWordCountChart(miscGrid, data, '#ec4899');
 
+            // Set up Section VIII Interaction
+            const trajSelect = document.getElementById('trajectoryMetric');
+            trajSelect.onchange = () => createTrajectoryChart(data, trajSelect.value);
+            createTrajectoryChart(data, 'Popularity');
+
             const numericFeatures = ['Energy', 'Valence', 'Danceability', 'Popularity', 'Acousticness', 'Loudness', 'Speechiness', 'Instrumentalness', 'Tempo', 'Duration (ms)'];
             const selectX = document.getElementById('interactiveX');
             const selectY = document.getElementById('interactiveY');
@@ -244,6 +268,58 @@
                 selectY.onchange = updateChartTimeline;
                 updateChartTimeline();
             }
+        }
+
+        // --- SECTION VIII DYNAMIC LOGIC ---
+        function createTrajectoryChart(data, metric) {
+            const ctx = document.getElementById('trajectoryCanvas').getContext('2d');
+            if (trajectoryChartInstance) trajectoryChartInstance.destroy();
+
+            const validData = data.filter(d => d['Added At'] && typeof d[metric] === 'number');
+            validData.sort((a, b) => new Date(a['Added At']) - new Date(b['Added At']));
+
+            const dailyAverages = {};
+            let cumulativeSum = 0;
+            let cumulativeCount = 0;
+
+            validData.forEach(d => {
+                const dateObj = new Date(d['Added At']);
+                if (isNaN(dateObj)) return;
+                const day = dateObj.toISOString().split('T')[0];
+                cumulativeSum += d[metric];
+                cumulativeCount++;
+                dailyAverages[day] = cumulativeSum / cumulativeCount;
+            });
+
+            const labels = Object.keys(dailyAverages).sort();
+            const dataPoints = labels.map(day => dailyAverages[day]);
+
+            trajectoryChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `Avg ${metric}`,
+                        data: dataPoints,
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', maxTicksLimit: 12 } },
+                        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
         }
 
         function createHistogram(container, data, col, color) {
@@ -370,7 +446,6 @@
             const legendDiv = document.getElementById('genreLegend');
             if (interactiveChartInstance) interactiveChartInstance.destroy();
 
-            // Find top genres in the currently filtered timeline set
             const genreCount = {};
             dataToDraw.forEach(d => {
                 if (!d['Genres']) return;
@@ -378,7 +453,6 @@
                 items.forEach(g => genreCount[g] = (genreCount[g] || 0) + 1);
             });
             const topGenres = Object.entries(genreCount).sort((a,b) => b[1] - a[1]).slice(0, 12).map(x => x[0]);
-
             const colors = ['#3b82f6', '#f43f5e', '#10b981', '#ff00eb', '#8b5cf6', '#06b6d4', '#f59e0b', '#a855f7', '#fb923c', '#2dd4bf', '#facc15', '#6366f1'];
             const genreColors = {};
             topGenres.forEach((g, i) => genreColors[g] = colors[i]);
@@ -387,19 +461,11 @@
             topGenres.forEach(g => groups[g] = []);
 
             dataToDraw.forEach(d => {
-                const x = Number(d[xCol]);
-                const y = Number(d[yCol]);
+                const x = Number(d[xCol]); const y = Number(d[yCol]);
                 if (isNaN(x) || isNaN(y)) return; 
                 const trackGenres = (d['Genres'] || '').toLowerCase();
                 const match = topGenres.find(g => trackGenres.includes(g));
-                const point = { 
-                    x, 
-                    y, 
-                    name: d['Track Name'] || 'Unknown', 
-                    artist: d['Artist Name(s)'] || 'Unknown',
-                    popularity: Number(d['Popularity']) || 0,
-                    loudness: Number(d['Loudness']) || 0
-                };
+                const point = { x, y, name: d['Track Name'] || 'Unknown', artist: d['Artist Name(s)'] || 'Unknown', popularity: Number(d['Popularity']) || 0, loudness: Number(d['Loudness']) || 0 };
                 if (match) groups[match].push(point); else groups['other'].push(point);
             });
 
@@ -419,66 +485,17 @@
 
             const allPoints = dataToDraw.map(d => ({ x: Number(d[xCol]), y: Number(d[yCol]) }));
             const trend = calculateTrendLine(allPoints);
-            if (trend) {
-                datasets.push({ label: 'Global Trend', data: trend, type: 'line', borderColor: 'rgba(255, 255, 255, 0.6)', borderDash: [8, 4], pointRadius: 0, fill: false, borderWidth: 2, showLine: true, order: 0 });
-            }
+            if (trend) datasets.push({ label: 'Global Trend', data: trend, type: 'line', borderColor: 'rgba(255, 255, 255, 0.6)', borderDash: [8, 4], pointRadius: 0, fill: false, borderWidth: 2, showLine: true, order: 0 });
 
-            // Calculate Dynamic Global Averages for ALL tracks currently visible on the chart
-            const globalAvgPop = mean(dataToDraw.map(d => Number(d['Popularity'])).filter(v => !isNaN(v))).toFixed(2);
-            const globalAvgEnergy = mean(dataToDraw.map(d => Number(d['Energy'])).filter(v => !isNaN(v))).toFixed(2);
-            const globalAvgValence = mean(dataToDraw.map(d => Number(d['Valence'])).filter(v => !isNaN(v))).toFixed(2);
-            const globalAvgDance = mean(dataToDraw.map(d => Number(d['Danceability'])).filter(v => !isNaN(v))).toFixed(2);
-
-            // 1. Build the Genre Cards
-            const genreCardsHtml = [...topGenres, 'other'].map(key => {
-                const groupData = groups[key];
-                if (!groupData || groupData.length === 0) return '';
-                
-                const isOther = key === 'other';
-                const label = isOther ? 'other' : key;
-                const color = isOther ? 'rgba(71, 85, 105, 1)' : genreColors[key];
-                
-                // Calculating Popularity and Loudness specifically instead of reflecting axis variables
+            legendDiv.innerHTML = [...topGenres, 'other'].map(key => {
+                const groupData = groups[key]; if (!groupData || groupData.length === 0) return '';
+                const isOther = key === 'other'; const label = isOther ? 'other' : key; const color = isOther ? 'rgba(71, 85, 105, 1)' : genreColors[key];
                 const avgPop = (groupData.reduce((sum, p) => sum + p.popularity, 0) / groupData.length).toFixed(1);
-                const avgLoud = (groupData.reduce((sum, p) => sum + p.loudness, 0) / groupData.length).toFixed(1);
-                
-                const artists = {};
-                groupData.forEach(p => { artists[p.artist] = (artists[p.artist] || 0) + 1; });
-                let topArtist = 'N/A';
-                let maxCount = 0;
-                for (const [art, count] of Object.entries(artists)) {
-                    if (count > maxCount && art !== 'Unknown') {
-                        topArtist = art;
-                        maxCount = count;
-                    }
-                }
-                
-                return `
-                    <div class="bg-[#0f172a] border border-slate-800 rounded-lg p-3 w-[165px] flex-shrink-0">
-                        <div class="flex items-center mb-1">
-                            <span class="legend-dot" style="background: ${color}"></span>
-                            <span class="text-xs font-bold text-white uppercase truncate">${label}</span>
-                        </div>
-                        <div class="text-[10px] text-slate-500 font-mono">Tracks: <span class="text-slate-300">${groupData.length}</span></div>
-                        <div class="text-[10px] text-slate-500 font-mono truncate">Avg Popularity: <span class="text-slate-300">${avgPop}</span></div>
-                        <div class="text-[10px] text-slate-500 font-mono truncate">Avg Loudness: <span class="text-slate-300">${avgLoud}</span></div>
-                        <div class="text-[10px] text-blue-400 font-mono truncate mt-1" title="${topArtist}">Top: ${topArtist}</div>
-                    </div>
-                `;
+                const artists = {}; groupData.forEach(p => { artists[p.artist] = (artists[p.artist] || 0) + 1; });
+                let topArtist = 'N/A'; let maxCount = 0;
+                for (const [art, count] of Object.entries(artists)) { if (count > maxCount && art !== 'Unknown') { topArtist = art; maxCount = count; } }
+                return `<div class="bg-[#0f172a] border border-slate-800 rounded-lg p-3 w-[165px] flex-shrink-0"><div class="flex items-center mb-1"><span class="legend-dot" style="background: ${color}"></span><span class="text-xs font-bold text-slate-300 truncate">${label.toUpperCase()}</span></div><div class="text-[10px] text-slate-500 mb-1">Count: <span class="text-slate-300 font-mono">${groupData.length}</span></div><div class="text-[10px] text-slate-500 mb-1">Avg Pop: <span class="text-slate-300 font-mono">${avgPop}</span></div><div class="text-[10px] text-slate-500 truncate">Artist: <span class="text-slate-300">${topArtist}</span></div></div>`;
             }).join('');
-
-            // 2. Build the Global Stats Footer (Added Under)
-            const globalStatsHtml = `
-                <div class="w-full mt-2 pt-3 border-t border-slate-800/50 flex flex-wrap gap-x-8 gap-y-2 items-center">
-                    <div class="text-xs font-bold text-blue-400 uppercase">Timeline Averages (${dataToDraw.length} Active Tracks):</div>
-                    <div class="text-xs font-mono text-slate-400">Avg Popularity: <span class="text-white font-bold">${globalAvgPop}</span></div>
-                    <div class="text-xs font-mono text-slate-400">Avg Energy: <span class="text-white font-bold">${globalAvgEnergy}</span></div>
-                    <div class="text-xs font-mono text-slate-400">Avg Valence: <span class="text-white font-bold">${globalAvgValence}</span></div>
-                    <div class="text-xs font-mono text-slate-400">Avg Danceability: <span class="text-white font-bold">${globalAvgDance}</span></div>
-                </div>
-            `;
-
-            legendDiv.innerHTML = genreCardsHtml + globalStatsHtml;
 
             interactiveChartInstance = new Chart(ctx, {
                 type: 'scatter',
@@ -486,20 +503,8 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: { duration: 0 },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#0f172a',
-                            titleFont: { family: 'JetBrains Mono' },
-                            bodyFont: { family: 'JetBrains Mono' },
-                            callbacks: { label: (c) => c.dataset.label === 'Global Trend' ? null : `${c.raw.name} - ${c.raw.artist} (${xCol}: ${c.raw.x}, ${yCol}: ${c.raw.y})` }
-                        }
-                    },
-                    scales: {
-                        x: { grid: { color: '#1e293b' }, title: { display: true, text: xCol, color: '#94a3b8' }, ticks: { color: '#64748b' } },
-                        y: { grid: { color: '#1e293b' }, title: { display: true, text: yCol, color: '#94a3b8' }, ticks: { color: '#64748b' } }
-                    }
+                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.dataset.type === 'line' ? 'Trend Line' : `${ctx.raw.name} by ${ctx.raw.artist}` } } },
+                    scales: { x: { title: { display: true, text: xCol, color: '#94a3b8' }, grid: { color: '#1e293b' } }, y: { title: { display: true, text: yCol, color: '#94a3b8' }, grid: { color: '#1e293b' } } }
                 }
             });
         }
