@@ -31,7 +31,6 @@
             <h1 class="text-4xl font-extrabold mb-2"><span class="accent-text">PLAYLIST VITALIST</span> ULTIMATE</h1>
             <p class="text-slate-400">Structural & Aesthetic Audit of Listening History.</p>
         </div>
-
         <div id="uploadContainer" class="upload-section rounded-2xl p-16 text-center cursor-pointer mb-12">
             <input type="file" id="csvFile" accept=".csv" class="hidden">
             <div id="dropZone">
@@ -41,42 +40,33 @@
                 <p class="text-xs text-slate-600 mt-4 uppercase tracking-widest">Client-Side Only • Private • Secure</p>
             </div>
         </div>
-
         <div id="errorBox" class="hidden bg-red-950 border border-red-500 text-red-200 p-4 rounded-lg mb-8"></div>
-
         <div id="dashboard" class="hidden space-y-12">
-            <div id="summaryStats" class="grid grid-cols-2 lg:grid-cols-4 gap-6"></div>
-
+            <div id="summaryStats" class="grid grid-cols-2 lg:grid-cols-5 gap-6"></div>
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">I. Sonic Landscapes</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="distGrid"></div>
             </div>
-
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">II. Relational Geographies</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="scatterGrid"></div>
             </div>
-
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">III. Temporal Evolution</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="timeGrid"></div>
             </div>
-
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">IV. Cultural Identity</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="identityGrid"></div>
             </div>
-
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">V. Technical Architecture</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="dnaGrid"></div>
             </div>
-
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">VI. Miscellaneous Insights</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="miscGrid"></div>
             </div>
-
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">VII. Interactive Explorer</h2>
                 <div class="card w-full">
@@ -108,7 +98,6 @@
                     </div>
                 </div>
             </div>
-
             <div>
                 <h2 class="text-xl font-bold mb-6 grid-header uppercase tracking-tighter">VIII. Metric Trajectory</h2>
                 <div class="card w-full">
@@ -131,7 +120,6 @@
             </div>
         </div>
     </div>
-
     <script>
         const fileInput = document.getElementById('csvFile');
         const uploadZone = document.getElementById('uploadContainer');
@@ -145,7 +133,6 @@
         let globalGenreColors = {};
 
         const mean = (arr) => arr.length ? arr.reduce((a, b) => a + (b || 0), 0) / arr.length : 0;
-
         uploadZone.onclick = () => fileInput.click();
         fileInput.onchange = (e) => processFile(e.target.files[0]);
 
@@ -180,9 +167,32 @@
 
         function generateDashboard(data) {
             const getCol = (col) => data.map(d => d[col]).filter(v => v != null);
+            
+            // LOGIC FOR NEW ADJUSTED POPULARITY BUBBLE
+           const calcCKS = (d) => {
+    const pop = d['Popularity'] || 0;
+    const releaseDate = new Date(d['Release Date']);
+    
+    // 1. Calculate age in years with decimal precision
+    const currentYear = new Date().getFullYear();;
+    const releaseYear = isNaN(releaseDate) ? currentYear : releaseDate.getFullYear();
+    const age = Math.max(0, currentYear - releaseYear);
+
+    // 2. Logarithmic Growth (Base 1.0 multiplier for new tracks)
+    // Formula: Popularity * (1 + log10(age + 1))
+    const raw = pop * (1 + Math.log10(age + 1));
+    return raw;
+};
+
+// 3. Normalization logic inside generateDashboard
+const rawScores = data.map(calcCKS);
+const maxRaw = Math.max(...rawScores) || 1; // Prevent division by zero
+const adjPopVal = mean(rawScores.map(score => (score / maxRaw) * 100)).toFixed(1);
+
             document.getElementById('summaryStats').innerHTML = [
                 { label: 'Total Tracks', val: data.length, accent: '#3b82f6' },
                 { label: 'Avg Popularity', val: mean(getCol('Popularity')).toFixed(1), accent: '#818cf8' },
+                { label: 'Adj Score', val: adjPopVal, accent: '#fbbf24' },
                 { label: 'Avg Energy', val: mean(getCol('Energy')).toFixed(2), accent: '#f43f5e' },
                 { label: 'Avg Valence', val: mean(getCol('Valence')).toFixed(2), accent: '#10b981' }
             ].map(m => `<div class="card text-center"><div class="text-slate-500 text-xs mb-1 uppercase">${m.label}</div><div class="text-3xl font-black" style="color: ${m.accent}">${m.val}</div></div>`).join('');
@@ -221,12 +231,10 @@
             createReleaseYearChart(miscGrid, data, '#ef4444');
             createTitleWordCountChart(miscGrid, data, '#ec4899');
 
-            // Set up Section VIII Interaction
             const trajSelect = document.getElementById('trajectoryMetric');
             trajSelect.onchange = () => createTrajectoryChart(data, trajSelect.value);
             createTrajectoryChart(data, 'Popularity');
 
-            // Pre-calculate Global Top Genres for Consistent Colors & Legends
             const totalGenreCount = {};
             data.forEach(d => {
                 if (!d['Genres']) return;
@@ -260,7 +268,6 @@
                     const [y, m, d] = ymd.split('-');
                     return `Week of ${new Date(y, parseInt(m)-1, d).toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' })}`;
                 };
-
                 const updateChartTimeline = () => {
                     const val = parseInt(slider.value);
                     if (val >= globalWeeks.length) {
@@ -283,18 +290,13 @@
             }
         }
 
-        // --- SECTION VIII DYNAMIC LOGIC ---
         function createTrajectoryChart(data, metric) {
             const ctx = document.getElementById('trajectoryCanvas').getContext('2d');
             if (trajectoryChartInstance) trajectoryChartInstance.destroy();
-
             const validData = data.filter(d => d['Added At'] && typeof d[metric] === 'number');
             validData.sort((a, b) => new Date(a['Added At']) - new Date(b['Added At']));
-
             const dailyAverages = {};
-            let cumulativeSum = 0;
-            let cumulativeCount = 0;
-
+            let cumulativeSum = 0; let cumulativeCount = 0;
             validData.forEach(d => {
                 const dateObj = new Date(d['Added At']);
                 if (isNaN(dateObj)) return;
@@ -303,10 +305,8 @@
                 cumulativeCount++;
                 dailyAverages[day] = cumulativeSum / cumulativeCount;
             });
-
             const labels = Object.keys(dailyAverages).sort();
             const dataPoints = labels.map(day => dailyAverages[day]);
-
             trajectoryChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -319,8 +319,7 @@
                         borderWidth: 2,
                         fill: true,
                         tension: 0.3,
-                        pointRadius: 0,
-                        pointHoverRadius: 6
+                        pointRadius: 0
                     }]
                 },
                 options: {
@@ -459,7 +458,7 @@
             const legendDiv = document.getElementById('genreLegend');
             if (interactiveChartInstance) interactiveChartInstance.destroy();
 
-            const groups = { 'other': [] };
+             const groups = { 'other': [] };
             globalTopGenres.forEach(g => groups[g] = []);
 
             dataToDraw.forEach(d => {
