@@ -141,6 +141,8 @@
         let trajectoryChartInstance = null;
         let globalData = [];
         let globalWeeks = [];
+        let globalTopGenres = [];
+        let globalGenreColors = {};
 
         const mean = (arr) => arr.length ? arr.reduce((a, b) => a + (b || 0), 0) / arr.length : 0;
 
@@ -223,6 +225,17 @@
             const trajSelect = document.getElementById('trajectoryMetric');
             trajSelect.onchange = () => createTrajectoryChart(data, trajSelect.value);
             createTrajectoryChart(data, 'Popularity');
+
+            // Pre-calculate Global Top Genres for Consistent Colors & Legends
+            const totalGenreCount = {};
+            data.forEach(d => {
+                if (!d['Genres']) return;
+                const items = d['Genres'].split(',').map(g => g.trim().toLowerCase());
+                items.forEach(g => totalGenreCount[g] = (totalGenreCount[g] || 0) + 1);
+            });
+            globalTopGenres = Object.entries(totalGenreCount).sort((a,b) => b[1] - a[1]).slice(0, 12).map(x => x[0]);
+            const colors = ['#3b82f6', '#f43f5e', '#10b981', '#ff00eb', '#8b5cf6', '#06b6d4', '#f59e0b', '#a855f7', '#fb923c', '#2dd4bf', '#facc15', '#6366f1'];
+            globalTopGenres.forEach((g, i) => globalGenreColors[g] = colors[i]);
 
             const numericFeatures = ['Energy', 'Valence', 'Danceability', 'Popularity', 'Acousticness', 'Loudness', 'Speechiness', 'Instrumentalness', 'Tempo', 'Duration (ms)'];
             const selectX = document.getElementById('interactiveX');
@@ -446,36 +459,25 @@
             const legendDiv = document.getElementById('genreLegend');
             if (interactiveChartInstance) interactiveChartInstance.destroy();
 
-            const genreCount = {};
-            dataToDraw.forEach(d => {
-                if (!d['Genres']) return;
-                const items = d['Genres'].split(',').map(g => g.trim().toLowerCase());
-                items.forEach(g => genreCount[g] = (genreCount[g] || 0) + 1);
-            });
-            const topGenres = Object.entries(genreCount).sort((a,b) => b[1] - a[1]).slice(0, 12).map(x => x[0]);
-            const colors = ['#3b82f6', '#f43f5e', '#10b981', '#ff00eb', '#8b5cf6', '#06b6d4', '#f59e0b', '#a855f7', '#fb923c', '#2dd4bf', '#facc15', '#6366f1'];
-            const genreColors = {};
-            topGenres.forEach((g, i) => genreColors[g] = colors[i]);
-
             const groups = { 'other': [] };
-            topGenres.forEach(g => groups[g] = []);
+            globalTopGenres.forEach(g => groups[g] = []);
 
             dataToDraw.forEach(d => {
                 const x = Number(d[xCol]); const y = Number(d[yCol]);
                 if (isNaN(x) || isNaN(y)) return; 
                 const trackGenres = (d['Genres'] || '').toLowerCase();
-                const match = topGenres.find(g => trackGenres.includes(g));
+                const match = globalTopGenres.find(g => trackGenres.includes(g));
                 const point = { x, y, name: d['Track Name'] || 'Unknown', artist: d['Artist Name(s)'] || 'Unknown', popularity: Number(d['Popularity']) || 0, loudness: Number(d['Loudness']) || 0 };
                 if (match) groups[match].push(point); else groups['other'].push(point);
             });
 
-            const datasets = [...topGenres, 'other'].map(key => {
+            const datasets = [...globalTopGenres, 'other'].map(key => {
                 const isOther = key === 'other';
                 return {
                     label: isOther ? 'All Other Tracks' : key,
                     data: groups[key],
-                    backgroundColor: isOther ? 'rgba(71, 85, 105, 0.2)' : genreColors[key] + 'bb',
-                    borderColor: isOther ? 'rgba(71, 85, 105, 0.4)' : genreColors[key],
+                    backgroundColor: isOther ? 'rgba(71, 85, 105, 0.2)' : globalGenreColors[key] + 'bb',
+                    borderColor: isOther ? 'rgba(71, 85, 105, 0.4)' : globalGenreColors[key],
                     borderWidth: isOther ? 0.5 : 1,
                     pointRadius: isOther ? 3 : 5,
                     pointHoverRadius: 8,
@@ -487,9 +489,9 @@
             const trend = calculateTrendLine(allPoints);
             if (trend) datasets.push({ label: 'Global Trend', data: trend, type: 'line', borderColor: 'rgba(255, 255, 255, 0.6)', borderDash: [8, 4], pointRadius: 0, fill: false, borderWidth: 2, showLine: true, order: 0 });
 
-            legendDiv.innerHTML = [...topGenres, 'other'].map(key => {
+            legendDiv.innerHTML = [...globalTopGenres, 'other'].map(key => {
                 const groupData = groups[key]; if (!groupData || groupData.length === 0) return '';
-                const isOther = key === 'other'; const label = isOther ? 'other' : key; const color = isOther ? 'rgba(71, 85, 105, 1)' : genreColors[key];
+                const isOther = key === 'other'; const label = isOther ? 'other' : key; const color = isOther ? 'rgba(71, 85, 105, 1)' : globalGenreColors[key];
                 const avgPop = (groupData.reduce((sum, p) => sum + p.popularity, 0) / groupData.length).toFixed(1);
                 const artists = {}; groupData.forEach(p => { artists[p.artist] = (artists[p.artist] || 0) + 1; });
                 let topArtist = 'N/A'; let maxCount = 0;
@@ -501,6 +503,7 @@
                 type: 'scatter',
                 data: { datasets },
                 options: {
+                    animation: false,
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.dataset.type === 'line' ? 'Trend Line' : `${ctx.raw.name} by ${ctx.raw.artist}` } } },
