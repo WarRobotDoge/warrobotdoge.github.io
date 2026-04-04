@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -169,18 +170,40 @@
             const getCol = (col) => data.map(d => d[col]).filter(v => v != null);
             
             // LOGIC FOR NEW ADJUSTED POPULARITY BUBBLE
-           const calcCKS = (d) => {
-    const pop = d['Popularity'] || 0;
+       const calcCKS = (d) => {
+    const pop = d['Popularity'] || 0; // base popularity
     const releaseDate = new Date(d['Release Date']);
-    
-    // 1. Calculate age in years with decimal precision
-    const currentYear = new Date().getFullYear();;
-    const releaseYear = isNaN(releaseDate) ? currentYear : releaseDate.getFullYear();
+    const currentYear = new Date().getFullYear();
+    const releaseYear = isNaN(releaseDate.getTime()) 
+        ? currentYear 
+        : releaseDate.getFullYear();
     const age = Math.max(0, currentYear - releaseYear);
 
-    // 2. Logarithmic Growth (Base 1.0 multiplier for new tracks)
-    // Formula: Popularity * (1 + log10(age + 1))
-    const raw = pop * (1 + Math.log10(age + 1));
+    // -----------------------------
+    // 1. Popularity boost (nonlinear)
+    const popBoost = Math.pow(pop, 1.2); // high-pop songs get extra weight
+
+    // -----------------------------
+    // 2. Age factor
+    // - peaks around 5–15 years
+    // - fades slowly for very old songs
+    const ageBoost = Math.exp(-Math.pow((age - 10) / 15, 2));
+
+    // -----------------------------
+    // 3. Niche factor for old low-pop songs
+    const nicheBoost = (age > 20 && pop < 50) ? Math.log10(pop + 10) * 0.5 : 1;
+
+    // -----------------------------
+    // 4. New-hit boost (so trending songs rank high)
+    // age = 0 → multiplier = 2
+    // age = 2 → multiplier = 1.5
+    // age ≥ 5 → multiplier = 1
+    const newBoost = age <= 5 ? 1 + (5 - age) * 0.2 : 1;
+
+    // -----------------------------
+    // 5. Combine everything
+    const raw = popBoost * ageBoost * nicheBoost * newBoost;
+
     return raw;
 };
 
@@ -192,7 +215,7 @@ const adjPopVal = mean(rawScores.map(score => (score / maxRaw) * 100)).toFixed(1
             document.getElementById('summaryStats').innerHTML = [
                 { label: 'Total Tracks', val: data.length, accent: '#3b82f6' },
                 { label: 'Avg Popularity', val: mean(getCol('Popularity')).toFixed(1), accent: '#818cf8' },
-                { label: 'Adj Score', val: adjPopVal, accent: '#fbbf24' },
+                { label: 'Weighted Popularity', val: adjPopVal, accent: '#fbbf24' },
                 { label: 'Avg Energy', val: mean(getCol('Energy')).toFixed(2), accent: '#f43f5e' },
                 { label: 'Avg Valence', val: mean(getCol('Valence')).toFixed(2), accent: '#10b981' }
             ].map(m => `<div class="card text-center"><div class="text-slate-500 text-xs mb-1 uppercase">${m.label}</div><div class="text-3xl font-black" style="color: ${m.accent}">${m.val}</div></div>`).join('');
