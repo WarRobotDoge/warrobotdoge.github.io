@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Live Lab</title>
+    <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/editor/editor.main.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #1e1e1e;
+        }
+
+        /* Toolbar Styles */
+        .toolbar {
+            height: 50px;
+            background: #252526;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #333;
+            gap: 20px; /* Space between elements */
+        }
+
+        .label { 
+            color: #858585; 
+            font-size: 12px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            width: 80px;
+        }
+
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background 0.2s;
+            /* This pushes the button toward the middle-left */
+            margin-left: 20px; 
+        }
+
+        button:hover { background: #005a9e; }
+
+        /* Workspace Layout */
+        .workspace {
+            display: flex;
+            height: calc(100vh - 50px);
+            width: 100%;
+        }
+
+        #editor-container {
+            width: 50%;
+            height: 100%;
+        }
+
+        #divider {
+            width: 8px;
+            cursor: col-resize;
+            background: #333;
+            transition: background 0.2s;
+            z-index: 10;
+        }
+
+        #divider:hover { background: #007acc; }
+
+        #output-container {
+            flex-grow: 1;
+            background: white;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <div class="label">           </div>
+        <button id="run-btn">RUN CODE</button>
+    </div>
+
+    <div class="workspace" id="workspace">
+        <div id="editor-container"></div>
+        <div id="divider"></div>
+        <div id="output-container">
+            <iframe id="output-frame"></iframe>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.min.js"></script>
+    <script>
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs' }});
+
+        let editor;
+
+        require(['vs/editor/editor.main'], function() {
+            editor = monaco.editor.create(document.getElementById('editor-container'), {
+                value: `<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: sans-serif; text-align: center; padding-top: 50px; }\n  h1 { color: #007acc; }\n</style>\n</head>\n<body>\n  <h1>Hello World!</h1>\n  <p>The button is now on the leftish-middle.</p>\n</body>\n</html>`,
+                language: 'html',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                fontSize: 14,
+                minimap: { enabled: false }
+            });
+        });
+
+        const runBtn = document.getElementById('run-btn');
+        const frame = document.getElementById('output-frame');
+
+        runBtn.addEventListener('click', () => {
+            const userCode = editor.getValue();
+            const blob = new Blob([userCode], { type: 'text/html' });
+            frame.src = URL.createObjectURL(blob);
+        });
+
+        // Resizer Logic
+        const divider = document.getElementById('divider');
+        const workspace = document.getElementById('workspace');
+        const editorContainer = document.getElementById('editor-container');
+        let isDragging = false;
+
+        divider.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            document.body.style.cursor = 'col-resize';
+            frame.style.pointerEvents = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            let containerRect = workspace.getBoundingClientRect();
+            let newWidth = e.clientX - containerRect.left;
+            
+            if (newWidth > 100 && newWidth < (containerRect.width - 100)) {
+                editorContainer.style.width = newWidth + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            document.body.style.cursor = 'default';
+            frame.style.pointerEvents = 'auto';
+        });
+    </script>
+</body>
+</html>
