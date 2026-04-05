@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MySpace.com - Jonathan</title>
+    <style>
+        /* THE CLASSIC MYSPACE CSS STYLING */
+        body {
+            background-color: #e5e5e5;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            font-size: 8pt;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border: 1px solid #003399;
+            padding: 10px;
+        }
+
+        /* HEADER AREA */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 24pt;
+            color: #003399;
+            letter-spacing: -2px;
+        }
+
+        .search-bar {
+            background-color: #6699cc;
+            padding: 5px;
+            color: white;
+        }
+
+        /* NAVIGATION */
+        nav {
+            background-color: #6699cc;
+            padding: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+
+        /* MAIN CONTENT LAYOUT */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+
+        /* LEFT COLUMN (Profile Pic & Contact) */
+        .profile-side {
+            width: 300px;
+        }
+
+        .profile-pic {
+            width: 100%;
+            border: 1px solid black;
+            margin-bottom: 10px;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .user-name {
+            font-size: 14pt;
+            font-weight: bold;
+        }
+
+        .contact-box {
+            border: 1px solid #6699cc;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .contact-box h3 {
+            background-color: #6699cc;
+            color: white;
+            margin: -10px -10px 10px -10px;
+            padding: 5px;
+            font-size: 10pt;
+        }
+
+        /* RIGHT COLUMN (About Me & Top 8) */
+        .content-side h2 {
+            background-color: #ffcc99;
+            color: #ff6600;
+            padding: 5px;
+            font-size: 11pt;
+            border-bottom: 1px solid #ff6600;
+        }
+
+        .blurb {
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* TOP 8 FRIENDS GRID */
+        .top8-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .friend {
+            font-size: 8pt;
+        }
+
+        .friend img {
+            width: 80px;
+            height: 80px;
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto 5px auto;
+            background-color: #ccc; /* Placeholder */
+        }
+
+        .friend-name {
+            color: #003399;
+            text-decoration: underline;
+            display: block;
+        }
+
+        /* MUSIC PLAYER STYLING */
+        .music-player {
+            background-color: #000;
+            color: #1DB954; /* Spotify-ish Green for a modern touch */
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px inset #666;
+            text-align: center;
+        }
+
+        .orange-text { color: #ff6600; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo">myspace.com</div>
+        <div class="search-bar">
+            Search: <input type="text"> <button>Go</button>
+        </div>
+    </header>
+
+    <nav>
+        <a href="#">Home</a> | <a href="#">Browse</a> | <a href="#">Search</a> | <a href="#">Invite</a> | <a href="#">Film</a> | <a href="#">Mail</a> | <a href="#">Blog</a> | <a href="#">Favorites</a> | <a href="#">Forum</a>
+    </nav>
+
+    <div class="main-layout">
+        <aside class="profile-side">
+            <div class="user-info">
+                <div class="user-name">Jonathan</div>
+                <img src="https://via.placeholder.com/250x300?text=Profile+Pic+Goes+Here" alt="Jonathan" class="profile-pic">
+                <p>"Searching for chaos in the melody."</p>
+                <p>Male<br>25 years old<br>Thousand Oaks, CALIFORNIA</p>
+                <p>Last Login: 4/05/2026</p>
+            </div>
+
+            <div class="contact-box">
+                <h3>Contacting Jonathan</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                    <a href="#">Send Message</a> <a href="#">Add to Friends</a>
+                    <a href="#">Forward to Friend</a> <a href="#">Add to Favorites</a>
+                    <a href="#">Instant Message</a> <a href="#">Block User</a>
+                </div>
+            </div>
+
+            <div class="contact-box">
+                <h3>MySpace URL:</h3>
+                myspace.com/warrobotdoge
+            </div>
+        </aside>
+
+        <section class="content-side">
+            
+            <div class="music-player" id="spotify-widget" style="background: #000; color: #fff; padding: 15px; text-align: center; border: 1px solid #333; max-width: 300px;">
+    <div id="track-status" style="font-size: 8pt; color: #aaa; margin-bottom: 5px;">NOTHING PLAYING</div>
+    
+    <img id="album-art" src="https://via.placeholder.com/150/111/fff?text=No+Track" style="width: 120px; border: 1px solid #555; margin-bottom: 10px;">
+    
+    <div id="track-name" style="font-weight: bold; color: #ff3333; font-size: 10pt;">...</div>
+    <div id="track-artist" style="font-size: 8pt; color: #ccc; margin-bottom: 10px;">...</div>
+    
+    <div style="background: #222; height: 4px; width: 80%; margin: 0 auto; border-radius: 2px;">
+        <div id="track-progress" style="background: #ff3333; height: 100%; width: 0%;"></div>
+    </div>
+    
+    <button id="spotify-login-btn" style="margin-top: 10px; background: #1DB954; color: white; border: none; padding: 5px 10px; border-radius: 20px; font-weight: bold; cursor: pointer;">Link Spotify</button>
+</div>
+
+            <h2>Jonathan's Interests</h2>
+            <table cellpadding="3" cellspacing="3">
+                <tr>
+                    <td class="orange-text" width="100">General:</td>
+                    <td>Screamo, front-end dev, 2000s DIY aesthetics, roller coasters.</td>
+                </tr>
+                <tr>
+                    <td class="orange-text">Music:</td>
+                    <td>Orchid, letterstoyou, Silverstein, Underoath, Deftones, Plague Walker, Modern Life Is War.</td>
+                </tr>
+                <tr>
+                    <td class="orange-text">Movies:</td>
+                    <td>Anything with a grainy, lo-fi visual treatment.</td>
+                </tr>
+            </table>
+
+            <h2>Jonathan's Blurbs</h2>
+            <div class="blurb">
+                <p class="orange-text">About me:</p>
+                <p>If it’s under 100 BPM or over 40 popularity, I probably haven't heard it. Just a front-end dev trying to map out the history of skramz through data visualization.</p>
+                <p>Currently obsessed with the new letterstoyou drop. If you like Orchid or Ampere, we'll get along fine.</p>
+                
+                <p class="orange-text">Who I'd like to meet:</p>
+                <p>Anyone who still appreciates a good house show or a messy CSS layout. Also anyone from the Thousand Oaks scene.</p>
+            </div>
+
+            <h2>Jonathan's Friend Space (Top 8)</h2>
+            <p><strong>Jonathan has <span style="color:red">2,354</span> Friends.</strong></p>
+            <div class="top8-container">
+                <div class="friend">
+                    <span class="friend-name">Orchid</span>
+                    <img src="https://via.placeholder.com/80?text=Screamo" alt="Orchid">
+                </div>
+                <div class="friend">
+                    <span class="friend-name">Silverstein</span>
+                    <img src="https://via.placeholder.com/80?text=Emo" alt="Silverstein">
+                </div>
+                <div class="friend">
+                    <span class="friend-name">Underoath</span>
+                    <img src="https://via.placeholder.com/80?text=Hardcore" alt="Underoath">
+                </div>
+                <div class="friend">
+                    <span class="friend-name">letterstoyou</span>
+                    <img src="https://via.placeholder.com/80?text=Revival" alt="letterstoyou">
+                </div>
+                <div class="friend">
+                    <span class="friend-name">Gavin</span>
+                    <img src="https://via.placeholder.com/80?text=Friend" alt="Gavin">
+                </div>
+                <div class="friend">
+                    <span class="friend-name">Sophia</span>
+                    <img src="https://via.placeholder.com/80?text=Friend" alt="Sophia">
+                </div>
+                <div class="friend">
+                    <span class="friend-name">Trey</span>
+                    <img src="https://via.placeholder.com/80?text=Friend" alt="Trey">
+                </div>
+                <div class="friend">
+                    <span class="friend-name">Matthew</span>
+                    <img src="https://via.placeholder.com/80?text=Friend" alt="Matthew">
+                </div>
+            </div>
+            <p style="text-align:right"><a href="#">View All of Jonathan's Friends</a></p>
+        </section>
+    </div>
+</div>
+
+
+<script>
+const CLIENT_ID = 'a708de725dda4cdea571e30a22401559';
+// IMPORTANT: Change this to your exact profile URL (or http://localhost:5500 for testing)
+const REDIRECT_URI = 'https://warrobotdoge.com/myspace'; 
+const SCOPES = 'user-read-currently-playing user-read-playback-state';
+
+const loginBtn = document.getElementById('spotify-login-btn');
+
+// 1. Handle clicking the Login button
+loginBtn.addEventListener('click', () => {
+    const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}&response_type=token&show_dialog=true`;
+    window.location.href = authUrl;
+});
+
+// 2. Extract access token from URL after redirect
+function getAccessToken() {
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    return params.get('access_token');
+}
+
+const accessToken = getAccessToken();
+
+// 3. Fetch data if we have a token
+if (accessToken) {
+    loginBtn.style.display = 'none'; // Hide login button
+    window.location.hash = ''; // Clean up URL bar
+    
+    // Check Spotify every 5 seconds for updates
+    setInterval(fetchNowPlaying, 5000);
+    fetchNowPlaying(); // Initial fetch
+}
+
+function fetchNowPlaying() {
+    fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+        headers: { 'Authorization': 'Bearer ' + accessToken }
+    })
+    .then(response => {
+        if (response.status === 204) {
+            document.getElementById('track-status').innerText = 'PAUSED / NOTHING PLAYING';
+            return;
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data || !data.item) return;
+
+        document.getElementById('track-status').innerText = '▶ NOW PLAYING';
+        document.getElementById('track-name').innerText = data.item.name;
+        document.getElementById('track-artist').innerText = data.item.artists.map(a => a.name).join(', ');
+        document.getElementById('album-art').src = data.item.album.images[0].url;
+
+        // Calculate progress percentage
+        const progressPct = (data.progress_ms / data.item.duration_ms) * 100;
+        document.getElementById('track-progress').style.width = progressPct + '%';
+    })
+    .catch(err => console.error('Error fetching Spotify track:', err));
+}
+</script>
+</body>
+</html>
