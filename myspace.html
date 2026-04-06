@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EYCEXST1XQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EYCEXST1XQ');
+</script>
     <meta charset="UTF-8">
-    <title>MySpace.com - Jonathan</title>
+    <title>WarRobotDoge</title>
     <style>
-        /* THE CLASSIC MYSPACE CSS STYLING */
+        /* THE CLASSIC WHITE/DEFAULT BLUE MYSPACE CSS */
         body {
             background-color: #e5e5e5;
             font-family: Verdana, Arial, Helvetica, sans-serif;
@@ -72,7 +80,13 @@
         .profile-pic {
             width: 100%;
             border: 1px solid black;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+        }
+
+        .mood-status {
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
         }
 
         .user-info {
@@ -99,6 +113,18 @@
             font-size: 10pt;
         }
 
+        .social-links a {
+            display: block;
+            margin-bottom: 5px;
+            color: #003399;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .social-links a:hover {
+            text-decoration: underline;
+        }
+
         /* RIGHT COLUMN (About Me & Top 8) */
         .content-side h2 {
             background-color: #ffcc99;
@@ -111,6 +137,12 @@
         .blurb {
             margin-bottom: 20px;
             line-height: 1.4;
+        }
+
+        .blog-snippet {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #ccc;
         }
 
         /* TOP 8 FRIENDS GRID */
@@ -144,7 +176,7 @@
         /* MUSIC PLAYER STYLING */
         .music-player {
             background-color: #000;
-            color: #1DB954; /* Spotify-ish Green for a modern touch */
+            color: #1DB954; /* Spotify Green */
             padding: 15px;
             margin-bottom: 20px;
             border: 2px inset #666;
@@ -152,13 +184,56 @@
         }
 
         .orange-text { color: #ff6600; font-weight: bold; }
+
+        /* COMMENTS SECTION */
+        .comments-section table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .comments-section th {
+            background-color: #ffcc99;
+            color: #ff6600;
+            text-align: left;
+            padding: 5px;
+        }
+        
+        .comment-row {
+            border-bottom: 1px solid #ffcc99;
+        }
+        
+        .comment-user {
+            width: 120px;
+            text-align: center;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        
+        .comment-user img {
+            width: 80px;
+            height: 80px;
+            border: 1px solid black;
+        }
+        
+        .comment-text {
+            padding: 10px;
+            vertical-align: top;
+            font-size: 9pt;
+        }
+        
+        .comment-date {
+            font-size: 7pt;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <div class="logo">myspace.com</div>
+        <div class="logo">warrobotdoge.com</div>
         <div class="search-bar">
             Search: <input type="text"> <button>Go</button>
         </div>
@@ -171,20 +246,30 @@
     <div class="main-layout">
         <aside class="profile-side">
             <div class="user-info">
-                <div class="user-name">Jonathan</div>
-                <img src="https://via.placeholder.com/250x300?text=Profile+Pic+Goes+Here" alt="Jonathan" class="profile-pic">
+                <div class="user-name">WarRobotDoge</div>
+                <img src="https://github.com/WarRobotDoge.png" alt="WarRobotDoge" class="profile-pic">
+                <div class="mood-status">WarRobotDoge is feeling: 🦇 nostalgic</div>
                 <p>"Searching for chaos in the melody."</p>
-                <p>Male<br>25 years old<br>Thousand Oaks, CALIFORNIA</p>
-                <p>Last Login: 4/05/2026</p>
+                <p>Male<br>??? years old<br>United States</p>
+                <p>Last Login: 04/05/2026</p>
             </div>
 
             <div class="contact-box">
-                <h3>Contacting Jonathan</h3>
+                <h3>Contacting WarRobotDoge</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
                     <a href="#">Send Message</a> <a href="#">Add to Friends</a>
                     <a href="#">Forward to Friend</a> <a href="#">Add to Favorites</a>
                     <a href="#">Instant Message</a> <a href="#">Block User</a>
                 </div>
+            </div>
+
+            <div class="contact-box social-links">
+                <h3>Elsewhere on the Web</h3>
+                <a href="https://steamcommunity.com/profiles/76561197994066574">📷 Steam (WarRobotDoge)</a>
+                <a href="#">📷 Instagram (@yourhandle)</a>
+                <a href="https://github.com/warrobotdoge">💻 GitHub (/warrobotdoge)</a>
+                <a href="#">🐦 Twitter (@warrobotdoge)</a>
+                <a href="https://open.spotify.com/user/muv7t4gxv5jhvisw1zj980q16">🎵 Spotify Profile</a>
             </div>
 
             <div class="contact-box">
@@ -195,38 +280,38 @@
 
         <section class="content-side">
             
-            <div class="music-player" id="spotify-widget" style="background: #000; color: #fff; padding: 15px; text-align: center; border: 1px solid #333; max-width: 300px;">
-    <div id="track-status" style="font-size: 8pt; color: #aaa; margin-bottom: 5px;">NOTHING PLAYING</div>
-    
-    <img id="album-art" src="https://via.placeholder.com/150/111/fff?text=No+Track" style="width: 120px; border: 1px solid #555; margin-bottom: 10px;">
-    
-    <div id="track-name" style="font-weight: bold; color: #ff3333; font-size: 10pt;">...</div>
-    <div id="track-artist" style="font-size: 8pt; color: #ccc; margin-bottom: 10px;">...</div>
-    
-    <div style="background: #222; height: 4px; width: 80%; margin: 0 auto; border-radius: 2px;">
-        <div id="track-progress" style="background: #ff3333; height: 100%; width: 0%;"></div>
-    </div>
-    
-    <button id="spotify-login-btn" style="margin-top: 10px; background: #1DB954; color: white; border: none; padding: 5px 10px; border-radius: 20px; font-weight: bold; cursor: pointer;">Link Spotify</button>
-</div>
+            <div class="music-player">
+                <strong>NOW PLAYING:</strong><br>
+                Orchid - "Le Désordre, C'est Moi"<br>
+                <progress value="45" max="100" style="width: 80%;"></progress>
+                <div style="font-size: 7pt; margin-top: 5px;">0:54 / 2:05</div>
+            </div>
 
-            <h2>Jonathan's Interests</h2>
+            <div class="blog-snippet">
+                <strong>WarRobotDoge's Latest Blog Entry</strong> [ <a href="#">Subscribe to this Blog</a> ]<br><br>
+                Visualizing the Skramz Revival (Data Dump) (<a href="#">view more</a>)<br>
+                Why Deftones was my gateway drug... (<a href="#">view more</a>)<br>
+                <br>
+                [ <a href="#">View All Blog Entries</a> ]
+            </div>
+
+            <h2>WarRobotDoge's Interests</h2>
             <table cellpadding="3" cellspacing="3">
                 <tr>
-                    <td class="orange-text" width="100">General:</td>
+                    <td class="orange-text" width="100" valign="top">General:</td>
                     <td>Screamo, front-end dev, 2000s DIY aesthetics, roller coasters.</td>
                 </tr>
                 <tr>
-                    <td class="orange-text">Music:</td>
+                    <td class="orange-text" valign="top">Music:</td>
                     <td>Orchid, letterstoyou, Silverstein, Underoath, Deftones, Plague Walker, Modern Life Is War.</td>
                 </tr>
                 <tr>
-                    <td class="orange-text">Movies:</td>
+                    <td class="orange-text" valign="top">Movies:</td>
                     <td>Anything with a grainy, lo-fi visual treatment.</td>
                 </tr>
             </table>
 
-            <h2>Jonathan's Blurbs</h2>
+            <h2>WarRobotDoge's Blurbs</h2>
             <div class="blurb">
                 <p class="orange-text">About me:</p>
                 <p>If it’s under 100 BPM or over 40 popularity, I probably haven't heard it. Just a front-end dev trying to map out the history of skramz through data visualization.</p>
@@ -236,106 +321,63 @@
                 <p>Anyone who still appreciates a good house show or a messy CSS layout. Also anyone from the Thousand Oaks scene.</p>
             </div>
 
-            <h2>Jonathan's Friend Space (Top 8)</h2>
-            <p><strong>Jonathan has <span style="color:red">2,354</span> Friends.</strong></p>
+            <h2>WarRobotDoge's Friend Space (Top 8)</h2>
+            <p><strong>WarRobotDoge has <span style="color:red">2,354</span> Friends.</strong></p>
             <div class="top8-container">
-                <div class="friend">
-                    <span class="friend-name">Orchid</span>
-                    <img src="https://via.placeholder.com/80?text=Screamo" alt="Orchid">
-                </div>
-                <div class="friend">
-                    <span class="friend-name">Silverstein</span>
-                    <img src="https://via.placeholder.com/80?text=Emo" alt="Silverstein">
-                </div>
-                <div class="friend">
-                    <span class="friend-name">Underoath</span>
-                    <img src="https://via.placeholder.com/80?text=Hardcore" alt="Underoath">
-                </div>
-                <div class="friend">
-                    <span class="friend-name">letterstoyou</span>
-                    <img src="https://via.placeholder.com/80?text=Revival" alt="letterstoyou">
-                </div>
-                <div class="friend">
-                    <span class="friend-name">Gavin</span>
-                    <img src="https://via.placeholder.com/80?text=Friend" alt="Gavin">
-                </div>
-                <div class="friend">
-                    <span class="friend-name">Sophia</span>
-                    <img src="https://via.placeholder.com/80?text=Friend" alt="Sophia">
-                </div>
-                <div class="friend">
-                    <span class="friend-name">Trey</span>
-                    <img src="https://via.placeholder.com/80?text=Friend" alt="Trey">
-                </div>
-                <div class="friend">
-                    <span class="friend-name">Matthew</span>
-                    <img src="https://via.placeholder.com/80?text=Friend" alt="Matthew">
-                </div>
+                <div class="friend"><span class="friend-name">Orchid</span><img src="https://via.placeholder.com/80?text=Screamo" alt="Orchid"></div>
+                <div class="friend"><span class="friend-name">Silverstein</span><img src="https://via.placeholder.com/80?text=Emo" alt="Silverstein"></div>
+                <div class="friend"><span class="friend-name">Underoath</span><img src="https://via.placeholder.com/80?text=Hardcore" alt="Underoath"></div>
+                <div class="friend"><span class="friend-name">Seric</span><img src="https://via.placeholder.com/80?text=Revival" alt="letterstoyou"></div>
+                <div class="friend"><span class="friend-name">Deftones</span><img src="https://via.placeholder.com/80?text=Friend" alt="Gavin"></div>
+                <div class="friend"><span class="friend-name">Title Fight</span><img src="https://via.placeholder.com/80?text=Friend" alt="Sophia"></div>
+                <div class="friend"><span class="friend-name">The Valley</span><img src="https://via.placeholder.com/80?text=Friend" alt="Trey"></div>
+                <div class="friend"><span class="friend-name">Loathe</span><img src="https://via.placeholder.com/80?text=Friend" alt="Matthew"></div>
             </div>
-            <p style="text-align:right"><a href="#">View All of Jonathan's Friends</a></p>
+            <p style="text-align:right"><a href="https://warrobotdoge.com/player">View All of Jonathan's Friends</a></p>
+
+            <div class="comments-section">
+                <h2>WarRobotDoge's Friends Comments</h2>
+                <p><strong>Displaying 3 of 142 comments (<a href="#">View/Edit All Comments</a>)</strong></p>
+                
+                <table>
+                    <tr class="comment-row">
+                        <td class="comment-user">
+                            <a href="#" class="friend-name">Underoath</a><br><br>
+                            <img src="https://via.placeholder.com/80?text=Hardcore" alt="Underoath">
+                        </td>
+                        <td class="comment-text">
+                            <div class="comment-date">Apr 4, 2026 8:14 PM</div>
+                            Thanks for the add man! Hope to see you in the pit next time we come to California.
+                        </td>
+                    </tr>
+                    <tr class="comment-row">
+                        <td class="comment-user">
+                            <a href="#" class="friend-name">Gavin</a><br><br>
+                            <img src="https://via.placeholder.com/80?text=Gavin" alt="Gavin">
+                        </td>
+                        <td class="comment-text">
+                            <div class="comment-date">Apr 2, 2026 3:22 PM</div>
+                            Bro your profile song is way too loud, it scared the crap out of me when the page loaded 😂
+                        </td>
+                    </tr>
+                    <tr class="comment-row">
+                        <td class="comment-user">
+                            <a href="#" class="friend-name">Tom</a><br><br>
+                            <img src="https://via.placeholder.com/80?text=Tom" alt="Tom">
+                        </td>
+                        <td class="comment-text">
+                            <div class="comment-date">Mar 28, 2026 11:05 AM</div>
+                            Hey WarRobotDoge! Welcome to MySpace!
+                        </td>
+                    </tr>
+                </table>
+                <p style="text-align:right"><a href="#">Add Comment</a></p>
+            </div>
+ <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
+    <script>commentBox('5680061592109056-proj')</script>
         </section>
     </div>
 </div>
 
-
-<script>
-const CLIENT_ID = 'a708de725dda4cdea571e30a22401559';
-// IMPORTANT: Change this to your exact profile URL (or http://localhost:5500 for testing)
-const REDIRECT_URI = 'https://warrobotdoge.com/myspace'; 
-const SCOPES = 'user-read-currently-playing user-read-playback-state';
-
-const loginBtn = document.getElementById('spotify-login-btn');
-
-// 1. Handle clicking the Login button
-loginBtn.addEventListener('click', () => {
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}&response_type=token&show_dialog=true`;
-    window.location.href = authUrl;
-});
-
-// 2. Extract access token from URL after redirect
-function getAccessToken() {
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    return params.get('access_token');
-}
-
-const accessToken = getAccessToken();
-
-// 3. Fetch data if we have a token
-if (accessToken) {
-    loginBtn.style.display = 'none'; // Hide login button
-    window.location.hash = ''; // Clean up URL bar
-    
-    // Check Spotify every 5 seconds for updates
-    setInterval(fetchNowPlaying, 5000);
-    fetchNowPlaying(); // Initial fetch
-}
-
-function fetchNowPlaying() {
-    fetch('https://api.spotify.com/v1/me/player/currently-playing', {
-        headers: { 'Authorization': 'Bearer ' + accessToken }
-    })
-    .then(response => {
-        if (response.status === 204) {
-            document.getElementById('track-status').innerText = 'PAUSED / NOTHING PLAYING';
-            return;
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (!data || !data.item) return;
-
-        document.getElementById('track-status').innerText = '▶ NOW PLAYING';
-        document.getElementById('track-name').innerText = data.item.name;
-        document.getElementById('track-artist').innerText = data.item.artists.map(a => a.name).join(', ');
-        document.getElementById('album-art').src = data.item.album.images[0].url;
-
-        // Calculate progress percentage
-        const progressPct = (data.progress_ms / data.item.duration_ms) * 100;
-        document.getElementById('track-progress').style.width = progressPct + '%';
-    })
-    .catch(err => console.error('Error fetching Spotify track:', err));
-}
-</script>
 </body>
 </html>
