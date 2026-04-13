@@ -1,489 +1,460 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Speech Archive</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Archive Professional</title>
+    <style>
+        :root { --bg: #0a0a0a; --panel: #151515; --accent: #4daafc; --border: #333; }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: #e0e0e0; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar */
+        #sidebar { width: 320px; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; }
+        #sidebar h2 { padding: 18px 20px; margin: 0; font-size: 16px; border-bottom: 1px solid var(--border); background: #111; color: #fff; letter-spacing: 0.5px; }
+        #speechList { flex: 1; overflow-y: auto; }
+        .category { padding: 8px 20px; background: #1a1a1a; font-weight: bold; color: #777; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid var(--border); border-bottom: 1px solid #222; }
+        .category:first-child { border-top: none; }
+        .speech { padding: 14px 20px; cursor: pointer; border-bottom: 1px solid #1e1e1e; font-size: 14px; transition: all 0.15s ease; color: #ccc; }
+        .speech:hover { background: #252525; color: #fff; }
+        .speech.active { background: #2a2d35; border-left: 4px solid var(--accent); color: #fff; font-weight: 500; }
 
-<style>
+        /* Main App Area */
+        #main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        
+        /* Top Search Bar */
+        #topbar { padding: 15px 30px; border-bottom: 1px solid var(--border); background: var(--panel); z-index: 5; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        #searchRow { display: flex; gap: 15px; align-items: center; margin-bottom: 12px; }
+        
+        /* Custom File Upload Button */
+        .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; }
+        .file-upload-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; }
+        .btn-upload { background: #2c2c2c; color: white; border: 1px solid #444; padding: 10px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-upload:hover { background: #3c3c3c; border-color: #666; }
 
-body{
-margin:0;
-font-family:Arial;
-background:#0f0f0f;
-color:white;
-display:flex;
-height:100vh;
-}
+        #search { flex: 1; padding: 10px 16px; background: #000; border: 1px solid #444; color: white; border-radius: 6px; font-size: 14px; outline: none; transition: 0.2s; }
+        #search:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(77, 170, 252, 0.2); }
+        
+        #navControls { display: flex; align-items: center; gap: 10px; background: #000; border: 1px solid #444; padding: 5px 10px; border-radius: 6px; }
+        #counter { font-family: "SFMono-Regular", Consolas, monospace; color: var(--accent); font-size: 13px; min-width: 60px; text-align: center; }
+        .nav-btn { background: none; border: none; color: #888; cursor: pointer; padding: 4px 8px; font-size: 16px; border-radius: 4px; }
+        .nav-btn:hover { background: #333; color: #fff; }
 
-#sidebar{
-width:300px;
-background:#151515;
-border-right:1px solid #333;
-overflow-y:auto;
-}
+        #resultsSummary { font-size: 13px; color: #999; line-height: 1.6; max-height: 60px; overflow-y: auto; display: none; }
+        .result-link { color: var(--accent); cursor: pointer; margin-right: 12px; text-decoration: none; padding: 2px 6px; border-radius: 4px; background: rgba(77, 170, 252, 0.1); border: 1px solid transparent; transition: 0.1s; display: inline-block; margin-bottom: 4px; }
+        .result-link:hover { background: rgba(77, 170, 252, 0.2); border-color: var(--accent); }
 
-#sidebar h2{
-padding:12px;
-margin:0;
-border-bottom:1px solid #333;
-}
+        /* Content & Player Area - FIXED SCROLLING */
+        #content { padding: 30px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; scroll-behavior: smooth; }
+        
+        /* This is no longer sticky, it flows naturally above the text */
+        #playerHeader { padding-bottom: 25px; margin-bottom: 25px; border-bottom: 1px solid var(--border); }
+        #title { margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: #fff; }
+        
+        .media-grid { display: flex; flex-direction: column; gap: 20px; max-width: 900px; }
+        .player-wrapper { display: none; background: #000; border: 1px solid #333; border-radius: 8px; overflow: hidden; padding-bottom: 10px; }
+        .player-wrapper.active { display: block; }
+        
+        .player-label { background: #1a1a1a; padding: 8px 15px; font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        video, audio { width: 100%; display: block; outline: none; }
+        audio { padding: 15px 15px 5px 15px; }
 
-.category{
-padding:8px 12px;
-background:#1d1d1d;
-font-weight:bold;
-}
+        /* The Enhanced Toggle inside the Audio Player */
+        .enhanced-controls { display: flex; gap: 5px; background: #000; padding: 2px; border-radius: 4px; border: 1px solid #444; }
+        .enh-btn { padding: 4px 10px; background: transparent; border: none; color: #888; font-size: 11px; cursor: pointer; border-radius: 2px; font-weight: bold; }
+        .enh-btn.active { background: #333; color: #fff; }
+        .enh-btn.accent.active { background: #ff9800; color: #000; }
 
-.speech{
-padding:10px 16px;
-cursor:pointer;
-border-bottom:1px solid #222;
-}
+        /* Transcript */
+        #transcript-container { max-width: 900px; }
+        #transcript { white-space: pre-wrap; line-height: 1.8; font-size: 1.15rem; color: #d0d0d0; }
+        
+        /* Precision Highlighting */
+        .highlight { background: rgba(77, 170, 252, 0.25); color: #fff; border-bottom: 2px solid rgba(77, 170, 252, 0.5); padding: 0 2px; border-radius: 2px; }
+        .active-highlight { background: #ffeb3b !important; color: #000 !important; border-bottom: none; box-shadow: 0 0 0 4px #ffeb3b; font-weight: bold; transition: all 0.2s ease; z-index: 1; position: relative; }
 
-.speech:hover{
-background:#222;
-}
-
-#main{
-flex:1;
-display:flex;
-flex-direction:column;
-}
-
-#topbar{
-display:flex;
-flex-direction:column;
-padding:10px;
-border-bottom:1px solid #333;
-background:#1a1a1a;
-gap:6px;
-}
-
-#topControls{
-display:flex;
-gap:10px;
-align-items:center;
-}
-
-#search{
-flex:1;
-padding:8px;
-background:#111;
-border:none;
-color:white;
-}
-
-#counter{
-font-size:14px;
-opacity:.7;
-}
-
-#resultsInfo{
-font-size:13px;
-opacity:.85;
-}
-
-.resultSpeech{
-cursor:pointer;
-color:#8ecaff;
-}
-
-.resultSpeech:hover{
-text-decoration:underline;
-}
-
-#content{
-padding:20px;
-overflow-y:auto;
-}
-
-audio,video{
-width:100%;
-margin-top:15px;
-}
-
-#transcript{
-margin-top:20px;
-white-space:pre-wrap;
-line-height:1.6;
-}
-
-.highlight{
-background:yellow;
-color:black;
-}
-
-.activeHighlight{
-background:orange;
-}
-
-</style>
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 5px; border: 2px solid var(--bg); }
+        ::-webkit-scrollbar-thumb:hover { background: #666; }
+    </style>
 </head>
-
 <body>
 
 <div id="sidebar">
-<h2>Speech Archive</h2>
-<div id="speechList"></div>
+    <h2>Library Archive</h2>
+    <div id="speechList"></div>
 </div>
 
 <div id="main">
+    <div id="topbar">
+        <div id="searchRow">
+            <div class="file-upload-wrapper">
+                <button class="btn-upload">📂 Select Folder</button>
+                <input type="file" id="folderUpload" webkitdirectory multiple title="Choose your speech folder">
+            </div>
+            
+            <input id="search" placeholder="Search entire text database... (Press Enter to jump)" autocomplete="off" disabled>
+            
+            <div id="navControls">
+                <button class="nav-btn" id="btnPrev" title="Previous (Shift+Enter)">▲</button>
+                <div id="counter">0 / 0</div>
+                <button class="nav-btn" id="btnNext" title="Next (Enter)">▼</button>
+            </div>
+        </div>
+        <div id="resultsSummary"></div>
+    </div>
+    
+    <div id="content">
+        <div id="playerHeader">
+            <h1 id="title">Awaiting Folder Upload...</h1>
+            
+            <div class="media-grid">
+                <div class="player-wrapper" id="videoWrapper">
+                    <div class="player-label">🎥 Video Source</div>
+                    <video id="videoPlayer" controls></video>
+                </div>
 
-<div id="topbar">
+                <div class="player-wrapper" id="audioWrapper">
+                    <div class="player-label">
+                        <span>🎙️ Audio Source</span>
+                        <div class="enhanced-controls" id="enhancedToggleBox" style="display: none;">
+                            <button class="enh-btn active" id="btnOrigAudio">Standard</button>
+                            <button class="enh-btn accent" id="btnEnhAudio">Enhanced ✨</button>
+                        </div>
+                    </div>
+                    <audio id="audioPlayer" controls></audio>
+                </div>
+            </div>
+        </div>
 
-<div id="topControls">
-<input type="file" id="folderUpload" webkitdirectory multiple>
-<input id="search" placeholder="Search transcripts...">
-<div id="counter">0 / 0</div>
-</div>
-
-<div id="resultsInfo"></div>
-
-</div>
-
-<div id="content">
-
-<h1 id="title">Upload your speech folder</h1>
-
-<video id="videoPlayer" controls style="display:none"></video>
-<audio id="audioPlayer" controls style="display:none"></audio>
-
-<div id="transcript"></div>
-
-</div>
-
+        <div id="transcript-container">
+            <div id="transcript">Please select a folder structure containing your speeches.</div>
+        </div>
+    </div>
 </div>
 
 <script>
+/** * SPEECH ARCHIVE PRO - Core Logic 
+ * Built for precision text-jumping and independent media handling.
+ */
 
-let speeches=[]
-let currentSpeechIndex=null
+// Global State
+let db = []; 
+let currentSpeechIndex = null;
+let globalMatches = []; 
+let activeGlobalMatchIndex = -1;
+let activeAudioSource = 'orig'; 
 
-let results=[]
-let speechMatches={}
-let currentResult=-1
+// DOM Elements
+const els = {
+    folderInput: document.getElementById('folderUpload'),
+    speechList: document.getElementById('speechList'),
+    title: document.getElementById('title'),
+    transcript: document.getElementById('transcript'),
+    search: document.getElementById('search'),
+    counter: document.getElementById('counter'),
+    summary: document.getElementById('resultsSummary'),
+    btnPrev: document.getElementById('btnPrev'),
+    btnNext: document.getElementById('btnNext'),
+    
+    videoWrapper: document.getElementById('videoWrapper'),
+    videoPlayer: document.getElementById('videoPlayer'),
+    
+    audioWrapper: document.getElementById('audioWrapper'),
+    audioPlayer: document.getElementById('audioPlayer'),
+    enhToggleBox: document.getElementById('enhancedToggleBox'),
+    btnOrigAudio: document.getElementById('btnOrigAudio'),
+    btnEnhAudio: document.getElementById('btnEnhAudio'),
+};
 
-const speechList=document.getElementById("speechList")
-const transcriptDiv=document.getElementById("transcript")
-const title=document.getElementById("title")
-const audio=document.getElementById("audioPlayer")
-const video=document.getElementById("videoPlayer")
-const counter=document.getElementById("counter")
-const searchInput=document.getElementById("search")
-const resultsInfo=document.getElementById("resultsInfo")
+// ---------------------------------------------------------
+// 1. FILE PARSING & DATABASE BUILDING
+// ---------------------------------------------------------
+els.folderInput.addEventListener("change", async (e) => {
+    const files = [...e.target.files];
+    let map = {};
 
-document.getElementById("folderUpload").addEventListener("change",async function(e){
+    for (let file of files) {
+        let path = file.webkitRelativePath.split("/");
+        if (path.length < 3) continue; 
+        
+        let cat = path[1];
+        let name = path[2];
 
-const files=[...e.target.files]
+        if (!map[cat]) map[cat] = {};
+        if (!map[cat][name]) {
+            map[cat][name] = { 
+                title: name, 
+                category: cat, 
+                video: null, 
+                audioOrig: null, 
+                audioEnh: null, 
+                text: "" 
+            };
+        }
 
-let map={}
+        let url = URL.createObjectURL(file);
+        let lowerName = file.name.toLowerCase();
 
-for(let file of files){
+        if (lowerName.endsWith(".txt")) {
+            map[cat][name].text = await file.text();
+        } else if (file.type.startsWith("video")) {
+            map[cat][name].video = url;
+        } else if (file.type.startsWith("audio") || lowerName.includes("mp3") || lowerName.includes("wav")) {
+            if (lowerName.includes("enhanced") || lowerName.includes("enh")) {
+                map[cat][name].audioEnh = url;
+            } else {
+                map[cat][name].audioOrig = url;
+            }
+        }
+    }
 
-let path=file.webkitRelativePath.split("/")
+    db = Object.values(map).flatMap(Object.values)
+        .sort((a, b) => a.category.localeCompare(b.category) || a.title.localeCompare(b.title));
+    
+    buildSidebar();
+    els.search.disabled = false;
+    els.title.innerText = "Folder Loaded. Select a speech from the sidebar.";
+    els.transcript.innerText = "";
+});
 
-if(path.length<3) continue
+function buildSidebar() {
+    els.speechList.innerHTML = "";
+    let currentCat = "";
 
-let category=path[1]
-let speechName=path[2]
-
-if(!map[category]) map[category]={}
-
-if(!map[category][speechName]){
-
-map[category][speechName]={
-title:speechName,
-category:category,
-audio:null,
-video:null,
-transcript:""
+    db.forEach((item, index) => {
+        if (item.category !== currentCat) {
+            const catHeader = document.createElement("div");
+            catHeader.className = "category";
+            catHeader.innerText = item.category;
+            els.speechList.appendChild(catHeader);
+            currentCat = item.category;
+        }
+        
+        const speechDiv = document.createElement("div");
+        speechDiv.className = "speech";
+        speechDiv.innerText = item.title;
+        speechDiv.dataset.index = index;
+        speechDiv.onclick = () => loadSpeech(index);
+        els.speechList.appendChild(speechDiv);
+    });
 }
 
+// ---------------------------------------------------------
+// 2. LOADING SPEECHES & MEDIA ROUTING
+// ---------------------------------------------------------
+function loadSpeech(index, keepPlayerState = false) {
+    if (!keepPlayerState) {
+        els.videoPlayer.pause();
+        els.audioPlayer.pause();
+    }
+
+    currentSpeechIndex = index;
+    const item = db[index];
+    
+    document.querySelectorAll(".speech").forEach(el => el.classList.remove("active"));
+    const activeSidebarEl = document.querySelector(`.speech[data-index="${index}"]`);
+    if(activeSidebarEl) {
+        activeSidebarEl.classList.add("active");
+        activeSidebarEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    els.title.innerText = item.title;
+    routeMedia(item, keepPlayerState);
+    renderTranscript();
+    
+    // Automatically scroll to the top of the content area when a new speech is loaded manually
+    if (!keepPlayerState) {
+        document.getElementById('content').scrollTo(0, 0);
+    }
 }
 
-if(file.type.startsWith("audio")){
-map[category][speechName].audio=URL.createObjectURL(file)
+function routeMedia(item, keepPlayerState) {
+    if (item.video) {
+        els.videoWrapper.classList.add("active");
+        if (!keepPlayerState || els.videoPlayer.src !== item.video) {
+            els.videoPlayer.src = item.video;
+        }
+    } else {
+        els.videoWrapper.classList.remove("active");
+        els.videoPlayer.src = "";
+    }
+
+    const hasAnyAudio = item.audioOrig || item.audioEnh;
+    if (hasAnyAudio) {
+        els.audioWrapper.classList.add("active");
+        
+        if (item.audioOrig && item.audioEnh) {
+            els.enhToggleBox.style.display = "flex";
+        } else {
+            els.enhToggleBox.style.display = "none";
+        }
+
+        setAudioSource(activeAudioSource, keepPlayerState);
+    } else {
+        els.audioWrapper.classList.remove("active");
+        els.audioPlayer.src = "";
+    }
 }
 
-else if(file.type.startsWith("video")){
-map[category][speechName].video=URL.createObjectURL(file)
+function setAudioSource(mode, keepTime = true) {
+    const item = db[currentSpeechIndex];
+    if (!item) return;
+
+    activeAudioSource = mode;
+    els.btnOrigAudio.classList.toggle('active', mode === 'orig');
+    els.btnEnhAudio.classList.toggle('active', mode === 'enh');
+
+    let targetUrl = null;
+    if (mode === 'enh' && item.audioEnh) targetUrl = item.audioEnh;
+    else if (mode === 'orig' && item.audioOrig) targetUrl = item.audioOrig;
+    else targetUrl = item.audioOrig || item.audioEnh; 
+
+    if (targetUrl && els.audioPlayer.src !== targetUrl) {
+        const currentTime = els.audioPlayer.currentTime;
+        const isPlaying = !els.audioPlayer.paused;
+        
+        els.audioPlayer.src = targetUrl;
+        
+        if (keepTime) els.audioPlayer.currentTime = currentTime;
+        if (isPlaying) els.audioPlayer.play();
+    }
 }
 
-else if(file.name.endsWith(".txt")){
-map[category][speechName].transcript=await file.text()
+els.btnOrigAudio.onclick = () => setAudioSource('orig');
+els.btnEnhAudio.onclick = () => setAudioSource('enh');
+
+
+// ---------------------------------------------------------
+// 3. THE "BULLETPROOF" EXACT-MATCH SEARCH ENGINE
+// ---------------------------------------------------------
+function executeGlobalSearch() {
+    const query = els.search.value.trim().toLowerCase();
+    globalMatches = [];
+    activeGlobalMatchIndex = -1;
+    let speechHitCounts = {};
+
+    if (!query) {
+        els.summary.style.display = "none";
+        els.counter.innerText = "0 / 0";
+        if (currentSpeechIndex !== null) renderTranscript();
+        return;
+    }
+
+    const regex = new RegExp(`(${escapeRegex(query)})`, "gi");
+    
+    db.forEach((item, sIdx) => {
+        let match;
+        let localIndex = 0;
+        
+        while ((match = regex.exec(item.text)) !== null) {
+            globalMatches.push({ speechIndex: sIdx, localMatchIndex: localIndex });
+            speechHitCounts[sIdx] = (speechHitCounts[sIdx] || 0) + 1;
+            localIndex++;
+        }
+    });
+
+    if (globalMatches.length > 0) {
+        els.summary.style.display = "block";
+        let html = "<strong>Found in:</strong> ";
+        
+        for (let sIdx in speechHitCounts) {
+            const firstGlobalIndexOfSpeech = globalMatches.findIndex(m => m.speechIndex == sIdx);
+            html += `<a class="result-link" onclick="jumpToMatch(${firstGlobalIndexOfSpeech})">
+                        ${db[sIdx].title} <span style="opacity:0.6">(${speechHitCounts[sIdx]})</span>
+                     </a>`;
+        }
+        els.summary.innerHTML = html;
+        jumpToMatch(0); 
+    } else {
+        els.summary.style.display = "block";
+        els.summary.innerHTML = "No matches found.";
+        els.counter.innerText = "0 / 0";
+        if (currentSpeechIndex !== null) renderTranscript();
+    }
 }
 
+function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-speeches=[]
+function renderTranscript() {
+    if (currentSpeechIndex === null) return;
+    const item = db[currentSpeechIndex];
+    const query = els.search.value.trim();
 
-for(let cat in map){
-for(let s in map[cat]){
-speeches.push(map[cat][s])
-}
-}
+    if (!query) {
+        els.transcript.textContent = item.text;
+        return;
+    }
 
-buildSidebar()
+    let safeText = item.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    
+    const escapedQuery = escapeRegex(query);
+    const regex = new RegExp(`(${escapedQuery})`, "gi");
+    
+    let localCounter = 0;
+    let highlightedHtml = safeText.replace(regex, (matchedStr) => {
+        const span = `<span class="highlight" id="match-${localCounter}">${matchedStr}</span>`;
+        localCounter++;
+        return span;
+    });
 
-})
-
-function buildSidebar(){
-
-speechList.innerHTML=""
-
-let categories={}
-
-speeches.forEach((speech,i)=>{
-
-if(!categories[speech.category]){
-categories[speech.category]=[]
-}
-
-categories[speech.category].push({speech,index:i})
-
-})
-
-for(let cat in categories){
-
-let catDiv=document.createElement("div")
-catDiv.className="category"
-catDiv.innerText=cat
-speechList.appendChild(catDiv)
-
-categories[cat].forEach(obj=>{
-
-let div=document.createElement("div")
-div.className="speech"
-div.innerText=obj.speech.title
-div.dataset.index=obj.index
-
-div.onclick=()=>loadSpeech(obj.index)
-
-speechList.appendChild(div)
-
-})
-
+    els.transcript.innerHTML = highlightedHtml;
 }
 
+// ---------------------------------------------------------
+// 4. PRECISION NAVIGATION (THE JUMP ENGINE)
+// ---------------------------------------------------------
+function jumpToMatch(globalIndex) {
+    if (globalMatches.length === 0) return;
+
+    if (globalIndex >= globalMatches.length) globalIndex = 0;
+    if (globalIndex < 0) globalIndex = globalMatches.length - 1;
+    
+    activeGlobalMatchIndex = globalIndex;
+    const matchData = globalMatches[activeGlobalMatchIndex];
+
+    els.counter.innerText = `${activeGlobalMatchIndex + 1} / ${globalMatches.length}`;
+
+    if (currentSpeechIndex !== matchData.speechIndex) {
+        loadSpeech(matchData.speechIndex, true);
+    } else {
+        renderTranscript();
+    }
+
+    scrollToExactElement(matchData.localMatchIndex);
 }
 
-function loadSpeech(index){
+function scrollToExactElement(localIndex) {
+    document.querySelectorAll('.active-highlight').forEach(el => el.classList.remove('active-highlight'));
 
-const speech=speeches[index]
-currentSpeechIndex=index
-
-title.innerText=speech.title
-transcriptDiv.innerText=speech.transcript
-
-if(speech.audio){
-audio.src=speech.audio
-audio.style.display="block"
-}else{
-audio.style.display="none"
+    const targetElement = document.getElementById(`match-${localIndex}`);
+    if (targetElement) {
+        targetElement.classList.add('active-highlight');
+        
+        setTimeout(() => {
+            targetElement.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+        }, 10);
+    }
 }
 
-if(speech.video){
-video.src=speech.video
-video.style.display="block"
-}else{
-video.style.display="none"
-}
-
-}
-
-function performSearch(){
-
-let q=searchInput.value.toLowerCase()
-
-results=[]
-speechMatches={}
-currentResult=-1
-
-if(!q){
-
-document.querySelectorAll(".speech").forEach(el=>{
-el.style.display="block"
-})
-
-counter.innerText="0 / 0"
-resultsInfo.innerHTML=""
-return
-}
-
-speeches.forEach((speech,i)=>{
-
-let text=speech.transcript.toLowerCase()
-let pos=text.indexOf(q)
-let count=0
-
-while(pos!==-1){
-
-results.push({
-speechIndex:i,
-position:pos
-})
-
-count++
-pos=text.indexOf(q,pos+1)
-
-}
-
-if(count>0){
-speechMatches[i]=count
-}
-
-})
-
-filterSidebar()
-updateResultsInfo()
-
-counter.innerText="0 / "+results.length
-
-if(results.length>0){
-jumpToResult(0)
-}
-
-}
-
-function filterSidebar(){
-
-document.querySelectorAll(".speech").forEach(el=>{
-
-let index=el.dataset.index
-
-if(speechMatches[index]){
-el.style.display="block"
-}else{
-el.style.display="none"
-}
-
-})
-
-}
-
-function updateResultsInfo(){
-
-let html="Matches in speeches:<br>"
-
-for(let i in speechMatches){
-
-html+=`<span class="resultSpeech" onclick="jumpToSpeech(${i})">
-${speeches[i].title} (${speechMatches[i]})
-</span><br>`
-
-}
-
-resultsInfo.innerHTML=html
-
-}
-
-function jumpToSpeech(index){
-
-loadSpeech(index)
-highlightTranscript()
-
-}
-
-function highlightTranscript(){
-
-let q=searchInput.value
-if(!q) return
-
-let speech=speeches[currentSpeechIndex]
-
-let regex=new RegExp(`(${q})`,"gi")
-
-transcriptDiv.innerHTML=speech.transcript.replace(regex,
-'<span class="highlight">$1</span>'
-)
-
-}
-
-function jumpToResult(index){
-
-if(results.length===0) return
-
-currentResult=index
-
-let result=results[currentResult]
-
-if(currentSpeechIndex!==result.speechIndex){
-
-loadSpeech(result.speechIndex)
-
-setTimeout(()=>{
-highlightTranscript()
-scrollToHighlight()
-},60)
-
-}else{
-
-highlightTranscript()
-scrollToHighlight()
-
-}
-
-counter.innerText=(currentResult+1)+" / "+results.length
-
-}
-
-function scrollToHighlight(){
-
-let highlights=document.querySelectorAll(".highlight")
-
-if(highlights.length===0) return
-
-highlights.forEach(h=>h.classList.remove("activeHighlight"))
-
-let localIndex=-1
-let count=-1
-
-for(let i=0;i<=currentResult;i++){
-
-if(results[i].speechIndex===currentSpeechIndex){
-count++
-}
-
-}
-
-localIndex=count
-
-let target=highlights[localIndex]
-
-if(!target) return
-
-target.classList.add("activeHighlight")
-
-target.scrollIntoView({
-behavior:"smooth",
-block:"center"
-})
-
-}
-
-searchInput.addEventListener("input",performSearch)
-
-searchInput.addEventListener("keydown",function(e){
-
-if(results.length===0) return
-
-if(e.key==="Enter"){
-
-if(e.shiftKey){
-currentResult--
-if(currentResult<0) currentResult=results.length-1
-}else{
-currentResult++
-if(currentResult>=results.length) currentResult=0
-}
-
-jumpToResult(currentResult)
-
-}
-
-})
+// ---------------------------------------------------------
+// 5. EVENT LISTENERS
+// ---------------------------------------------------------
+els.search.addEventListener("input", executeGlobalSearch);
+
+els.search.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && globalMatches.length > 0) {
+        e.preventDefault(); 
+        jumpToMatch(e.shiftKey ? activeGlobalMatchIndex - 1 : activeGlobalMatchIndex + 1);
+    }
+});
+
+els.btnNext.onclick = () => jumpToMatch(activeGlobalMatchIndex + 1);
+els.btnPrev.onclick = () => jumpToMatch(activeGlobalMatchIndex - 1);
 
 </script>
-
 </body>
 </html>
