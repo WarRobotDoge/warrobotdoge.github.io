@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,26 +36,12 @@
         }
 
         /* 1. CUSTOM SCROLLBARS */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-deep);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #282828;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3e3e3e;
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: #282828; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3e3e3e; }
 
-        #app-shell {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
+        #app-shell { display: flex; flex: 1; overflow: hidden; }
 
         /* Center Grid Area */
         #main-view {
@@ -103,6 +87,7 @@
             transition: all 0.2s ease;
         }
         .action-btn:hover { transform: scale(1.04); background: #f0f0f0; }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         #album-grid {
             display: grid;
@@ -120,7 +105,6 @@
             border-radius: 6px;
             transition: background 0.3s ease;
         }
-
         .album-card:hover { background: var(--bg-hover); }
         .album-card.active { background: #1c1c1c; }
 
@@ -153,7 +137,6 @@
 
         .drawer-left { width: 180px; flex-shrink: 0; }
         .drawer-right { flex: 1; }
-
         .drawer-cover { width: 180px; height: 180px; border-radius: 4px; box-shadow: 0 12px 24px rgba(0,0,0,0.6); object-fit: cover; }
 
         /* Split Tracklist */
@@ -176,7 +159,6 @@
             color: var(--text-bright);
             transition: background 0.1s;
         }
-
         .track-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
         .track-item.playing-track { color: var(--accent); }
         .track-num { width: 30px; color: var(--text-dim); font-weight: 600; font-family: monospace; }
@@ -241,7 +223,7 @@
 
         .scrubber-row { width: 100%; display: flex; align-items: center; gap: 12px; font-size: 11px; font-family: monospace; color: var(--text-dim); }
 
-        /* Custom Audio Sliders (Like Spotify) */
+        /* Custom Audio Sliders */
         input[type="range"] {
             -webkit-appearance: none;
             flex: 1;
@@ -264,7 +246,7 @@
         input[type="range"]:hover::-webkit-slider-thumb { opacity: 1; }
         input[type="range"]:hover { background: var(--accent); }
 
-        /* Spotify-styled Mini Player (Bottom Left) */
+        /* Spotify-styled Mini Player */
         #mini-player {
             display: flex;
             align-items: center;
@@ -295,6 +277,7 @@
                     <input type="text" class="search-bar" id="search-input" placeholder="Search files..." oninput="filterGrid()">
                     <button class="action-btn" onclick="document.getElementById('folder-picker').click()">Load Folder</button>
                     <input type="file" id="folder-picker" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(event)">
+                    <button class="action-btn" id="export-btn" onclick="exportLibrary()" style="display: none; background: var(--accent); color: #000;">Export to Folders</button>
                 </div>
             </div>
             
@@ -359,7 +342,7 @@
 
     <audio id="core-audio"></audio>
 
-<script>
+    <script>
         const jsmediatags = window.jsmediatags;
         const audio = document.getElementById('core-audio');
         
@@ -370,6 +353,7 @@
         let isRepeat = false;
         let activeTrackUid = ""; 
 
+        // Tags Promisified
         function getBasicTags(file) {
             return new Promise((resolve) => {
                 jsmediatags.read(file, {
@@ -412,17 +396,15 @@
             let path = fullPath.split('/').filter(p => p);
             let fallbackName = path.length >= 2 ? path[path.length - 2] : "Singles";
 
-            // Get the raw display name
+            // Priority: 1. Album -> 2. Artist -> 3. Folder Name / "Singles"
             let rawAlbumName = tags.album ? tags.album.trim() : 
                                tags.artist ? tags.artist.trim() + " (Singles)" : 
                                fallbackName;
             
-            // Generate a lowercase key to group mismatched capitalizations together
+            // Lowercase Key for deduplication
             let albumKey = rawAlbumName.toLowerCase();
-            
             let artistName = tags.artist ? tags.artist.trim() : "Unknown Archive";
 
-            // Use the lowercase key for logic, but save the raw name for the UI
             if (!library.has(albumKey)) {
                 library.set(albumKey, { 
                     name: rawAlbumName, 
@@ -435,13 +417,13 @@
             library.get(albumKey).tracks.push(file);
         }
 
+        // Updated regex to support OGG and OPUS
         function isMusic(n) { return /\.(mp3|flac|m4a|wav|opus|ogg)$/i.test(n); }
 
         function drawGrid() {
             const grid = document.getElementById('album-grid');
             grid.innerHTML = '';
             
-            // Notice we pull the 'albumKey' here to pass to the drawer
             library.forEach((album, albumKey) => {
                 const card = document.createElement('div');
                 card.className = 'album-card';
@@ -458,6 +440,9 @@
                 
                 if (!album.art && album.tracks.length > 0) fetchTags(album.tracks[0], album);
             });
+
+            // Show export button if library has files
+            if (library.size > 0) document.getElementById('export-btn').style.display = 'inline-block';
         }
 
         function filterGrid() {
@@ -487,7 +472,6 @@
             });
         }
 
-        // Updated to accept the lowercase key instead of the display name
         function openDrawer(albumKey, card) {
             const existing = document.querySelector('.drawer');
             const wasThis = existing && existing.dataset.owner === albumKey;
@@ -514,7 +498,6 @@
                 `;
             }).join('');
 
-            // album.name is used here to ensure the UI still shows the proper capitalization
             drawer.innerHTML = `
                 <div class="drawer-left"><img src="${album.art || ''}" class="drawer-cover" style="${!album.art ? 'display:none' : ''}"></div>
                 <div class="drawer-right">
@@ -540,7 +523,6 @@
             });
         }
 
-        // Updated to accept the lowercase key
         function ignite(albumKey, idx) {
             const album = library.get(albumKey);
             activeQueue = [...album.tracks];
@@ -633,6 +615,47 @@
                 toggle();
             }
         });
+
+        // File System Export Logic
+        async function exportLibrary() {
+            try {
+                const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                
+                const btn = document.getElementById('export-btn');
+                const originalText = btn.innerText;
+                btn.innerText = "Exporting...";
+                btn.style.opacity = "0.5";
+                btn.disabled = true;
+
+                for (let [albumKey, album] of library.entries()) {
+                    const safeAlbumName = album.name.replace(/[<>:"/\\|?*]/g, '_'); 
+                    const albumFolder = await dirHandle.getDirectoryHandle(safeAlbumName, { create: true });
+                    
+                    for (let file of album.tracks) {
+                        const safeFileName = file.name.replace(/[<>:"/\\|?*]/g, '_');
+                        const fileHandle = await albumFolder.getFileHandle(safeFileName, { create: true });
+                        const writable = await fileHandle.createWritable();
+                        await writable.write(file);
+                        await writable.close();
+                    }
+                }
+                
+                btn.innerText = "Export Complete!";
+                btn.style.opacity = "1";
+                setTimeout(() => { 
+                    btn.innerText = originalText; 
+                    btn.disabled = false; 
+                }, 3000);
+
+            } catch (err) {
+                console.error("Export failed or was cancelled by the user:", err);
+                document.getElementById('export-btn').innerText = "Export Failed";
+                setTimeout(() => { 
+                    document.getElementById('export-btn').innerText = "Export to Folders"; 
+                    document.getElementById('export-btn').disabled = false;
+                }, 3000);
+            }
+        }
     </script>
 </body>
 </html>
