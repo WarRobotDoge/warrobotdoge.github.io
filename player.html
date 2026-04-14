@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vault Pro // Command Center</title>
@@ -617,45 +618,48 @@
         });
 
         // File System Export Logic
-        async function exportLibrary() {
-            try {
-                const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-                
-                const btn = document.getElementById('export-btn');
-                const originalText = btn.innerText;
-                btn.innerText = "Exporting...";
-                btn.style.opacity = "0.5";
-                btn.disabled = true;
+async function exportLibrary() {
+    const btn = document.getElementById('export-btn');
+    const originalText = btn.innerText;
+    
+    try {
+        const zip = new JSZip();
+        btn.innerText = "Zipping...";
+        btn.style.opacity = "0.5";
+        btn.disabled = true;
 
-                for (let [albumKey, album] of library.entries()) {
-                    const safeAlbumName = album.name.replace(/[<>:"/\\|?*]/g, '_'); 
-                    const albumFolder = await dirHandle.getDirectoryHandle(safeAlbumName, { create: true });
-                    
-                    for (let file of album.tracks) {
-                        const safeFileName = file.name.replace(/[<>:"/\\|?*]/g, '_');
-                        const fileHandle = await albumFolder.getFileHandle(safeFileName, { create: true });
-                        const writable = await fileHandle.createWritable();
-                        await writable.write(file);
-                        await writable.close();
-                    }
-                }
-                
-                btn.innerText = "Export Complete!";
-                btn.style.opacity = "1";
-                setTimeout(() => { 
-                    btn.innerText = originalText; 
-                    btn.disabled = false; 
-                }, 3000);
-
-            } catch (err) {
-                console.error("Export failed or was cancelled by the user:", err);
-                document.getElementById('export-btn').innerText = "Export Failed";
-                setTimeout(() => { 
-                    document.getElementById('export-btn').innerText = "Export to Folders"; 
-                    document.getElementById('export-btn').disabled = false;
-                }, 3000);
+        // Iterate through our organized library
+        for (let [albumKey, album] of library.entries()) {
+            // Create a folder in the zip for each album
+            const safeAlbumName = album.name.replace(/[<>:"/\\|?*]/g, '_'); 
+            const folder = zip.folder(safeAlbumName);
+            
+            for (let file of album.tracks) {
+                // Add the file into that folder
+                folder.file(file.name, file);
             }
         }
+
+        // Generate the zip and trigger download
+        const content = await zip.generateAsync({type:"blob"});
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(content);
+        link.download = "Organized_Music_Library.zip";
+        link.click();
+        
+        btn.innerText = "Download Ready!";
+        btn.style.opacity = "1";
+        setTimeout(() => { 
+            btn.innerText = originalText; 
+            btn.disabled = false; 
+        }, 3000);
+
+    } catch (err) {
+        console.error("Zip failed:", err);
+        btn.innerText = "Export Failed";
+        btn.disabled = false;
+    }
+}
     </script>
 </body>
 </html>
