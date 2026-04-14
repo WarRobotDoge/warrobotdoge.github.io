@@ -435,7 +435,7 @@
             library.get(albumKey).tracks.push(file);
         }
 
-        function isMusic(n) { return /\.(mp3|flac|m4a|wav)$/i.test(n); }
+        function isMusic(n) { return /\.(mp3|flac|m4a|wav|opus|ogg)$/i.test(n); }
 
         function drawGrid() {
             const grid = document.getElementById('album-grid');
