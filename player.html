@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -358,7 +359,7 @@
 
     <audio id="core-audio"></audio>
 
-    <script>
+<script>
         const jsmediatags = window.jsmediatags;
         const audio = document.getElementById('core-audio');
         
@@ -367,7 +368,16 @@
         let activeIdx = -1;
         let isShuffle = false;
         let isRepeat = false;
-        let activeTrackUid = ""; // Tracker for list highlighting
+        let activeTrackUid = ""; 
+
+        function getBasicTags(file) {
+            return new Promise((resolve) => {
+                jsmediatags.read(file, {
+                    onSuccess: (t) => resolve(t.tags),
+                    onError: () => resolve({}) 
+                });
+            });
+        }
 
         async function handleFolderSelect(e) {
             const files = e.target.files;
@@ -397,19 +407,32 @@
         }
 
         async function mapFile(file, fullPath) {
-            let path = fullPath.split('/').filter(p => p);
-            let albumName = path.length >= 2 ? path[path.length - 2] : "Singles";
+            const tags = await getBasicTags(file);
 
-            if (!library.has(albumName)) {
-                library.set(albumName, { 
-                    name: albumName,
+            let path = fullPath.split('/').filter(p => p);
+            let fallbackName = path.length >= 2 ? path[path.length - 2] : "Singles";
+
+            // Get the raw display name
+            let rawAlbumName = tags.album ? tags.album.trim() : 
+                               tags.artist ? tags.artist.trim() + " (Singles)" : 
+                               fallbackName;
+            
+            // Generate a lowercase key to group mismatched capitalizations together
+            let albumKey = rawAlbumName.toLowerCase();
+            
+            let artistName = tags.artist ? tags.artist.trim() : "Unknown Archive";
+
+            // Use the lowercase key for logic, but save the raw name for the UI
+            if (!library.has(albumKey)) {
+                library.set(albumKey, { 
+                    name: rawAlbumName, 
                     id: "alb-" + Math.random().toString(36).slice(2, 9),
                     tracks: [], 
                     art: null, 
-                    artist: "Unknown Archive" 
+                    artist: artistName 
                 });
             }
-            library.get(albumName).tracks.push(file);
+            library.get(albumKey).tracks.push(file);
         }
 
         function isMusic(n) { return /\.(mp3|flac|m4a|wav)$/i.test(n); }
@@ -417,7 +440,9 @@
         function drawGrid() {
             const grid = document.getElementById('album-grid');
             grid.innerHTML = '';
-            library.forEach((album) => {
+            
+            // Notice we pull the 'albumKey' here to pass to the drawer
+            library.forEach((album, albumKey) => {
                 const card = document.createElement('div');
                 card.className = 'album-card';
                 card.id = album.id;
@@ -428,9 +453,10 @@
                     <div class="title">${album.name}</div>
                     <div class="artist" id="art-${album.id}">${album.artist}</div>
                 `;
-                card.onclick = () => openDrawer(album.name, card);
+                card.onclick = () => openDrawer(albumKey, card);
                 grid.appendChild(card);
-                if (!album.art) fetchTags(album.tracks[0], album);
+                
+                if (!album.art && album.tracks.length > 0) fetchTags(album.tracks[0], album);
             });
         }
 
@@ -461,25 +487,26 @@
             });
         }
 
-        function openDrawer(albumName, card) {
+        // Updated to accept the lowercase key instead of the display name
+        function openDrawer(albumKey, card) {
             const existing = document.querySelector('.drawer');
-            const wasThis = existing && existing.dataset.owner === albumName;
+            const wasThis = existing && existing.dataset.owner === albumKey;
             
             document.querySelectorAll('.album-card').forEach(c => c.classList.remove('active'));
             if (existing) existing.remove();
             if (wasThis) return;
 
             card.classList.add('active');
-            const album = library.get(albumName);
+            const album = library.get(albumKey);
             const drawer = document.createElement('div');
             drawer.className = 'drawer';
-            drawer.dataset.owner = albumName;
+            drawer.dataset.owner = albumKey;
 
             const tracksHtml = album.tracks.map((t, i) => {
                 const trackUid = `${album.id}-${i}`;
                 const isPlaying = trackUid === activeTrackUid;
                 return `
-                    <li class="track-item ${isPlaying ? 'playing-track' : ''}" data-uid="${trackUid}" onclick="ignite('${albumName}', ${i})">
+                    <li class="track-item ${isPlaying ? 'playing-track' : ''}" data-uid="${trackUid}" onclick="ignite('${albumKey}', ${i})">
                         <span class="track-num">${(i + 1).toString().padStart(2, '0')}</span>
                         <span class="track-name">${t.name.replace(/\.[^/.]+$/, "")}</span>
                         <span class="track-length" id="dur-${trackUid}">--:--</span>
@@ -487,10 +514,11 @@
                 `;
             }).join('');
 
+            // album.name is used here to ensure the UI still shows the proper capitalization
             drawer.innerHTML = `
-                <div class="drawer-left"><img src="${album.art || ''}" class="drawer-cover"></div>
+                <div class="drawer-left"><img src="${album.art || ''}" class="drawer-cover" style="${!album.art ? 'display:none' : ''}"></div>
                 <div class="drawer-right">
-                    <h2 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 800;">${albumName}</h2>
+                    <h2 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 800;">${album.name}</h2>
                     <p style="color:var(--text-dim); margin:0 0 20px 0; font-size:13px; font-weight: 600;">${album.artist}</p>
                     <ul class="track-columns">${tracksHtml}</ul>
                 </div>
@@ -512,8 +540,9 @@
             });
         }
 
-        function ignite(albumName, idx) {
-            const album = library.get(albumName);
+        // Updated to accept the lowercase key
+        function ignite(albumKey, idx) {
+            const album = library.get(albumKey);
             activeQueue = [...album.tracks];
             activeIdx = idx;
             
@@ -544,7 +573,6 @@
                     const titleStr = t.tags.title || file.name.replace(/\.[^/.]+$/, "");
                     const artistStr = t.tags.artist || "Unknown Archive";
 
-                    // Update Right Side Panel
                     document.getElementById('sp-title').innerText = titleStr;
                     document.getElementById('sp-artist').innerText = artistStr;
                     document.getElementById('sp-album').innerText = t.tags.album || "—";
@@ -552,7 +580,6 @@
                     document.getElementById('sp-year').innerText = t.tags.year || "—";
                     document.getElementById('sp-type').innerText = file.name.split('.').pop().toUpperCase();
                     
-                    // Update Spotify Mini-Player
                     document.getElementById('mini-title').innerText = titleStr;
                     document.getElementById('mini-artist').innerText = artistStr;
                     
@@ -561,6 +588,7 @@
                         let b = "";
                         for (let i = 0; i < data.length; i++) b += String.fromCharCode(data[i]);
                         const finalArt = `data:${format};base64,${window.btoa(b)}`;
+                        
                         document.getElementById('sp-art').src = finalArt;
                         
                         const miniArtEl = document.getElementById('mini-art');
@@ -568,6 +596,7 @@
                         miniArtEl.style.display = 'block';
                     } else {
                         document.getElementById('mini-art').style.display = 'none';
+                        document.getElementById('sp-art').src = "";
                     }
                 }
             });
@@ -598,7 +627,6 @@
         
         audio.onended = () => { if (isRepeat) { audio.currentTime = 0; audio.play(); } else { next(); } };
 
-        // Keyboard Shortcut: Spacebar for Play/Pause
         window.addEventListener('keydown', (e) => {
             if (e.code === "Space" && e.target.tagName !== 'INPUT') {
                 e.preventDefault();
