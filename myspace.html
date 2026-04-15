@@ -391,6 +391,7 @@
             <th>Comment</th>
         </tr>
     </table>
+    <div id="pagination" style="margin-top:10px;"></div>
     <div style="margin-top:10px;">
     <input id="username" placeholder="Name" style="width:100px;">
     <input id="message" placeholder="Message" style="width:60%;">
@@ -411,9 +412,15 @@ async function fetchMessages() {
     const res = await fetch(SCRIPT_URL);
     const data = await res.json();
 
+    globalData = data.reverse(); // newest first (optional but feels like MySpace)
+
+    renderPage(currentPage);
+    renderPagination();
+}
+
+function renderPage(page) {
     const table = document.getElementById("chatTable");
 
-    // keep header row only
     table.innerHTML = `
         <tr>
             <th>Friend</th>
@@ -421,7 +428,12 @@ async function fetchMessages() {
         </tr>
     `;
 
-    data.forEach(row => {
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+
+    const pageData = globalData.slice(start, end);
+
+    pageData.forEach(row => {
         if (row[0] && row[1]) {
             table.innerHTML += `
                 <tr class="comment-row">
@@ -439,6 +451,27 @@ async function fetchMessages() {
     });
 }
 
+function renderPagination() {
+    const container = document.getElementById("pagination");
+    container.innerHTML = "";
+
+    const totalPages = Math.ceil(globalData.length / pageSize);
+
+    for (let i = 1; i <= totalPages; i++) {
+        container.innerHTML += `
+            <button onclick="goToPage(${i})"
+                style="margin:2px; ${i === currentPage ? 'font-weight:bold;' : ''}">
+                ${i}
+            </button>
+        `;
+    }
+}
+
+function goToPage(page) {
+    currentPage = page;
+    renderPage(page);
+    renderPagination();
+}
 
 async function sendMessage() {
     const user = document.getElementById("username").value || "Anon";
