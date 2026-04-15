@@ -363,6 +363,7 @@
                 <h2>WarRobotDoge's Friends Comments</h2>
                 <table>
                   <div class="commentbox"></div>
+                  <div id="chatBox"></div>
                 </table>
             </div>
  <h2>WarRobotDoge Chat</h2>
@@ -388,7 +389,7 @@ function fetchMessages() {
 
 function handleMessages(data) {
     const chatBox = document.getElementById("chatBox");
-
+console.log(data);
     chatBox.innerHTML = "";
 
     data.forEach(row => {
