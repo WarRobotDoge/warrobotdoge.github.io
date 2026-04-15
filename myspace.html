@@ -387,12 +387,10 @@ function handleMessages(data) {
     chatBox.innerHTML = "";
 
     data.reverse().forEach(row => {
-        if(row[0] && row[1]) {
+        if (row[0] && row[1]) {
             chatBox.innerHTML += `<div><b>${row[0]}</b>: ${row[1]}</div>`;
         }
     });
-
-    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 async function sendMessage() {
