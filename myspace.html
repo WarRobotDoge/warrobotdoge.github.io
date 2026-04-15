@@ -449,6 +449,7 @@ async function fetchMessages() {
     renderPagination();
 }
 
+    
 function renderPage(page) {
     const table = document.getElementById("chatTable");
 
@@ -469,10 +470,12 @@ function renderPage(page) {
 
         const isAdmin = row[0].toLowerCase() === "warrobotdoge";
 
-        const nameHTML = isAdmin
-            ? `<b style="color:red;">${row[0]}</b>`
-            : `<b>${row[0]}</b>`;
+       const displayName = formatName(row[0]);
 
+const nameHTML = isAdmin
+    ? `<b style="color:red;">${displayName}</b>`
+    : `<b>${displayName}</b>`;
+    
         const imgHTML = isAdmin
             ? "https://github.com/WarRobotDoge.png"
             : anonImg;
@@ -491,6 +494,13 @@ function renderPage(page) {
         `;
     }
 });
+}
+
+function formatName(name) {
+    if (name.toLowerCase() === "warrobotdoge") {
+        return "WarRobotDoge";
+    }
+    return name;
 }
 
 function renderPagination() {
