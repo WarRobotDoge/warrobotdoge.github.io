@@ -376,11 +376,13 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaQxhxY3nZswLqhk7GBJqhJqgmFGQwZC7p5zXx_-8IBGBa8OEDiu83yMbQ-jZYQ5Wssw/exec";
 
-async function fetchMessages() {
-    const res = await fetch(SCRIPT_URL + "?t=" + Date.now());
-    const text = await res.text();
-    const data = JSON.parse(text);
+function fetchMessages() {
+    const script = document.createElement("script");
+    script.src = SCRIPT_URL + "?callback=handleMessages&t=" + Date.now();
+    document.body.appendChild(script);
+}
 
+function handleMessages(data) {
     const chatBox = document.getElementById("chatBox");
     chatBox.innerHTML = "";
 
@@ -399,11 +401,11 @@ async function sendMessage() {
 
     await fetch(SCRIPT_URL, {
         method: "POST",
-        body: JSON.stringify({ user, message })
+        body: JSON.stringify({ user, message }),
+        mode: "no-cors"
     });
 
     document.getElementById("message").value = "";
-    fetchMessages();
 }
 
 // refresh every 3 seconds
