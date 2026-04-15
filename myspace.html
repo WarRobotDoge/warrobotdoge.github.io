@@ -452,22 +452,33 @@ function renderPage(page) {
 
     const pageData = globalData.slice(start, end);
 
-    pageData.forEach(row => {
-        if (row[0] && row[1]) {
-            table.innerHTML += `
-                <tr class="comment-row">
-                    <td class="comment-user">
-                        <img src="${anonImg}" />
-                        <div><b>${row[0]}</b></div>
-                    </td>
-                    <td class="comment-text">
-                        <div class="comment-date">${row[2] || ""}</div>
-                        ${row[1]}
-                    </td>
-                </tr>
-            `;
-        }
-    });
+   pageData.forEach(row => {
+    if (row[0] && row[1]) {
+
+        const isAdmin = row[0].toLowerCase() === "warrobotdoge";
+
+        const nameHTML = isAdmin
+            ? `<b style="color:red;">${row[0]}</b>`
+            : `<b>${row[0]}</b>`;
+
+        const imgHTML = isAdmin
+            ? "https://github.com/WarRobotDoge.png"
+            : anonImg;
+
+        table.innerHTML += `
+            <tr class="comment-row">
+                <td class="comment-user">
+                    <img src="${imgHTML}" />
+                    <div>${nameHTML}</div>
+                </td>
+                <td class="comment-text">
+                    <div class="comment-date">${row[2] || ""}</div>
+                    ${row[1]}
+                </td>
+            </tr>
+        `;
+    }
+});
 }
 
 function renderPagination() {
