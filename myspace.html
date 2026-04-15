@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -408,12 +409,23 @@ let adminUnlocked = false;
 const anonImg = "https://warrobotdoge.com/uploads/anon.png";
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaQxhxY3nZswLqhk7GBJqhJqgmFGQwZC7p5zXx_-8IBGBa8OEDiu83yMbQ-jZYQ5Wssw/exec";
 
-function checkUsername(name) {
+const ADMIN_HASH = "ffd27d8a5098394047544115eedceaf0d52742680e35e6c9047f0cd14752e841";
+
+async function sha256(text) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function checkUsername(name) {
     if (name.toLowerCase() === RESERVED_NAME) {
         if (!adminUnlocked) {
             const pass = prompt("Enter admin password:");
+            const hashed = await sha256(pass);
 
-            if (pass === "Lsr0425.") {
+            if (hashed === ADMIN_HASH) {
                 adminUnlocked = true;
                 alert("Admin unlocked.");
                 return true;
@@ -507,7 +519,7 @@ async function sendMessage() {
     const userInput = document.getElementById("username").value || "Anon";
     const message = document.getElementById("message").value;
 
-    const allowed = checkUsername(userInput);
+const allowed = await checkUsername(userInput);
     if (!allowed) return;
 
     const user = userInput;
