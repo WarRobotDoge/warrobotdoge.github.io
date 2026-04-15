@@ -365,8 +365,50 @@
                   <div class="commentbox"></div>
                 </table>
             </div>
- <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
-    <script>commentBox('5680061592109056-proj')</script>
+ <h2>WarRobotDoge Chat</h2>
+
+<div id="chatBox" style="height:300px; overflow-y:auto; border:1px solid #ccc; padding:10px; background:#fff;"></div>
+
+<input id="username" placeholder="Name" style="width:100px;">
+<input id="message" placeholder="Message" style="width:60%;">
+<button onclick="sendMessage()">Send</button>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaQxhxY3nZswLqhk7GBJqhJqgmFGQwZC7p5zXx_-8IBGBa8OEDiu83yMbQ-jZYQ5Wssw/exec";
+
+async function fetchMessages() {
+    const res = await fetch(SCRIPT_URL);
+    const data = await res.json();
+
+    const chatBox = document.getElementById("chatBox");
+    chatBox.innerHTML = "";
+
+    data.reverse().forEach(row => {
+        if(row[0] && row[1]) {
+            chatBox.innerHTML += `<div><b>${row[0]}</b>: ${row[1]}</div>`;
+        }
+    });
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function sendMessage() {
+    const user = document.getElementById("username").value || "Anon";
+    const message = document.getElementById("message").value;
+
+    await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({ user, message })
+    });
+
+    document.getElementById("message").value = "";
+    fetchMessages();
+}
+
+// refresh every 3 seconds
+setInterval(fetchMessages, 3000);
+fetchMessages();
+</script>
         </section>
     </div>
 </div>
