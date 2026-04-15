@@ -377,19 +377,11 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaQxhxY3nZswLqhk7GBJqhJqgmFGQwZC7p5zXx_-8IBGBa8OEDiu83yMbQ-jZYQ5Wssw/exec";
 
-function fetchMessages() {
-    const oldScript = document.getElementById("chatScript");
-    if (oldScript) oldScript.remove();
+async function fetchMessages() {
+    const res = await fetch(SCRIPT_URL);
+    const data = await res.json();
 
-    const script = document.createElement("script");
-    script.id = "chatScript";
-    script.src = SCRIPT_URL + "?callback=handleMessages&t=" + Date.now();
-    document.body.appendChild(script);
-}
-
-function handleMessages(data) {
     const chatBox = document.getElementById("chatBox");
-console.log(data);
     chatBox.innerHTML = "";
 
     data.forEach(row => {
@@ -407,14 +399,12 @@ async function sendMessage() {
 
     await fetch(SCRIPT_URL, {
         method: "POST",
-        body: JSON.stringify({ user, message }),
-        mode: "no-cors"
+        body: JSON.stringify({ user, message })
     });
 
     document.getElementById("message").value = "";
 
-    // IMPORTANT: wait a bit then refresh
-    setTimeout(fetchMessages, 500);
+    setTimeout(fetchMessages, 300);
 }
 
 setInterval(fetchMessages, 3000);
