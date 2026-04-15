@@ -377,20 +377,27 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaQxhxY3nZswLqhk7GBJqhJqgmFGQwZC7p5zXx_-8IBGBa8OEDiu83yMbQ-jZYQ5Wssw/exec";
 
 function fetchMessages() {
+    const oldScript = document.getElementById("chatScript");
+    if (oldScript) oldScript.remove();
+
     const script = document.createElement("script");
+    script.id = "chatScript";
     script.src = SCRIPT_URL + "?callback=handleMessages&t=" + Date.now();
     document.body.appendChild(script);
 }
 
 function handleMessages(data) {
     const chatBox = document.getElementById("chatBox");
+
     chatBox.innerHTML = "";
 
-    data.reverse().forEach(row => {
+    data.forEach(row => {
         if (row[0] && row[1]) {
             chatBox.innerHTML += `<div><b>${row[0]}</b>: ${row[1]}</div>`;
         }
     });
+
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 async function sendMessage() {
@@ -404,9 +411,11 @@ async function sendMessage() {
     });
 
     document.getElementById("message").value = "";
+
+    // IMPORTANT: wait a bit then refresh
+    setTimeout(fetchMessages, 500);
 }
 
-// refresh every 3 seconds
 setInterval(fetchMessages, 3000);
 fetchMessages();
 </script>
