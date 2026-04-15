@@ -402,11 +402,30 @@
 let currentPage = 1;
 const pageSize = 10;
 let globalData = [];
+const RESERVED_NAME = "warrobotdoge";
+let adminUnlocked = false;
 
 const anonImg = "https://warrobotdoge.com/uploads/anon.png";
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaQxhxY3nZswLqhk7GBJqhJqgmFGQwZC7p5zXx_-8IBGBa8OEDiu83yMbQ-jZYQ5Wssw/exec";
 
+function checkUsername(name) {
+    if (name.toLowerCase() === RESERVED_NAME) {
+        if (!adminUnlocked) {
+            const pass = prompt("Enter admin password:");
 
+            if (pass === "Lsr0425.") {
+                adminUnlocked = true;
+                alert("Admin unlocked.");
+                return true;
+            } else {
+                alert("Wrong password.");
+                return false;
+            }
+        }
+        return true;
+    }
+    return true;
+}
 
 async function fetchMessages() {
     const res = await fetch(SCRIPT_URL);
