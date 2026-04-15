@@ -299,7 +299,32 @@
                 <div class="mood-status">WarRobotDoge is feeling: 🦇 nostalgic</div>
                 <p>"Searching for chaos in the melody."</p>
                 <p>Male<br>??? years old<br>United States</p>
-                <p>Last Login: 04/05/2026</p>
+                               <p id="lastLogin"></p>
+                <script>
+  const date = new Date(document.lastModified);
+
+  const formatted = date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  });
+
+  document.getElementById("lastLogin").textContent =
+    "Last Login: " + formatted;
+</script>
+<script>
+const img = document.getElementById("pfp");
+
+const realImg = new Image();
+realImg.src = img.dataset.src;
+
+realImg.onload = () => {
+  img.src = realImg.src;
+};
+</script>
             </div>
 
             <div class="contact-box">
@@ -320,9 +345,9 @@
                 <a href="https://open.spotify.com/user/muv7t4gxv5jhvisw1zj980q16">🎵 Spotify Profile</a>
             </div>
 
-            <div class="contact-box">
-                <h3>MySpace URL:</h3>
-                myspace.com/warrobotdoge
+                <div class="contact-box">
+                <h3>WarRobotDoge URL:</h3>
+                warrobotdoge.com
             </div>
         </aside>
 
@@ -335,10 +360,9 @@
                 <div style="font-size: 7pt; margin-top: 5px;">0:54 / 2:05</div>
             </div>
 
-            <div class="blog-snippet">
+             <div class="blog-snippet">
                 <strong>WarRobotDoge's Latest Blog Entry</strong> [ <a href="#">Subscribe to this Blog</a> ]<br><br>
-                Visualizing the Skramz Revival (Data Dump) (<a href="#">view more</a>)<br>
-                Why Deftones was my gateway drug... (<a href="#">view more</a>)<br>
+                Nes page (<a href="https://warrobotdoge.com/news">view more</a>)<br>
                 <br>
                 [ <a href="#">View All Blog Entries</a> ]
             </div>
@@ -347,17 +371,22 @@
             <table cellpadding="3" cellspacing="3">
                 <tr>
                     <td class="orange-text" width="100" valign="top">General:</td>
-                    <td>Screamo, front-end dev, 2000s DIY aesthetics, roller coasters.</td>
+                    <td>I enjoy making random project websites, writing, and reading. I enjoy (alt-right) poltiics, Screamo and Post-Hardcore music</td>
                 </tr>
                 <tr>
                     <td class="orange-text" valign="top">Music:</td>
-                    <td>Orchid, letterstoyou, Silverstein, Underoath, Deftones, Plague Walker, Modern Life Is War.</td>
+                    <td>Orchid, Deftones, The Valley, letterstoyou, Silverstein, Underoath, Plague Walker, Modern Life Is War, GunsLikeGirls, Seric</td>
                 </tr>
                 <tr>
                     <td class="orange-text" valign="top">Movies:</td>
-                    <td>Anything with a grainy, lo-fi visual treatment.</td>
+                    <td>Oblivion, Perfect Blue, American Psycho, Meet Joe Black</td>
+                </tr>
+                <tr>
+                    <td class="orange-text" valign="top">Books:</td>
+                    <td>Harassment Architecture</td>
                 </tr>
             </table>
+           
 
             <h2>WarRobotDoge's Blurbs</h2>
             <div class="blurb">
