@@ -493,8 +493,13 @@ function goToPage(page) {
 }
 
 async function sendMessage() {
-    const user = document.getElementById("username").value || "Anon";
+    const userInput = document.getElementById("username").value || "Anon";
     const message = document.getElementById("message").value;
+
+    const allowed = checkUsername(userInput);
+    if (!allowed) return;
+
+    const user = userInput;
 
     await fetch(SCRIPT_URL, {
         method: "POST",
@@ -502,7 +507,6 @@ async function sendMessage() {
     });
 
     document.getElementById("message").value = "";
-
     setTimeout(fetchMessages, 300);
 }
 
