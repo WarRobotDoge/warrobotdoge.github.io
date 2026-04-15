@@ -377,8 +377,9 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaQxhxY3nZswLqhk7GBJqhJqgmFGQwZC7p5zXx_-8IBGBa8OEDiu83yMbQ-jZYQ5Wssw/exec";
 
 async function fetchMessages() {
-    const res = await fetch(SCRIPT_URL);
-    const data = await res.json();
+    const res = await fetch(SCRIPT_URL + "?t=" + Date.now());
+    const text = await res.text();
+    const data = JSON.parse(text);
 
     const chatBox = document.getElementById("chatBox");
     chatBox.innerHTML = "";
