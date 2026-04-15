@@ -398,7 +398,14 @@
 </div>
 </div>
 <script>
+let currentPage = 1;
+const pageSize = 10;
+let globalData = [];
+
+const anonImg = "https://warrobotdoge.com/uploads/anon.png";
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaQxhxY3nZswLqhk7GBJqhJqgmFGQwZC7p5zXx_-8IBGBa8OEDiu83yMbQ-jZYQ5Wssw/exec";
+
+
 
 async function fetchMessages() {
     const res = await fetch(SCRIPT_URL);
@@ -419,7 +426,7 @@ async function fetchMessages() {
             table.innerHTML += `
                 <tr class="comment-row">
                     <td class="comment-user">
-                        <img src="https://via.placeholder.com/80" />
+                        <img src="${anonImg}" />
                         <div><b>${row[0]}</b></div>
                     </td>
                     <td class="comment-text">
@@ -431,6 +438,7 @@ async function fetchMessages() {
         }
     });
 }
+
 
 async function sendMessage() {
     const user = document.getElementById("username").value || "Anon";
