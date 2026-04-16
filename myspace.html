@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -299,7 +300,10 @@
                 <div class="mood-status">WarRobotDoge is feeling: 🦇 nostalgic</div>
                 <p>"Searching for chaos in the melody."</p>
                 <p>Male<br>??? years old<br>United States</p>
+                  Profile Views: <span id="view-count">Loading...</span>
                                <p id="lastLogin"></p>
+
+
                 <script>
   const date = new Date(document.lastModified);
 
@@ -395,7 +399,7 @@ realImg.onload = () => {
                 <p>Currently obsessed with the new letterstoyou drop. If you like Orchid or Ampere, we'll get along fine.</p>
                 
                 <p class="orange-text">Who I'd like to meet:</p>
-                <p>Anyone who still appreciates a good house show or a messy CSS layout. Also anyone from the Thousand Oaks scene.</p>
+                <p>Anyone who still appreciates a good house show or a messy CSS layout. Also anyone from the scene.</p>
             </div>
 
             <h2>WarRobotDoge's Friend Space (Top 8)</h2>
@@ -578,6 +582,32 @@ fetchMessages();
         </section>
     </div>
 </div>
+<script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwLd3aCL7qF_UbtMgCjnAEqgaxHpnvm_3SWFlED2T1YIXUnlNQVvvZjnxuZoVInw7q6/exec";
 
+  async function getViews() {
+    // 1. Check if the user has visited in this browser session
+    const hasVisited = localStorage.getItem('hasVisited');
+    
+    // 2. Decide whether to ADD a view or just GET the total
+    // We add a 'mode' parameter so the script knows what to do
+    const mode = hasVisited ? 'get' : 'increment';
+    
+    try {
+      const response = await fetch(`${scriptURL}?mode=${mode}`);
+      const data = await response.json();
+      document.getElementById('view-count').innerText = data.views;
+      
+      // 3. Mark them as visited so refresh doesn't count again
+      if (!hasVisited) {
+        localStorage.setItem('hasVisited', 'true');
+      }
+    } catch (error) {
+      document.getElementById('view-count').innerText = "Error";
+    }
+  }
+
+  getViews();
+</script>
 </body>
 </html>
