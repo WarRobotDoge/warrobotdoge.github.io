@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -504,6 +505,25 @@ Reddit
 </div>
 </div>
 <script>
+function formatDate(rawDate) {
+    if (!rawDate) return "";
+    
+    const date = new Date(rawDate);
+    
+    // Check if the date is valid
+    if (isNaN(date.getTime())) return rawDate;
+
+    return date.toLocaleString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+}
+
+
 let currentPage = 1;
 const pageSize = 10;
 let globalData = [];
@@ -591,7 +611,8 @@ const nameHTML = isAdmin
                     <div>${nameHTML}</div>
                 </td>
                 <td class="comment-text">
-                    <div class="comment-date">${row[2] || ""}</div>
+                    <div class="comment-date">${formatDate(row[2])}</div>
+
                     ${row[1]}
                 </td>
             </tr>
