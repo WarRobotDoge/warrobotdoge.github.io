@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -393,7 +394,7 @@ Spotify
 </a>
 
 <a href="https://reddit.com/u/warrobotdoge">
-<svg width="16" height="16" viewBox="0 0 512 512" style="vertical-align:middle;margin-right:6px;">
+<svg width="18" height="16" viewBox="0 0 400 512" style="vertical-align:middle;margin-right:6px;">
   <path fill="#003399" d="M440.3 203.5c0-32.6-26.4-59-59-59-15.6 0-29.7 6.1-40.2 16-39.5-26.5-91.3-43.4-148.1-45.5l25.7-80.6 69.9 16.5c0 23.1 18.7 41.8 41.8 41.8s41.8-18.7 41.8-41.8S353.5 9 330.4 9c-16.3 0-30.4 9.4-37.3 23.1l-77.9-18.4c-7.6-1.8-15.3 2.6-17.6 10.1l-30.2 94.7c-57.2 2.2-109.3 19.1-148.9 45.7-10.6-10-24.8-16.2-40.5-16.2-32.6 0-59 26.4-59 59 0 21.7 11.8 40.6 29.3 50.8-1.2 6.3-1.9 12.7-1.9 19.2 0 92.6 107.6 167.7 240.3 167.7s240.3-75.1 240.3-167.7c0-6.4-.6-12.7-1.8-18.9 17.8-10.1 29.9-29.1 29.9-51.2z"/>
 </svg>
 Reddit
@@ -412,15 +413,25 @@ Reddit
         <section class="content-side">
             
             <div class="music-player">
-                <strong>NOW PLAYING:</strong><br>
-                Orchid - "Le Désordre, C'est Moi"<br>
-                <progress value="45" max="100" style="width: 80%;"></progress>
-                <div style="font-size: 7pt; margin-top: 5px;">0:54 / 2:05</div>
-            </div>
+    <strong>NOW PLAYING:</strong><br>
+    <span id="track-title">The Valley - "Pretty Words Kill Me"</span><br>
+    
+    <audio id="audio-engine" src="https://warrobotdoge.com/uploads/the-valley-pretty-words-kill-me.mp3"></audio>
+    
+    <progress id="track-progress" value="0" max="100" style="width: 80%; cursor: pointer;"></progress>
+    
+    <div style="font-size: 7pt; margin-top: 5px;">
+        <span id="current-time">0:00</span> / <span id="duration">0:00</span>
+    </div>
+    
+    <div style="margin-top: 5px;">
+        <button id="play-pause-btn" style="font-size: 8pt; cursor: pointer;">PLAY</button>
+    </div>
+</div>
 
              <div class="blog-snippet">
                 <strong>WarRobotDoge's Latest Blog Entry</strong> [ <a href="#">Subscribe to this Blog</a> ]<br><br>
-                Nes page (<a href="https://warrobotdoge.com/news">view more</a>)<br>
+                New page (<a href="https://warrobotdoge.com/news">view more</a>)<br>
                 <br>
                 [ <a href="#">View All Blog Entries</a> ]
             </div>
@@ -433,11 +444,15 @@ Reddit
                 </tr>
                 <tr>
                     <td class="orange-text" valign="top">Music:</td>
-                    <td>Orchid, Deftones, The Valley, letterstoyou, Silverstein, Underoath, Plague Walker, Modern Life Is War, GunsLikeGirls, Seric</td>
+                    <td>Orchid, Deftones, The Valley, letterstoyou, Silverstein, Underoath, Plague Walker, Modern Life Is War, GunsLikeGirls, Seric... Post-Hardcore Emo Screamo</td>
                 </tr>
                 <tr>
                     <td class="orange-text" valign="top">Movies:</td>
-                    <td>Oblivion, Perfect Blue, American Psycho, Meet Joe Black</td>
+                    <td>500 Days of Summer, Invincibles, Oblivion, Perfect Blue, American Psycho, Dexter, Meet Joe Black</td>
+                </tr>
+                <tr>
+                    <td class="orange-text" valign="top">Games:</td>
+                    <td>BookWorm, Class of '09, Resident Evil,  Call of Duty, CS2, Silent Hill, Miku Project Diva, Skate, Read Dead Redemption 2, Rocket League</td>
                 </tr>
                 <tr>
                     <td class="orange-text" valign="top">Books:</td>
@@ -449,26 +464,28 @@ Reddit
             <h2>WarRobotDoge's Blurbs</h2>
             <div class="blurb">
                 <p class="orange-text">About me:</p>
-                <p>If it’s under 100 BPM or over 40 popularity, I probably haven't heard it. Just a front-end dev trying to map out the history of skramz through data visualization.</p>
-                <p>Currently obsessed with the new letterstoyou drop. If you like Orchid or Ampere, we'll get along fine.</p>
+                <p>I like to make random html projects. I play games from time to time and I take lots of breaks. I love to analyze anything poltical. I am also obsessed with medieval history. </p>
                 
                 <p class="orange-text">Who I'd like to meet:</p>
-                <p>Anyone who still appreciates a good house show or a messy CSS layout. Also anyone from the scene.</p>
+                <p>Anyone who isn't offended by the most insignificant little thing. I enjoy the company of like minded people and those with nostalgia for the 2000's. Also anyone who likes BookWorm or Jonathan Bowden lol</p>
+                
+            <p class="orange-text">Quotes:</p>
+                <p>1 Peter 4:16 KJV - Yet if any man suffer as a Christian, let him not be ashamed; but let him glorify God on this behalf.<br><br> We will not be replaced. <br><br> Well, you can always be thinner... look better.<br><br>I envy the future, yet I grieve the journey.<br><br>If at first you don’t succeed, try, try again.<br><br>"I saw God and He told me to burn it all down"<br><br>I long for what’s ahead, yet I fear tomorrow will betray today’s hope.<br>They make it look so easy.. connecting with another human being. It's like no one ever told them it's the hardest thing in the world<br><br>When you see a chance, sit a tight hold and don't let go until it's all you got.<br><br>You can't add days to your life, but you can add life to your days.<br><br>How can you call it a movement when you have no motion? You can't call it a movement cuz you have no motion.<br><br>If he were to get a glance of the future he died for, do you think he would do it again? - A tiktok comment about a WW2 soldier.<br><br>More is lost with indecision than wrong decision.<br><br>El hombre tiene que ser libre, pero no existe la libertad sino dentro de un orden.<br><br>The most precious possession you have in this world is your own people. And for this people, and for the sake of this people, we will struggle and fight, and never slacken, never tire, never lose courage, and never lose faith.<br><br>You will never get to see fifty foot statues of warlords and emperors or feel the triumph of conquest. You will never see man live as the ancients dreamed he would, all because a couple of rats tunneled their way into positions of power. They said the past is wrong. They said invaders should have your land. They said its ok to embrace apathy. You are a victim of the technocracy, of an abuse named 'civility'. You have been robbed of a fulfilling earnest life. - Mike Ma<br><br>I believe in discrimination. Discrimination is a moral good and a moral law! It’s an aristocratic spirituality. Of course you discriminate. You discriminate over who’s your enemy and who’s your friend. You don’t treat people all as the same except in some universal ninnydom which only exists in the minds of people who’d like human nature to be different from what it is. - Jonathan Bowden</p>
             </div>
 
             <h2>WarRobotDoge's Friend Space (Top 8)</h2>
             <p><strong>WarRobotDoge has <span style="color:red">2,354</span> Friends.</strong></p>
             <div class="top8-container">
-                <div class="friend"><span class="friend-name">Orchid</span><img src="https://via.placeholder.com/80?text=Screamo" alt="Orchid"></div>
-                <div class="friend"><span class="friend-name">Silverstein</span><img src="https://via.placeholder.com/80?text=Emo" alt="Silverstein"></div>
-                <div class="friend"><span class="friend-name">Underoath</span><img src="https://via.placeholder.com/80?text=Hardcore" alt="Underoath"></div>
-                <div class="friend"><span class="friend-name">Seric</span><img src="https://via.placeholder.com/80?text=Revival" alt="letterstoyou"></div>
-                <div class="friend"><span class="friend-name">Deftones</span><img src="https://via.placeholder.com/80?text=Friend" alt="Deftones"></div>
-                <div class="friend"><span class="friend-name">Title Fight</span><img src="https://via.placeholder.com/80?text=Friend" alt="Title Fight"></div>
-                <div class="friend"><span class="friend-name">The Valley</span><img src="https://via.placeholder.com/80?text=Friend" alt="they Valley"></div>
-                <div class="friend"><span class="friend-name">Loathe</span><img src="https://via.placeholder.com/80?text=Friend" alt="Loathe"></div>
+                <div class="friend"><span class="friend-name">Orchid</span><img src="https://warrobotdoge.com/uploads/orchid.png" alt="Orchid"></div>
+                <div class="friend"><span class="friend-name">Silverstein</span><img src="https://warrobotdoge.com/uploads/silverstein.png" alt="Silverstein"></div>
+                <div class="friend"><span class="friend-name">Underoath</span><img src="https://warrobotdoge.com/uploads/underoath.png" alt="Underoath"></div>
+                <div class="friend"><span class="friend-name">Seric</span><img src="https://warrobotdoge.com/uploads/seric.png" alt="Seric"></div>
+                <div class="friend"><span class="friend-name">Deftones</span><img src="https://warrobotdoge.com/uploads/deftones.png" alt="Deftones"></div>
+                <div class="friend"><span class="friend-name">Title Fight</span><img src="https://warrobotdoge.com/uploads/title-fight.png" alt="Title Fight"></div>
+                <div class="friend"><span class="friend-name">The Valley</span><img src="https://warrobotdoge.com/uploads/thevalley.png" alt="they Valley"></div>
+                <div class="friend"><span class="friend-name">From Autumn To Ashes</span><img src="https://warrobotdoge.com/uploads/ashes.png" alt="From Autumn To Ashes"></div>
             </div>
-            <p style="text-align:right"><a href="https://warrobotdoge.com/player">View All of Jonathan's Friends</a></p>
+            <p style="text-align:right"><a href="https://warrobotdoge.com/player">View All of WarRobotDoge's Friends</a></p>
 
            <div class="comments-section">
     <h2>WarRobotDoge's Friends Comments</h2>
@@ -662,6 +679,50 @@ fetchMessages();
   }
 
   getViews();
+</script>
+<script>
+    const audio = document.getElementById('audio-engine');
+    const playBtn = document.getElementById('play-pause-btn');
+    const progressBar = document.getElementById('track-progress');
+    const currentTimeText = document.getElementById('current-time');
+    const durationText = document.getElementById('duration');
+
+    // Helper to format seconds into M:SS
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    // Toggle Play/Pause
+    playBtn.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play();
+            playBtn.textContent = 'PAUSE';
+        } else {
+            audio.pause();
+            playBtn.textContent = 'PLAY';
+        }
+    });
+
+    // Update Progress Bar and Time
+    audio.addEventListener('timeupdate', () => {
+        const percent = (audio.currentTime / audio.duration) * 100;
+        progressBar.value = percent;
+        currentTimeText.textContent = formatTime(audio.currentTime);
+    });
+
+    // Display total duration once metadata loads
+    audio.addEventListener('loadedmetadata', () => {
+        durationText.textContent = formatTime(audio.duration);
+    });
+
+    // Optional: Click progress bar to seek
+    progressBar.addEventListener('click', (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const pos = (e.pageX - rect.left) / rect.width;
+        audio.currentTime = pos * audio.duration;
+    });
 </script>
 </body>
 </html>
