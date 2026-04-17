@@ -483,7 +483,7 @@ Reddit
                 <div class="friend"><span class="friend-name">Deftones</span><img src="https://warrobotdoge.com/uploads/deftones.png" alt="Deftones"></div>
                 <div class="friend"><span class="friend-name">Title Fight</span><img src="https://warrobotdoge.com/uploads/title-fight.png" alt="Title Fight"></div>
                 <div class="friend"><span class="friend-name">The Valley</span><img src="https://warrobotdoge.com/uploads/thevalley.png" alt="they Valley"></div>
-                <div class="friend"><span class="friend-name">From Autumn To Ashes</span><img src="https://warrobotdoge.com/uploads/ashes.png" alt="From Autumn To Ashes"></div>
+                <div class="friend"><span class="friend-name">Dead Butterflies</span><img src="https://warrobotdoge.com/uploads/butterflies.png" alt="Dead Butterflies"></div>
             </div>
             <p style="text-align:right"><a href="https://warrobotdoge.com/player">View All of WarRobotDoge's Friends</a></p>
 
@@ -630,21 +630,40 @@ function goToPage(page) {
 }
 
 async function sendMessage() {
+    const sendBtn = document.querySelector("button[onclick='sendMessage()']");
+    const messageInput = document.getElementById("message");
     const userInput = document.getElementById("username").value || "Anon";
-    const message = document.getElementById("message").value;
+    const message = messageInput.value;
 
-const allowed = await checkUsername(userInput);
+    // 1. Prevent empty messages
+    if (!message.trim()) return;
+
+    // 2. Check admin status
+    const allowed = await checkUsername(userInput);
     if (!allowed) return;
 
-    const user = userInput;
+    // 3. UI Lock: Disable button and clear input IMMEDIATELY
+    sendBtn.disabled = true;
+    const originalMessage = message; // Keep a backup in case of error
+    messageInput.value = ""; 
 
-    await fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({ user, message })
-    });
-
-    document.getElementById("message").value = "";
-    setTimeout(fetchMessages, 300);
+    try {
+        await fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: 'no-cors', // Common for Google Apps Script POSTs
+            body: JSON.stringify({ user: userInput, message: originalMessage })
+        });
+        
+        // Refresh messages after a short delay
+        setTimeout(fetchMessages, 10);
+    } catch (error) {
+        console.error("Failed to send:", error);
+        alert("Message failed to send.");
+        messageInput.value = originalMessage; // Restore text if it failed
+    } finally {
+        // 4. Unlock the button after the request finishes
+        sendBtn.disabled = false;
+    }
 }
 
 setInterval(fetchMessages, 3000);
