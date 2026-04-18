@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vault Pro // Command Center</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
     <style>
         :root {
@@ -12,7 +12,7 @@
             --bg-surface: #090909;
             --bg-card: #111111;
             --bg-hover: #161616;
-            --accent: #1db954; /* Spotify green styled for high-end contrast */
+            --accent: #1db954; 
             --text-main: #ffffff;
             --text-dim: #6a6a6a;
             --text-bright: #b3b3b3;
@@ -36,7 +36,6 @@
             letter-spacing: -0.01em;
         }
 
-        /* 1. CUSTOM SCROLLBARS */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-deep); }
         ::-webkit-scrollbar-thumb { background: #282828; border-radius: 4px; }
@@ -44,7 +43,6 @@
 
         #app-shell { display: flex; flex: 1; overflow: hidden; }
 
-        /* Center Grid Area */
         #main-view {
             flex: 1;
             background: linear-gradient(to bottom, #121212 0%, var(--bg-deep) 100%);
@@ -59,6 +57,7 @@
             align-items: center;
             margin-bottom: 30px;
             gap: 20px;
+            flex-wrap: wrap;
         }
 
         .search-bar {
@@ -75,6 +74,8 @@
         }
         .search-bar:focus { border-color: var(--border-heavy); background: #222; }
 
+        select.search-bar { width: 140px; cursor: pointer; appearance: none; }
+
         .action-btn {
             background: #fff;
             border: none;
@@ -90,6 +91,20 @@
         .action-btn:hover { transform: scale(1.04); background: #f0f0f0; }
         .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+        /* Loading UI Styles */
+        #upload-status {
+            display: none; 
+            align-items: center; 
+            gap: 12px; 
+            background: #161616; 
+            border: 1px solid var(--border-heavy);
+            padding: 8px 18px; 
+            border-radius: 500px;
+        }
+        #load-text { font-size: 11px; font-weight: 600; font-family: monospace; color: var(--accent); white-space: nowrap; }
+        .load-track { width: 100px; height: 4px; background: #000; border-radius: 2px; overflow: hidden; }
+        #load-bar { width: 0%; height: 100%; background: var(--accent); transition: width 0.1s linear; }
+
         #album-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -97,7 +112,6 @@
             align-items: start;
         }
 
-        /* Album Card Styling */
         .album-card {
             background: var(--bg-card);
             padding: 15px;
@@ -124,7 +138,6 @@
         .title { font-weight: 700; font-size: 14px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .artist { color: var(--text-dim); font-size: 12px; font-weight: 500; }
 
-        /* Smooth Clean Drawer System */
         .drawer {
             grid-column: 1 / -1;
             background: #111;
@@ -140,7 +153,6 @@
         .drawer-right { flex: 1; }
         .drawer-cover { width: 180px; height: 180px; border-radius: 4px; box-shadow: 0 12px 24px rgba(0,0,0,0.6); object-fit: cover; }
 
-        /* Split Tracklist */
         .track-columns {
             column-count: 2;
             column-gap: 40px;
@@ -167,7 +179,6 @@
         .track-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
         .track-length { width: 45px; text-align: right; color: var(--text-dim); font-family: monospace; }
 
-        /* Massive Right Panel */
         #info-panel {
             width: var(--sidebar-width);
             background: var(--bg-deep);
@@ -180,28 +191,12 @@
 
         .panel-headline { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); font-weight: 700; margin-bottom: 25px; }
 
-        .empty-signal {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-dim);
-            font-size: 13px;
-            font-weight: 500;
-        }
+        .empty-signal { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 13px; font-weight: 500; }
 
-        .meta-grid {
-            margin-top: 30px;
-            display: grid;
-            grid-template-columns: 80px 1fr;
-            gap: 15px;
-            font-size: 12px;
-            line-height: 1.5;
-        }
+        .meta-grid { margin-top: 30px; display: grid; grid-template-columns: 80px 1fr; gap: 15px; font-size: 12px; line-height: 1.5; }
         .meta-label { color: var(--text-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px; }
         .meta-val { color: #fff; font-weight: 500; }
 
-        /* Fixed Player Bar */
         #player {
             height: var(--player-height);
             background: #000;
@@ -224,7 +219,7 @@
 
         .scrubber-row { width: 100%; display: flex; align-items: center; gap: 12px; font-size: 11px; font-family: monospace; color: var(--text-dim); }
 
-        /* Custom Audio Sliders */
+        /* FIXED: Persistent Progress Bar Sliders */
         input[type="range"] {
             -webkit-appearance: none;
             flex: 1;
@@ -241,22 +236,13 @@
             border-radius: 50%;
             background: #fff;
             box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            opacity: 0;
-            transition: opacity 0.1s ease;
+            opacity: 1; /* Made persistent instead of 0 */
+            transition: transform 0.1s ease;
         }
-        input[type="range"]:hover::-webkit-slider-thumb { opacity: 1; }
+        input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.2); }
         input[type="range"]:hover { background: var(--accent); }
 
-        /* Spotify-styled Mini Player */
-        #mini-player {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: absolute;
-            left: 35px;
-            max-width: 250px;
-            overflow: hidden;
-        }
+        #mini-player { display: flex; align-items: center; gap: 12px; position: absolute; left: 35px; max-width: 250px; overflow: hidden; }
         #mini-art { width: 44px; height: 44px; border-radius: 4px; object-fit: cover; background: #181818; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
         #mini-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         #mini-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
@@ -274,33 +260,39 @@
                     <h1 style="font-size: 26px; font-weight: 800; margin: 0 0 5px 0;">Archive Grid</h1>
                     <p style="color: var(--text-dim); font-size: 13px; margin: 0; font-weight: 500;">Load your local directories to populate your grid.</p>
                 </div>
-                <div style="display: flex; gap: 15px;">
+                
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div id="upload-status">
+                        <span id="load-text">0/0 loaded</span>
+                        <div class="load-track"><div id="load-bar"></div></div>
+                    </div>
+
                     <input type="text" class="search-bar" id="search-input" placeholder="Search files..." oninput="filterGrid()">
+                    
+                    <select id="sort-select" class="search-bar" onchange="drawGrid()">
+                        <option value="added">Sort: Date Added</option>
+                        <option value="title">Sort: Title (A-Z)</option>
+                        <option value="artist">Sort: Artist (A-Z)</option>
+                    </select>
+
                     <button class="action-btn" onclick="document.getElementById('folder-picker').click()">Load Folder</button>
                     <input type="file" id="folder-picker" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(event)">
                     <button class="action-btn" id="export-btn" onclick="exportLibrary()" style="display: none; background: var(--accent); color: #000;">Export to Folders</button>
                 </div>
             </div>
             
-            <div id="album-grid">
-                </div>
+            <div id="album-grid"></div>
         </main>
 
         <aside id="info-panel">
             <div class="panel-headline">Now Playing</div>
-            
-            <div id="panel-standby" class="empty-signal">
-                Select an album or play a track to view console data.
-            </div>
-
+            <div id="panel-standby" class="empty-signal">Select an album or play a track to view console data.</div>
             <div id="panel-active" style="display: none;">
                 <div style="position: relative;">
                     <img id="sp-art" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px; box-shadow: 0 12px 24px rgba(0,0,0,0.5);">
                 </div>
-                
                 <h2 id="sp-title" style="margin: 25px 0 4px 0; font-size: 18px; font-weight: 800;"></h2>
                 <p id="sp-artist" style="color: var(--accent); font-size: 13px; font-weight: 600; margin: 0;"></p>
-                
                 <div class="meta-grid">
                     <div class="meta-label">Album</div><div class="meta-val" id="sp-album">—</div>
                     <div class="meta-label">Year</div><div class="meta-val" id="sp-year">—</div>
@@ -313,7 +305,7 @@
 
     <footer id="player">
         <div id="mini-player">
-            <img id="mini-art" src="">
+            <img id="mini-art">
             <div id="mini-text">
                 <div id="mini-title"></div>
                 <div id="mini-artist"></div>
@@ -344,9 +336,7 @@
     <audio id="core-audio"></audio>
 
     <script>
-        const jsmediatags = window.jsmediatags;
         const audio = document.getElementById('core-audio');
-        
         let library = new Map(); 
         let activeQueue = [];
         let activeIdx = -1;
@@ -354,55 +344,84 @@
         let isRepeat = false;
         let activeTrackUid = ""; 
 
-        // Tags Promisified
+        // Loading UI Helpers
+        function showLoading(show) { document.getElementById('upload-status').style.display = show ? 'flex' : 'none'; }
+        function updateLoading(loaded, total) {
+            document.getElementById('load-text').innerText = `${loaded}/${total} loaded`;
+            document.getElementById('load-bar').style.width = `${(loaded/total)*100}%`;
+        }
+
         function getBasicTags(file) {
             return new Promise((resolve) => {
-                jsmediatags.read(file, {
-                    onSuccess: (t) => resolve(t.tags),
-                    onError: () => resolve({}) 
-                });
+                if(!window.jsmediatags) { resolve({}); return; }
+                window.jsmediatags.read(file, { onSuccess: (t) => resolve(t.tags), onError: () => resolve({}) });
             });
         }
 
+        // Updated for Loading Bar Sync
         async function handleFolderSelect(e) {
-            const files = e.target.files;
-            for (let file of files) { if (isMusic(file.name)) await mapFile(file, file.webkitRelativePath); }
+            const files = Array.from(e.target.files).filter(f => isMusic(f.name));
+            const total = files.length;
+            if(total === 0) return;
+
+            showLoading(true);
+            let loaded = 0;
+
+            for (let file of files) { 
+                await mapFile(file, file.webkitRelativePath); 
+                loaded++;
+                updateLoading(loaded, total);
+            }
+            
             drawGrid();
+            setTimeout(() => showLoading(false), 1500);
         }
 
+        // Updated Drop Logic to pre-scan for accurate loading totals
         async function handleDrop(e) {
             e.preventDefault();
+            showLoading(true);
+            document.getElementById('load-text').innerText = `Scanning folders...`;
+            
+            let allFiles = [];
             const items = e.dataTransfer.items;
             for (let item of items) {
                 const entry = item.webkitGetAsEntry();
-                if (entry) await parseEntry(entry);
+                if (entry) await collectFiles(entry, allFiles);
             }
+
+            const total = allFiles.length;
+            let loaded = 0;
+            for (let {file, path} of allFiles) {
+                await mapFile(file, path);
+                loaded++;
+                updateLoading(loaded, total);
+            }
+
             drawGrid();
+            setTimeout(() => showLoading(false), 1500);
         }
 
-        async function parseEntry(entry) {
+        async function collectFiles(entry, fileList) {
             if (entry.isFile && isMusic(entry.name)) {
                 const file = await new Promise(r => entry.file(r));
-                await mapFile(file, entry.fullPath);
+                fileList.push({file, path: entry.fullPath});
             } else if (entry.isDirectory) {
                 let reader = entry.createReader();
                 let entries = await new Promise(r => reader.readEntries(r));
-                for (let e of entries) await parseEntry(e);
+                for (let e of entries) await collectFiles(e, fileList);
             }
         }
 
         async function mapFile(file, fullPath) {
             const tags = await getBasicTags(file);
-
             let path = fullPath.split('/').filter(p => p);
             let fallbackName = path.length >= 2 ? path[path.length - 2] : "Singles";
 
-            // Priority: 1. Album -> 2. Artist -> 3. Folder Name / "Singles"
             let rawAlbumName = tags.album ? tags.album.trim() : 
                                tags.artist ? tags.artist.trim() + " (Singles)" : 
                                fallbackName;
             
-            // Lowercase Key for deduplication
             let albumKey = rawAlbumName.toLowerCase();
             let artistName = tags.artist ? tags.artist.trim() : "Unknown Archive";
 
@@ -412,20 +431,34 @@
                     id: "alb-" + Math.random().toString(36).slice(2, 9),
                     tracks: [], 
                     art: null, 
-                    artist: artistName 
+                    artist: artistName,
+                    dateAdded: Date.now() // Track when it was added
                 });
             }
             library.get(albumKey).tracks.push(file);
         }
 
-        // Updated regex to support OGG and OPUS
         function isMusic(n) { return /\.(mp3|flac|m4a|wav|opus|ogg)$/i.test(n); }
 
+        // Updated with Sorting Logic
         function drawGrid() {
             const grid = document.getElementById('album-grid');
             grid.innerHTML = '';
             
-            library.forEach((album, albumKey) => {
+            // Convert Map to Array for sorting
+            let albumsArray = Array.from(library.entries());
+            const sortMethod = document.getElementById('sort-select').value;
+
+            if (sortMethod === 'title') {
+                albumsArray.sort((a, b) => a[1].name.localeCompare(b[1].name));
+            } else if (sortMethod === 'artist') {
+                albumsArray.sort((a, b) => a[1].artist.localeCompare(b[1].artist));
+            } else {
+                // Default 'added' sort
+                albumsArray.sort((a, b) => a[1].dateAdded - b[1].dateAdded);
+            }
+            
+            albumsArray.forEach(([albumKey, album]) => {
                 const card = document.createElement('div');
                 card.className = 'album-card';
                 card.id = album.id;
@@ -442,8 +475,8 @@
                 if (!album.art && album.tracks.length > 0) fetchTags(album.tracks[0], album);
             });
 
-            // Show export button if library has files
             if (library.size > 0) document.getElementById('export-btn').style.display = 'inline-block';
+            filterGrid(); // Re-apply search if exists
         }
 
         function filterGrid() {
@@ -456,7 +489,8 @@
         }
 
         function fetchTags(file, album) {
-            jsmediatags.read(file, {
+            if(!window.jsmediatags) return;
+            window.jsmediatags.read(file, {
                 onSuccess: (t) => {
                     album.artist = t.tags.artist || album.artist;
                     if (t.tags.picture) {
@@ -551,6 +585,7 @@
             document.getElementById('panel-standby').style.display = 'none';
             document.getElementById('panel-active').style.display = 'block';
 
+            if(!window.jsmediatags) return;
             jsmediatags.read(file, {
                 onSuccess: (t) => {
                     const titleStr = t.tags.title || file.name.replace(/\.[^/.]+$/, "");
@@ -573,7 +608,6 @@
                         const finalArt = `data:${format};base64,${window.btoa(b)}`;
                         
                         document.getElementById('sp-art').src = finalArt;
-                        
                         const miniArtEl = document.getElementById('mini-art');
                         miniArtEl.src = finalArt;
                         miniArtEl.style.display = 'block';
@@ -617,49 +651,39 @@
             }
         });
 
-        // File System Export Logic
-async function exportLibrary() {
-    const btn = document.getElementById('export-btn');
-    const originalText = btn.innerText;
-    
-    try {
-        const zip = new JSZip();
-        btn.innerText = "Zipping...";
-        btn.style.opacity = "0.5";
-        btn.disabled = true;
-
-        // Iterate through our organized library
-        for (let [albumKey, album] of library.entries()) {
-            // Create a folder in the zip for each album
-            const safeAlbumName = album.name.replace(/[<>:"/\\|?*]/g, '_'); 
-            const folder = zip.folder(safeAlbumName);
+        async function exportLibrary() {
+            if(!window.JSZip) return;
+            const btn = document.getElementById('export-btn');
+            const originalText = btn.innerText;
             
-            for (let file of album.tracks) {
-                // Add the file into that folder
-                folder.file(file.name, file);
+            try {
+                const zip = new JSZip();
+                btn.innerText = "Zipping...";
+                btn.style.opacity = "0.5";
+                btn.disabled = true;
+
+                for (let [albumKey, album] of library.entries()) {
+                    const safeAlbumName = album.name.replace(/[<>:"/\\|?*]/g, '_'); 
+                    const folder = zip.folder(safeAlbumName);
+                    for (let file of album.tracks) folder.file(file.name, file);
+                }
+
+                const content = await zip.generateAsync({type:"blob"});
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(content);
+                link.download = "Organized_Music_Library.zip";
+                link.click();
+                
+                btn.innerText = "Download Ready!";
+                btn.style.opacity = "1";
+                setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 3000);
+
+            } catch (err) {
+                console.error("Zip failed:", err);
+                btn.innerText = "Export Failed";
+                btn.disabled = false;
             }
         }
-
-        // Generate the zip and trigger download
-        const content = await zip.generateAsync({type:"blob"});
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(content);
-        link.download = "Organized_Music_Library.zip";
-        link.click();
-        
-        btn.innerText = "Download Ready!";
-        btn.style.opacity = "1";
-        setTimeout(() => { 
-            btn.innerText = originalText; 
-            btn.disabled = false; 
-        }, 3000);
-
-    } catch (err) {
-        console.error("Zip failed:", err);
-        btn.innerText = "Export Failed";
-        btn.disabled = false;
-    }
-}
     </script>
 </body>
 </html>
