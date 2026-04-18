@@ -89,7 +89,6 @@
             transition: all 0.2s ease;
         }
         .action-btn:hover { transform: scale(1.04); background: #f0f0f0; }
-        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         #upload-status {
             display: none; 
@@ -174,7 +173,6 @@
         .track-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
         .track-item.playing-track { color: var(--accent); }
         .track-num { width: 30px; color: var(--text-dim); font-weight: 600; font-family: monospace; }
-        .track-item.playing-track .track-num { color: var(--accent); }
         .track-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
         .track-length { width: 45px; text-align: right; color: var(--text-dim); font-family: monospace; }
 
@@ -196,6 +194,24 @@
         .meta-label { color: var(--text-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px; }
         .meta-val { color: #fff; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+        /* Fallback Art Indicator Overlay */
+        #art-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--accent);
+            font-size: 9px;
+            font-weight: 900;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--accent);
+            display: none;
+            pointer-events: none;
+        }
+
         #player {
             height: var(--player-height);
             background: #000;
@@ -214,7 +230,6 @@
         .btn-active { color: var(--accent) !important; }
         
         #play-toggle { font-size: 28px; color: #fff; opacity: 1; }
-        #play-toggle:hover { transform: scale(1.08); }
 
         .scrubber-row { width: 100%; display: flex; align-items: center; gap: 12px; font-size: 11px; font-family: monospace; color: var(--text-dim); }
 
@@ -233,18 +248,16 @@
             height: 12px;
             border-radius: 50%;
             background: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
             opacity: 1;
             transition: transform 0.1s ease;
         }
         input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.2); }
-        input[type="range"]:hover { background: var(--accent); }
 
         #mini-player { display: flex; align-items: center; gap: 12px; position: absolute; left: 35px; max-width: 250px; overflow: hidden; }
-        #mini-art { width: 44px; height: 44px; border-radius: 4px; object-fit: cover; background: #181818; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        #mini-art { width: 44px; height: 44px; border-radius: 4px; object-fit: cover; background: #181818; display: none; }
         #mini-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-        #mini-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        #mini-artist { font-size: 11px; color: var(--text-dim); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        #mini-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        #mini-artist { font-size: 11px; color: var(--text-dim); font-weight: 500; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -256,7 +269,7 @@
             <div class="header-row">
                 <div>
                     <h1 style="font-size: 26px; font-weight: 800; margin: 0 0 5px 0;">Archive Grid</h1>
-                    <p style="color: var(--text-dim); font-size: 13px; margin: 0; font-weight: 500;">Load your local directories to populate your grid.</p>
+                    <p style="color: var(--text-dim); font-size: 13px; margin: 0; font-weight: 500;">Archive visualizer and local file management.</p>
                 </div>
                 
                 <div style="display: flex; gap: 15px; align-items: center;">
@@ -265,7 +278,7 @@
                         <div class="load-track"><div id="load-bar"></div></div>
                     </div>
 
-                    <input type="text" class="search-bar" id="search-input" placeholder="Search files..." oninput="filterGrid()">
+                    <input type="text" class="search-bar" id="search-input" placeholder="Search archive..." oninput="filterGrid()">
                     
                     <select id="sort-select" class="search-bar" onchange="drawGrid()">
                         <option value="added">Sort: Date Added</option>
@@ -275,7 +288,6 @@
 
                     <button class="action-btn" onclick="document.getElementById('folder-picker').click()">Load Folder</button>
                     <input type="file" id="folder-picker" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(event)">
-                    <button class="action-btn" id="export-btn" onclick="exportLibrary()" style="display: none; background: var(--accent); color: #000;">Export to Folders</button>
                 </div>
             </div>
             
@@ -284,10 +296,11 @@
 
         <aside id="info-panel">
             <div class="panel-headline">Now Playing</div>
-            <div id="panel-standby" class="empty-signal">Select an album or play a track to view console data.</div>
+            <div id="panel-standby" class="empty-signal">Select a track to view archive metadata.</div>
             <div id="panel-active" style="display: none;">
                 <div style="position: relative;">
                     <img id="sp-art" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px; box-shadow: 0 12px 24px rgba(0,0,0,0.5);">
+                    <div id="art-indicator">No Embedded Art</div>
                 </div>
                 <h2 id="sp-title" style="margin: 25px 0 4px 0; font-size: 18px; font-weight: 800; word-break: break-all;"></h2>
                 <p id="sp-artist" style="color: var(--accent); font-size: 13px; font-weight: 600; margin: 0;"></p>
@@ -340,6 +353,7 @@
         let library = new Map(); 
         let activeQueue = [];
         let activeIdx = -1;
+        let activeAlbumKey = "";
         let isShuffle = false;
         let isRepeat = false;
         let activeTrackUid = ""; 
@@ -350,27 +364,15 @@
             document.getElementById('load-bar').style.width = `${(loaded/total)*100}%`;
         }
 
-        function getBasicTags(file) {
-            return new Promise((resolve) => {
-                if(!window.jsmediatags) { resolve({}); return; }
-                window.jsmediatags.read(file, { onSuccess: (t) => resolve(t.tags), onError: () => resolve({}) });
-            });
-        }
-
         async function handleFolderSelect(e) {
             const files = Array.from(e.target.files).filter(f => isMusic(f.name));
-            const total = files.length;
-            if(total === 0) return;
-
+            if(files.length === 0) return;
             showLoading(true);
             let loaded = 0;
-
             for (let file of files) { 
                 await mapFile(file, file.webkitRelativePath); 
-                loaded++;
-                updateLoading(loaded, total);
+                loaded++; updateLoading(loaded, files.length);
             }
-            
             drawGrid();
             setTimeout(() => showLoading(false), 1500);
         }
@@ -378,23 +380,17 @@
         async function handleDrop(e) {
             e.preventDefault();
             showLoading(true);
-            document.getElementById('load-text').innerText = `Scanning folders...`;
-            
             let allFiles = [];
             const items = e.dataTransfer.items;
             for (let item of items) {
                 const entry = item.webkitGetAsEntry();
                 if (entry) await collectFiles(entry, allFiles);
             }
-
-            const total = allFiles.length;
             let loaded = 0;
             for (let {file, path} of allFiles) {
                 await mapFile(file, path);
-                loaded++;
-                updateLoading(loaded, total);
+                loaded++; updateLoading(loaded, allFiles.length);
             }
-
             drawGrid();
             setTimeout(() => showLoading(false), 1500);
         }
@@ -411,314 +407,163 @@
         }
 
         async function mapFile(file, fullPath) {
-            const tags = await getBasicTags(file);
+            const tags = await new Promise(r => {
+                if(!window.jsmediatags) r({});
+                else window.jsmediatags.read(file, { onSuccess: t => r(t.tags), onError: () => r({}) });
+            });
             let path = fullPath.split('/').filter(p => p);
             let fallbackName = path.length >= 2 ? path[path.length - 2] : "Singles";
-
-            let rawAlbumName = tags.album ? tags.album.trim() : 
-                               tags.artist ? tags.artist.trim() + " (Singles)" : 
-                               fallbackName;
-            
+            let rawAlbumName = tags.album ? tags.album.trim() : (tags.artist ? tags.artist.trim() + " (Singles)" : fallbackName);
             let albumKey = rawAlbumName.toLowerCase();
             let artistName = tags.artist ? tags.artist.trim() : "Unknown Archive";
 
             if (!library.has(albumKey)) {
                 library.set(albumKey, { 
-                    name: rawAlbumName, 
-                    id: "alb-" + Math.random().toString(36).slice(2, 9),
-                    tracks: [], 
-                    art: null, 
-                    artist: artistName,
-                    dateAdded: Date.now()
+                    name: rawAlbumName, id: "alb-" + Math.random().toString(36).slice(2, 9),
+                    tracks: [], art: null, artist: artistName, dateAdded: Date.now()
                 });
             }
             library.get(albumKey).tracks.push(file);
         }
 
-        // Expanded regex to include mp4, aac
         function isMusic(n) { return /\.(mp3|flac|m4a|mp4|aac|wav|opus|ogg)$/i.test(n); }
 
         function drawGrid() {
             const grid = document.getElementById('album-grid');
             grid.innerHTML = '';
-            
             let albumsArray = Array.from(library.entries());
             const sortMethod = document.getElementById('sort-select').value;
-
-            if (sortMethod === 'title') {
-                albumsArray.sort((a, b) => a[1].name.localeCompare(b[1].name));
-            } else if (sortMethod === 'artist') {
-                albumsArray.sort((a, b) => a[1].artist.localeCompare(b[1].artist));
-            } else {
-                albumsArray.sort((a, b) => a[1].dateAdded - b[1].dateAdded);
-            }
+            if (sortMethod === 'title') albumsArray.sort((a, b) => a[1].name.localeCompare(b[1].name));
+            else if (sortMethod === 'artist') albumsArray.sort((a, b) => a[1].artist.localeCompare(b[1].artist));
+            else albumsArray.sort((a, b) => a[1].dateAdded - b[1].dateAdded);
             
-            albumsArray.forEach(([albumKey, album]) => {
+            albumsArray.forEach(([key, album]) => {
                 const card = document.createElement('div');
                 card.className = 'album-card';
                 card.id = album.id;
-                card.innerHTML = `
-                    <div class="cover-wrapper">
-                        <img class="cover-img" id="img-${album.id}" src="${album.art || ''}" style="${!album.art ? 'display:none' : ''}">
-                    </div>
-                    <div class="title">${album.name}</div>
-                    <div class="artist" id="art-${album.id}">${album.artist}</div>
-                `;
-                card.onclick = () => openDrawer(albumKey, card);
+                card.innerHTML = `<div class="cover-wrapper"><img class="cover-img" id="img-${album.id}" src="${album.art || ''}" style="${!album.art ? 'display:none' : ''}"></div><div class="title">${album.name}</div><div class="artist" id="art-${album.id}">${album.artist}</div>`;
+                card.onclick = () => openDrawer(key, card);
                 grid.appendChild(card);
-                
-                if (!album.art && album.tracks.length > 0) fetchTags(album.tracks[0], album);
+                if (!album.art && album.tracks.length > 0) fetchGridArt(album.tracks[0], album);
             });
-
-            if (library.size > 0) document.getElementById('export-btn').style.display = 'inline-block';
             filterGrid(); 
+        }
+
+        function fetchGridArt(file, album) {
+            jsmediatags.read(file, { onSuccess: t => {
+                if (t.tags.picture) {
+                    const { data, format } = t.tags.picture;
+                    let base = ""; for (let i = 0; i < data.length; i++) base += String.fromCharCode(data[i]);
+                    album.art = `data:${format};base64,${window.btoa(base)}`;
+                    let el = document.getElementById('img-' + album.id); if (el) { el.src = album.art; el.style.display = 'block'; }
+                }
+            }});
         }
 
         function filterGrid() {
             const query = document.getElementById('search-input').value.toLowerCase();
             document.querySelectorAll('.album-card').forEach(card => {
-                const title = card.querySelector('.title').innerText.toLowerCase();
-                const artist = card.querySelector('.artist').innerText.toLowerCase();
-                card.style.display = (title.includes(query) || artist.includes(query)) ? 'block' : 'none';
-            });
-        }
-
-        function fetchTags(file, album) {
-            if(!window.jsmediatags) return;
-            window.jsmediatags.read(file, {
-                onSuccess: (t) => {
-                    album.artist = t.tags.artist || album.artist;
-                    if (t.tags.picture) {
-                        const { data, format } = t.tags.picture;
-                        let base = "";
-                        for (let i = 0; i < data.length; i++) base += String.fromCharCode(data[i]);
-                        album.art = `data:${format};base64,${window.btoa(base)}`;
-                        let el = document.getElementById('img-' + album.id);
-                        if (el) { el.src = album.art; el.style.display = 'block'; }
-                    }
-                    let artEl = document.getElementById('art-' + album.id);
-                    if (artEl) artEl.innerText = album.artist;
-                }
+                const txt = card.innerText.toLowerCase();
+                card.style.display = txt.includes(query) ? 'block' : 'none';
             });
         }
 
         function openDrawer(albumKey, card) {
             const existing = document.querySelector('.drawer');
             const wasThis = existing && existing.dataset.owner === albumKey;
-            
             document.querySelectorAll('.album-card').forEach(c => c.classList.remove('active'));
             if (existing) existing.remove();
             if (wasThis) return;
-
             card.classList.add('active');
             const album = library.get(albumKey);
             const drawer = document.createElement('div');
             drawer.className = 'drawer';
             drawer.dataset.owner = albumKey;
-
-            const tracksHtml = album.tracks.map((t, i) => {
-                const trackUid = `${album.id}-${i}`;
-                const isPlaying = trackUid === activeTrackUid;
-                return `
-                    <li class="track-item ${isPlaying ? 'playing-track' : ''}" data-uid="${trackUid}" onclick="ignite('${albumKey}', ${i})">
-                        <span class="track-num">${(i + 1).toString().padStart(2, '0')}</span>
-                        <span class="track-name">${t.name.replace(/\.[^/.]+$/, "")}</span>
-                        <span class="track-length" id="dur-${trackUid}">--:--</span>
-                    </li>
-                `;
-            }).join('');
-
-            drawer.innerHTML = `
-                <div class="drawer-left"><img src="${album.art || ''}" class="drawer-cover" style="${!album.art ? 'display:none' : ''}"></div>
-                <div class="drawer-right">
-                    <h2 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 800;">${album.name}</h2>
-                    <p style="color:var(--text-dim); margin:0 0 20px 0; font-size:13px; font-weight: 600;">${album.artist}</p>
-                    <ul class="track-columns">${tracksHtml}</ul>
-                </div>
-            `;
-
-            let target = card;
-            while (target.nextElementSibling && target.nextElementSibling.offsetTop === card.offsetTop) { target = target.nextElementSibling; }
+            drawer.innerHTML = `<div class="drawer-left"><img src="${album.art || ''}" class="drawer-cover" style="${!album.art ? 'display:none' : ''}"></div><div class="drawer-right"><h2 style="margin: 0 0 4px 0;">${album.name}</h2><p style="color:var(--text-dim); margin:0 0 20px 0;">${album.artist}</p><ul class="track-columns">${album.tracks.map((t, i) => `<li class="track-item ${album.id+'-'+i === activeTrackUid ? 'playing-track' : ''}" data-uid="${album.id+'-'+i}" onclick="ignite('${albumKey}', ${i})"><span class="track-num">${(i + 1).toString().padStart(2, '0')}</span><span class="track-name">${t.name.replace(/\.[^/.]+$/, "")}</span><span class="track-length" id="dur-${album.id+'-'+i}">--:--</span></li>`).join('')}</ul></div>`;
+            let target = card; while (target.nextElementSibling && target.nextElementSibling.offsetTop === card.offsetTop) { target = target.nextElementSibling; }
             target.after(drawer);
-
             album.tracks.forEach((t, i) => {
-                const trackUid = `${album.id}-${i}`;
-                const tempAudio = new Audio();
-                tempAudio.src = URL.createObjectURL(t);
-                tempAudio.onloadedmetadata = () => {
-                    const durEl = document.getElementById(`dur-${trackUid}`);
-                    if (durEl) durEl.innerText = fmt(tempAudio.duration);
-                    URL.revokeObjectURL(tempAudio.src);
-                };
+                const temp = new Audio(); temp.src = URL.createObjectURL(t);
+                temp.onloadedmetadata = () => { const el = document.getElementById(`dur-${album.id+'-'+i}`); if (el) el.innerText = fmt(temp.duration); URL.revokeObjectURL(temp.src); };
             });
         }
 
         function ignite(albumKey, idx) {
+            activeAlbumKey = albumKey;
             const album = library.get(albumKey);
             activeQueue = [...album.tracks];
             activeIdx = idx;
-            
-            if (isShuffle) {
-                activeQueue = activeQueue.sort(() => Math.random() - 0.5);
-                activeIdx = activeQueue.indexOf(album.tracks[idx]);
-            }
-            
+            if (isShuffle) { activeQueue = activeQueue.sort(() => Math.random() - 0.5); activeIdx = activeQueue.indexOf(album.tracks[idx]); }
             activeTrackUid = `${album.id}-${idx}`;
             document.querySelectorAll('.track-item').forEach(el => el.classList.remove('playing-track'));
             const listEl = document.querySelector(`[data-uid="${activeTrackUid}"]`);
             if (listEl) listEl.classList.add('playing-track');
-
             loadTrack();
         }
 
         function loadTrack() {
             const file = activeQueue[activeIdx];
+            const album = library.get(activeAlbumKey);
             audio.src = URL.createObjectURL(file);
+            audio.play().catch(() => {});
             
-            // Catch codec errors if browser rejects the file format
-            audio.play().catch(e => {
-                console.warn("Playback blocked or codec not supported:", e);
-                if (e.name === 'NotSupportedError') {
-                    document.getElementById('sp-artist').innerText = "⚠️ Codec Not Supported (Try Safari for ALAC, or use FLAC)";
-                    document.getElementById('sp-artist').style.color = "#ff4444";
-                }
-            });
-
             document.getElementById('play-toggle').innerText = '⏸';
             document.getElementById('panel-standby').style.display = 'none';
             document.getElementById('panel-active').style.display = 'block';
 
-            // 1. INSTANT UI UPDATE (Fixes the m4a freeze bug)
+            // Instant UI Setup with Album Art Fallback
             const fallbackTitle = file.name.replace(/\.[^/.]+$/, "");
             document.getElementById('sp-title').innerText = fallbackTitle;
-            document.getElementById('sp-artist').innerText = "Loading metadata...";
-            document.getElementById('sp-artist').style.color = "var(--accent)";
-            document.getElementById('mini-title').innerText = fallbackTitle;
-            document.getElementById('mini-artist').innerText = "Loading...";
+            document.getElementById('sp-artist').innerText = "Loading...";
             document.getElementById('sp-type').innerText = file.name.split('.').pop().toUpperCase();
             
-            // Clear old metadata
-            ['sp-album', 'sp-genre', 'sp-year', 'sp-track', 'sp-composer'].forEach(id => {
-                document.getElementById(id).innerText = "—";
-            });
+            // Set primary cover to album art first (Fallback)
+            document.getElementById('sp-art').src = album.art || "";
+            document.getElementById('mini-art').src = album.art || "";
+            document.getElementById('mini-art').style.display = album.art ? 'block' : 'none';
+            document.getElementById('art-indicator').style.display = 'block'; // Assume fallback until proven otherwise
 
-            // 2. BACKGROUND METADATA FETCH
-            if(!window.jsmediatags) return;
             jsmediatags.read(file, {
                 onSuccess: (t) => {
                     const tags = t.tags || {};
-                    const titleStr = tags.title || fallbackTitle;
-                    const artistStr = tags.artist || "Unknown Archive";
-
-                    document.getElementById('sp-title').innerText = titleStr;
-                    document.getElementById('sp-artist').innerText = artistStr;
-                    document.getElementById('mini-title').innerText = titleStr;
-                    document.getElementById('mini-artist').innerText = artistStr;
-                    
+                    document.getElementById('sp-title').innerText = tags.title || fallbackTitle;
+                    document.getElementById('sp-artist').innerText = tags.artist || "Unknown Artist";
+                    document.getElementById('mini-title').innerText = tags.title || fallbackTitle;
+                    document.getElementById('mini-artist').innerText = tags.artist || "Unknown";
                     document.getElementById('sp-album').innerText = tags.album || "—";
                     document.getElementById('sp-genre').innerText = tags.genre || "—";
-                    
-                    // Improved Year Extraction (Checks standard year, ID3v2 TDRC, and M4A ©day)
-                    let yearOut = tags.year || "—";
-                    if (yearOut === "—" && tags.TDRC && tags.TDRC.data) yearOut = tags.TDRC.data;
-                    if (yearOut === "—" && tags["©day"] && tags["©day"].data) yearOut = tags["©day"].data;
-                    document.getElementById('sp-year').innerText = yearOut;
-
-                    // New Metadata fields
+                    document.getElementById('sp-year').innerText = tags.year || tags.TDRC?.data || tags["©day"]?.data || "—";
                     document.getElementById('sp-track').innerText = tags.track || "—";
-                    
-                    let compOut = tags.composer || "—";
-                    if (compOut === "—" && tags["©wrt"] && tags["©wrt"].data) compOut = tags["©wrt"].data;
-                    document.getElementById('sp-composer').innerText = compOut;
+                    document.getElementById('sp-composer').innerText = tags.composer || tags["©wrt"]?.data || "—";
                     
                     if (tags.picture) {
                         const { data, format } = tags.picture;
-                        let b = "";
-                        for (let i = 0; i < data.length; i++) b += String.fromCharCode(data[i]);
-                        const finalArt = `data:${format};base64,${window.btoa(b)}`;
-                        
-                        document.getElementById('sp-art').src = finalArt;
-                        const miniArtEl = document.getElementById('mini-art');
-                        miniArtEl.src = finalArt;
-                        miniArtEl.style.display = 'block';
-                    } else {
-                        document.getElementById('mini-art').style.display = 'none';
-                        document.getElementById('sp-art').src = "";
+                        let b = ""; for (let i = 0; i < data.length; i++) b += String.fromCharCode(data[i]);
+                        const trackArt = `data:${format};base64,${window.btoa(b)}`;
+                        document.getElementById('sp-art').src = trackArt;
+                        document.getElementById('mini-art').src = trackArt;
+                        document.getElementById('mini-art').style.display = 'block';
+                        document.getElementById('art-indicator').style.display = 'none'; // Own art found
                     }
                 },
-                onError: (error) => {
-                    console.warn("jsmediatags couldn't parse this file:", error);
-                    document.getElementById('sp-artist').innerText = "Unknown Archive";
+                onError: () => { 
+                    document.getElementById('sp-artist').innerText = album.artist; 
                     document.getElementById('mini-artist').innerText = "Unknown";
                 }
             });
         }
 
-        function toggle() { 
-            if (audio.paused) { audio.play(); document.getElementById('play-toggle').innerText = '⏸'; }
-            else { audio.pause(); document.getElementById('play-toggle').innerText = '▶️'; }
-        }
+        function toggle() { if (audio.paused) { audio.play(); document.getElementById('play-toggle').innerText = '⏸'; } else { audio.pause(); document.getElementById('play-toggle').innerText = '▶️'; } }
         function next() { if (activeIdx < activeQueue.length - 1) { activeIdx++; loadTrack(); } }
         function prev() { if (activeIdx > 0) { activeIdx--; loadTrack(); } }
-        
         function toggleShuffle() { isShuffle = !isShuffle; document.getElementById('shuffle-btn').classList.toggle('btn-active', isShuffle); }
         function toggleRepeat() { isRepeat = !isRepeat; document.getElementById('repeat-btn').classList.toggle('btn-active', isRepeat); }
-
         const fmt = (s) => isNaN(s) ? "00:00" : Math.floor(s/60).toString().padStart(2, '0') + ":" + Math.floor(s%60).toString().padStart(2, '0');
-        
-        audio.ontimeupdate = () => {
-            const b = document.getElementById('seek-bar');
-            b.max = audio.duration || 0;
-            b.value = audio.currentTime;
-            document.getElementById('time-cur').innerText = fmt(audio.currentTime);
-            document.getElementById('time-total').innerText = fmt(audio.duration);
-        };
-        
+        audio.ontimeupdate = () => { document.getElementById('seek-bar').max = audio.duration || 0; document.getElementById('seek-bar').value = audio.currentTime; document.getElementById('time-cur').innerText = fmt(audio.currentTime); document.getElementById('time-total').innerText = fmt(audio.duration); };
         document.getElementById('seek-bar').oninput = (e) => audio.currentTime = e.target.value;
         document.getElementById('vol-slider').oninput = (e) => audio.volume = e.target.value;
-        
-        audio.onended = () => { if (isRepeat) { audio.currentTime = 0; audio.play(); } else { next(); } };
-
-        window.addEventListener('keydown', (e) => {
-            if (e.code === "Space" && e.target.tagName !== 'INPUT') {
-                e.preventDefault();
-                toggle();
-            }
-        });
-
-        async function exportLibrary() {
-            if(!window.JSZip) return;
-            const btn = document.getElementById('export-btn');
-            const originalText = btn.innerText;
-            
-            try {
-                const zip = new JSZip();
-                btn.innerText = "Zipping...";
-                btn.style.opacity = "0.5";
-                btn.disabled = true;
-
-                for (let [albumKey, album] of library.entries()) {
-                    const safeAlbumName = album.name.replace(/[<>:"/\\|?*]/g, '_'); 
-                    const folder = zip.folder(safeAlbumName);
-                    for (let file of album.tracks) folder.file(file.name, file);
-                }
-
-                const content = await zip.generateAsync({type:"blob"});
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(content);
-                link.download = "Organized_Music_Library.zip";
-                link.click();
-                
-                btn.innerText = "Download Ready!";
-                btn.style.opacity = "1";
-                setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 3000);
-
-            } catch (err) {
-                console.error("Zip failed:", err);
-                btn.innerText = "Export Failed";
-                btn.disabled = false;
-            }
-        }
+        audio.onended = () => { if (isRepeat) { audio.currentTime = 0; audio.play(); } else next(); };
+        window.addEventListener('keydown', (e) => { if (e.code === "Space" && e.target.tagName !== 'INPUT') { e.preventDefault(); toggle(); } });
     </script>
 </body>
 </html>
