@@ -234,13 +234,17 @@
             trajSelect.onchange = () => createTrajectoryChart(data, trajSelect.value);
             createTrajectoryChart(data, 'Popularity');
 
+            // MODIFIED: Only count the PRIMARY (first) genre to determine the Top 12
             const totalGenreCount = {};
             data.forEach(d => {
                 if (!d['Genres']) return;
-                const items = d['Genres'].split(',').map(g => g.trim().toLowerCase());
-                items.forEach(g => totalGenreCount[g] = (totalGenreCount[g] || 0) + 1);
+                // Grab only the first genre before the first comma
+                const primaryGenre = d['Genres'].split(',')[0].trim().toLowerCase(); 
+                if (primaryGenre) {
+                    totalGenreCount[primaryGenre] = (totalGenreCount[primaryGenre] || 0) + 1;
+                }
             });
-            globalTopGenres = Object.entries(totalGenreCount).sort((a,b) => b[1] - a[1]).slice(0, 12).map(x => x[0]);
+            globalTopGenres = Object.entries(totalGenreCount).sort((a,b) => b[1] - a[1]).slice(0, 9).map(x => x[0]);
             const colors = ['#3b82f6', '#f43f5e', '#10b981', '#ff00eb', '#8b5cf6', '#06b6d4', '#f59e0b', '#a855f7', '#fb923c', '#2dd4bf', '#facc15', '#6366f1'];
             globalTopGenres.forEach((g, i) => globalGenreColors[g] = colors[i]);
 
@@ -520,8 +524,13 @@
             dataToDraw.forEach(d => {
                 const x = Number(d[xCol]); const y = Number(d[yCol]);
                 if (isNaN(x) || isNaN(y)) return; 
-                const trackGenres = (d['Genres'] || '').toLowerCase();
-                const match = globalTopGenres.find(g => trackGenres.includes(g));
+                
+                // MODIFIED: Isolate the primary genre
+                const primaryGenre = (d['Genres'] || '').split(',')[0].trim().toLowerCase();
+                
+                // MODIFIED: Check if the primary genre is in our Top 12 list
+                const match = globalTopGenres.includes(primaryGenre) ? primaryGenre : null;
+                
                 const point = { x, y, name: d['Track Name'] || 'Unknown', artist: d['Artist Name(s)'] || 'Unknown', popularity: Number(d['Popularity']) || 0, loudness: Number(d['Loudness']) || 0 };
                 if (match) groups[match].push(point); else groups['other'].push(point);
             });
