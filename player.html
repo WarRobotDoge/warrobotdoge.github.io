@@ -526,7 +526,7 @@
             albumKey  = 'notag::' + albumName.toLowerCase();
         } else if (parent) {
             artist    = parent;
-            albumName = parent + ' (.OPUS)';
+            albumName = parent + ' (Single)';
             albumKey  = 'notag::' + albumName.toLowerCase();
         } else {
             artist    = 'Unknown Archive';
@@ -609,7 +609,7 @@
         });
 
         const rawAlbum = tags.album  ? tags.album.trim()
-                       : tags.artist ? tags.artist.trim() + ' (.OPUS)'
+                       : tags.artist ? tags.artist.trim() + ' (Single)'
                        : folderAlbum;
         const albumKey  = rawAlbum.toLowerCase();
         const artist    = tags.artist ? tags.artist.trim() : (folderArtist || folderAlbum);
