@@ -212,6 +212,137 @@
             border: 1px solid var(--accent); display: none; pointer-events: none;
         }
 
+        /* ── CD FINDER ──────────────────────────────────────────────────── */
+        #cd-finder-section {
+            margin-top: 28px;
+            border-top: 1px solid var(--border-heavy);
+            padding-top: 22px;
+        }
+
+        #cd-finder-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        #btn-find-cds {
+            width: 100%;
+            background: transparent;
+            border: 1px solid #282828;
+            color: var(--accent);
+            padding: 11px 18px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        #btn-find-cds:hover:not(:disabled) {
+            background: rgba(29, 185, 84, 0.08);
+            border-color: var(--accent);
+        }
+        #btn-find-cds:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+        #btn-find-cds.searching {
+            border-color: #282828;
+            color: var(--text-dim);
+        }
+        #btn-find-cds .cd-spin {
+            display: inline-block;
+            animation: spin 1.4s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #cd-results {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cd-listing {
+            background: #111;
+            border: 1px solid var(--border-heavy);
+            border-left: 2px solid var(--accent);
+            border-radius: 4px;
+            padding: 12px 14px;
+            animation: fadeIn 0.25s ease both;
+        }
+        .cd-listing-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+        .cd-listing-price {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .cd-listing-meta {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 3px;
+        }
+        .cd-listing-link {
+            display: inline-block;
+            margin-top: 7px;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-decoration: none;
+            border: 1px solid #282828;
+            padding: 3px 9px;
+            border-radius: 3px;
+            transition: all 0.15s;
+        }
+        .cd-listing-link:hover { color: #fff; border-color: #444; }
+
+        .cd-quick-links {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .cd-quick-links a {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-decoration: none;
+            border: 1px solid #282828;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: all 0.15s;
+        }
+        .cd-quick-links a:hover { color: #fff; border-color: #444; }
+
+        .cd-note {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-style: italic;
+            margin-top: 2px;
+        }
+        .cd-no-results {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+        .cd-error {
+            font-size: 12px;
+            color: #c0392b;
+        }
+        /* ── END CD FINDER ──────────────────────────────────────────────── */
+
         #player {
             height: var(--player-height);
             background: #000;
@@ -290,6 +421,17 @@
                 <div class="meta-label">Genre</div><div class="meta-val" id="sp-genre">—</div>
                 <div class="meta-label">Encoding</div><div class="meta-val" id="sp-type">—</div>
             </div>
+
+            <!-- ── CD FINDER SECTION ──────────────────────────────────── -->
+            <div id="cd-finder-section">
+                <div id="cd-finder-label">Find on CD</div>
+                <button id="btn-find-cds" onclick="findCDs()">
+                    <span id="cd-btn-icon">💿</span>
+                    <span id="cd-btn-text">Search CD Listings</span>
+                </button>
+                <div id="cd-results"></div>
+            </div>
+            <!-- ── END CD FINDER ──────────────────────────────────────── -->
         </div>
     </aside>
 </div>
@@ -334,7 +476,9 @@
     let isRepeat    = false;
     let activeTrackUid = "";
 
-    // Correct MIME types — fixes m4a/mp4 playback where File.type can be wrong/empty
+    // Track the album/artist currently shown in the sidebar for CD search
+    let cdContext = { album: '', artist: '' };
+
     const MIME_MAP = {
         mp3: 'audio/mpeg', flac: 'audio/flac',
         m4a: 'audio/mp4',  mp4:  'audio/mp4',
@@ -342,7 +486,6 @@
         opus:'audio/ogg; codecs=opus', ogg: 'audio/ogg'
     };
 
-    // Formats jsmediatags cannot read — skip tag parsing, use filename/folder instead
     const NO_TAG_FORMATS = /\.(opus|wav)$/i;
 
     function getExt(name) { return (name.split('.').pop() || '').toLowerCase(); }
@@ -352,58 +495,36 @@
         return URL.createObjectURL(new Blob([file], { type: mime }));
     }
 
-    // ── FILENAME PARSER ────────────────────────────────────────────────────────
-    // Extracts { artist, title } from common naming patterns:
-    //   "Artist - Title.opus"
-    //   "01 - Artist - Title.opus"
-    //   "01. Artist - Title.opus"
     function parseFilename(filename) {
         const bare = filename.replace(/\.[^/.]+$/, '').trim();
         const parts = bare.split(/\s+-\s+/);
-
         if (parts.length >= 2) {
             const first = parts[0].trim();
-            // If first segment is a bare track number, skip it
             if (/^\d+\.?$/.test(first)) {
-                if (parts.length >= 3) {
-                    // "01 - Artist - Title"
-                    return { artist: parts[1].trim(), title: parts.slice(2).join(' - ') };
-                }
-                // "01 - Title" — can't determine artist from filename
+                if (parts.length >= 3) return { artist: parts[1].trim(), title: parts.slice(2).join(' - ') };
                 return { artist: null, title: parts.slice(1).join(' - ') };
             }
-            // "Artist - Title"
             return { artist: first, title: parts.slice(1).join(' - ') };
         }
         return { artist: null, title: bare };
     }
 
-    // ── FALLBACK METADATA RESOLVER for opus/wav ────────────────────────────────
-    // Priority chain for artist + album when tags are unreadable:
-    //  1. Filename pattern "Artist - Title.opus"  → artist from filename
-    //  2. Deep folder structure Artist/Album/file → grandparent=artist, parent=album
-    //  3. Shallow structure    Artist/file        → parent folder = artist
-    //  4. Flat (no path depth)                   → "Unknown Archive"
     function resolveNoTagMeta(file, fullPath) {
-        const parts      = fullPath.split('/').filter(Boolean);
-        const parent     = parts.length >= 2 ? parts[parts.length - 2] : null;
-        const grandParent= parts.length >= 3 ? parts[parts.length - 3] : null;
-        const parsed     = parseFilename(file.name);
+        const parts       = fullPath.split('/').filter(Boolean);
+        const parent      = parts.length >= 2 ? parts[parts.length - 2] : null;
+        const grandParent = parts.length >= 3 ? parts[parts.length - 3] : null;
+        const parsed      = parseFilename(file.name);
 
         let artist, albumName, albumKey;
-
         if (parsed.artist) {
-            // Filename tells us the artist directly — most reliable signal
             artist    = parsed.artist;
             albumName = artist + ' (.OPUS)';
             albumKey  = 'notag::' + albumName.toLowerCase();
         } else if (grandParent) {
-            // Deep folder: Artist/Album/file.opus
             artist    = grandParent;
             albumName = parent;
             albumKey  = 'notag::' + albumName.toLowerCase();
         } else if (parent) {
-            // Shallow: Artist/file.opus — treat the folder as artist grouping
             artist    = parent;
             albumName = parent + ' (.OPUS)';
             albumKey  = 'notag::' + albumName.toLowerCase();
@@ -412,11 +533,8 @@
             albumName = 'Unknown Archive';
             albumKey  = 'notag::unknown-archive';
         }
-
         return { artist, albumName, albumKey };
     }
-
-    // ──────────────────────────────────────────────────────────────────────────
 
     function showLoading(show) { document.getElementById('upload-status').style.display = show ? 'flex' : 'none'; }
     function updateLoading(loaded, total) {
@@ -466,8 +584,6 @@
     }
 
     async function mapFile(file, fullPath) {
-
-        // ── NO-TAG BRANCH: opus + wav ──────────────────────────────────────────
         if (NO_TAG_FORMATS.test(file.name)) {
             const { artist, albumName, albumKey } = resolveNoTagMeta(file, fullPath);
             if (!library.has(albumKey)) {
@@ -483,7 +599,6 @@
             return;
         }
 
-        // ── TAG BRANCH: mp3 / flac / m4a / aac / ogg / mp4 ───────────────────
         const parts        = fullPath.split('/').filter(Boolean);
         const folderAlbum  = parts.length >= 2 ? parts[parts.length - 2] : '.OPUS';
         const folderArtist = parts.length >= 3 ? parts[parts.length - 3] : null;
@@ -523,13 +638,11 @@
         else                        albums.sort((a, b) => a[1].dateAdded - b[1].dateAdded);
 
         albums.forEach(([key, album]) => {
-            // Sort no-tag albums by filename (numeric-aware so track02 < track10)
             if (album.noTags) {
                 album.tracks.sort((a, b) =>
                     a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
                 );
             }
-
             const card = document.createElement('div');
             card.className = 'album-card';
             card.id = album.id;
@@ -656,10 +769,12 @@
         document.getElementById('panel-standby').style.display = 'none';
         document.getElementById('panel-active').style.display  = 'block';
 
+        // Reset CD finder whenever a new track loads
+        resetCDFinder();
+
         const fallbackTitle = file.name.replace(/\.[^/.]+$/, '');
         document.getElementById('sp-type').innerText = getExt(file.name).toUpperCase();
 
-        // ── No-tag path: derive all sidebar info from filename + album object ──
         if (NO_TAG_FORMATS.test(file.name)) {
             const parsed = parseFilename(file.name);
             document.getElementById('sp-title').innerText    = parsed.title || fallbackTitle;
@@ -674,10 +789,12 @@
             document.getElementById('sp-art').src            = '';
             document.getElementById('mini-art').style.display = 'none';
             document.getElementById('art-indicator').style.display = 'block';
+
+            // Store context for CD search
+            cdContext = { album: album.name, artist: album.artist };
             return;
         }
 
-        // ── Tag path ────────────────────────────────────────────────────────────
         document.getElementById('sp-title').innerText  = fallbackTitle;
         document.getElementById('sp-artist').innerText = 'Loading...';
         document.getElementById('sp-art').src          = album.art || '';
@@ -685,18 +802,28 @@
         document.getElementById('mini-art').style.display = album.art ? 'block' : 'none';
         document.getElementById('art-indicator').style.display = 'block';
 
+        // Store fallback context immediately; will be overwritten once tags load
+        cdContext = { album: album.name, artist: album.artist };
+
         jsmediatags.read(file, {
             onSuccess: t => {
                 const tags = t.tags || {};
-                document.getElementById('sp-title').innerText    = tags.title    || fallbackTitle;
-                document.getElementById('sp-artist').innerText   = tags.artist   || album.artist;
-                document.getElementById('mini-title').innerText  = tags.title    || fallbackTitle;
-                document.getElementById('mini-artist').innerText = tags.artist   || album.artist;
-                document.getElementById('sp-album').innerText    = tags.album    || album.name || '—';
+                const title  = tags.title  || fallbackTitle;
+                const artist = tags.artist || album.artist;
+                const alb    = tags.album  || album.name || '—';
+
+                document.getElementById('sp-title').innerText    = title;
+                document.getElementById('sp-artist').innerText   = artist;
+                document.getElementById('mini-title').innerText  = title;
+                document.getElementById('mini-artist').innerText = artist;
+                document.getElementById('sp-album').innerText    = alb;
                 document.getElementById('sp-genre').innerText    = tags.genre    || '—';
                 document.getElementById('sp-year').innerText     = tags.year     || tags.TDRC?.data || tags['©day']?.data || '—';
                 document.getElementById('sp-track').innerText    = tags.track    || '—';
                 document.getElementById('sp-composer').innerText = tags.composer || tags['©wrt']?.data || '—';
+
+                // Update CD context with real tag data
+                cdContext = { album: alb !== '—' ? alb : album.name, artist };
 
                 if (tags.picture) {
                     const { data, format } = tags.picture;
@@ -715,6 +842,139 @@
         });
     }
 
+    // ── CD FINDER ─────────────────────────────────────────────────────────────
+
+    function resetCDFinder() {
+        const btn = document.getElementById('btn-find-cds');
+        const results = document.getElementById('cd-results');
+        btn.disabled = false;
+        btn.className = '';
+        document.getElementById('cd-btn-icon').textContent = '💿';
+        document.getElementById('cd-btn-text').textContent = 'Search CD Listings';
+        results.innerHTML = '';
+    }
+
+    async function findCDs() {
+        const btn     = document.getElementById('btn-find-cds');
+        const results = document.getElementById('cd-results');
+
+        const { album, artist } = cdContext;
+        if (!album || album === '—') {
+            results.innerHTML = '<div class="cd-error">No album info available yet — try again once the track loads.</div>';
+            return;
+        }
+
+        // Searching state
+        btn.disabled = true;
+        btn.className = 'searching';
+        document.getElementById('cd-btn-icon').innerHTML = '<span class="cd-spin">◎</span>';
+        document.getElementById('cd-btn-text').textContent = 'Searching…';
+        results.innerHTML = '';
+
+        const discogsURL = `https://www.discogs.com/search/?q=${encodeURIComponent(artist + ' ' + album)}&type=release&format=CD`;
+        const ebayURL    = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(artist + ' ' + album + ' CD')}`;
+        const amazonURL  = `https://www.amazon.com/s?k=${encodeURIComponent(artist + ' ' + album + ' CD')}`;
+
+        try {
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'claude-sonnet-4-20250514',
+                    max_tokens: 1000,
+                    tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+                    system: `You are a music CD shopping assistant. Search for CD listings of the given album for sale online (Discogs, eBay, Amazon, etc.).
+Return ONLY a raw JSON object — no markdown, no backticks, no preamble — in this exact structure:
+{
+  "found": true,
+  "listings": [
+    {
+      "title": "listing title",
+      "price": "price or price range e.g. $8.99 or $5–$20",
+      "source": "Discogs / eBay / Amazon / etc.",
+      "condition": "New / Used / VG+ / etc. or null",
+      "url": "direct url to the listing or search page"
+    }
+  ],
+  "note": "optional short note about availability"
+}
+Include up to 4 listings. If no specific listings are found, set found to false and listings to [].`,
+                    messages: [{
+                        role: 'user',
+                        content: `Find CD listings for sale: "${album}" by ${artist}. Search Discogs and eBay first, then Amazon.`
+                    }]
+                })
+            });
+
+            const data = await response.json();
+            const text = (data.content || [])
+                .filter(b => b.type === 'text')
+                .map(b => b.text)
+                .join('');
+
+            let parsed = null;
+            try {
+                const clean = text.replace(/```json|```/g, '').trim();
+                parsed = JSON.parse(clean);
+            } catch (_) {}
+
+            // Restore button to a "done / search again" state
+            btn.disabled = false;
+            btn.className = '';
+            document.getElementById('cd-btn-icon').textContent = '🔄';
+            document.getElementById('cd-btn-text').textContent = 'Search Again';
+
+            if (parsed && parsed.listings && parsed.listings.length > 0) {
+                let html = '';
+                parsed.listings.forEach(l => {
+                    const cond = l.condition ? ` · ${esc(l.condition)}` : '';
+                    html += `
+                    <div class="cd-listing">
+                        <div class="cd-listing-title">${esc(l.title || '')}</div>
+                        ${l.price ? `<div class="cd-listing-price">${esc(l.price)}<span class="cd-listing-meta">${cond} — ${esc(l.source || '')}</span></div>` : `<div class="cd-listing-meta">${esc(l.source || '')}${cond}</div>`}
+                        ${l.url ? `<a class="cd-listing-link" href="${esc(l.url)}" target="_blank" rel="noopener">View listing ↗</a>` : ''}
+                    </div>`;
+                });
+                if (parsed.note) html += `<div class="cd-note">${esc(parsed.note)}</div>`;
+                html += `<div class="cd-quick-links">
+                    <a href="${discogsURL}" target="_blank" rel="noopener">Discogs ↗</a>
+                    <a href="${ebayURL}"    target="_blank" rel="noopener">eBay ↗</a>
+                    <a href="${amazonURL}"  target="_blank" rel="noopener">Amazon ↗</a>
+                </div>`;
+                results.innerHTML = html;
+            } else {
+                results.innerHTML = `
+                    <div class="cd-no-results">No specific listings found — search directly:</div>
+                    <div class="cd-quick-links">
+                        <a href="${discogsURL}" target="_blank" rel="noopener">Discogs ↗</a>
+                        <a href="${ebayURL}"    target="_blank" rel="noopener">eBay ↗</a>
+                        <a href="${amazonURL}"  target="_blank" rel="noopener">Amazon ↗</a>
+                    </div>`;
+            }
+
+        } catch (err) {
+            btn.disabled = false;
+            btn.className = '';
+            document.getElementById('cd-btn-icon').textContent = '💿';
+            document.getElementById('cd-btn-text').textContent = 'Search CD Listings';
+            results.innerHTML = `
+                <div class="cd-error">Search failed — try the links below.</div>
+                <div class="cd-quick-links" style="margin-top:10px;">
+                    <a href="${discogsURL}" target="_blank" rel="noopener">Discogs ↗</a>
+                    <a href="${ebayURL}"    target="_blank" rel="noopener">eBay ↗</a>
+                    <a href="${amazonURL}"  target="_blank" rel="noopener">Amazon ↗</a>
+                </div>`;
+        }
+    }
+
+    function esc(s) {
+        return String(s)
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── PLAYBACK ───────────────────────────────────────────────────────────────
+
     function toggle() {
         if (audio.paused) { audio.play(); document.getElementById('play-toggle').innerText = '⏸'; }
         else              { audio.pause(); document.getElementById('play-toggle').innerText = '▶️'; }
@@ -731,8 +991,8 @@
         document.getElementById('time-cur').innerText   = fmt(audio.currentTime);
         document.getElementById('time-total').innerText = fmt(audio.duration);
     };
-    document.getElementById('seek-bar').oninput   = e => audio.currentTime = e.target.value;
-    document.getElementById('vol-slider').oninput  = e => audio.volume = e.target.value;
+    document.getElementById('seek-bar').oninput  = e => audio.currentTime = e.target.value;
+    document.getElementById('vol-slider').oninput = e => audio.volume = e.target.value;
     audio.onended = () => { if (isRepeat) { audio.currentTime = 0; audio.play(); } else next(); };
     window.addEventListener('keydown', e => {
         if (e.code === 'Space' && e.target.tagName !== 'INPUT') { e.preventDefault(); toggle(); }
