@@ -9,6 +9,33 @@
 
   gtag('config', 'G-EYCEXST1XQ');
 </script>
+  <script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwLd3aCL7qF_UbtMgCjnAEqgaxHpnvm_3SWFlED2T1YIXUnlNQVvvZjnxuZoVInw7q6/exec";
+
+  async function getViews() {
+    // 1. Check if the user has visited in this browser session
+    const hasVisited = localStorage.getItem('hasVisited');
+    
+    // 2. Decide whether to ADD a view or just GET the total
+    // We add a 'mode' parameter so the script knows what to do
+    const mode = hasVisited ? 'get' : 'increment';
+    
+    try {
+      const response = await fetch(`${scriptURL}?mode=${mode}`);
+      const data = await response.json();
+      document.getElementById('view-count').innerText = data.views;
+      
+      // 3. Mark them as visited so refresh doesn't count again
+      if (!hasVisited) {
+        localStorage.setItem('hasVisited', 'true');
+      }
+    } catch (error) {
+      document.getElementById('view-count').innerText = "Error";
+    }
+  }
+
+  getViews();
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookWorm Games Archive</title>
