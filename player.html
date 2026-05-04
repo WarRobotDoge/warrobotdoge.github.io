@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -447,11 +448,43 @@
     </div>
     <div class="playback-engine">
         <div class="main-controls">
-            <button class="btn-icon" id="shuffle-btn" onclick="toggleShuffle()">🔀</button>
-            <button class="btn-icon" onclick="prev()">⏮</button>
-            <button class="btn-icon" id="play-toggle" onclick="toggle()">▶️</button>
-            <button class="btn-icon" onclick="next()">⏭</button>
-            <button class="btn-icon" id="repeat-btn" onclick="toggleRepeat()">🔁</button>
+            <!-- Shuffle Button -->
+            <button class="btn-icon" id="shuffle-btn" onclick="toggleShuffle()">
+                <svg width="20" height="20" viewBox="0 0 16 16">
+                    <path d="M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15.98 3.75zM.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5z" fill="currentColor"/>
+                    <path d="m7.5 10.723.98-1.167.957 1.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 1 1-1.06-1.06L13.109 13H11.16a3.75 3.75 0 0 1-2.873-1.34l-.787-.938z" fill="currentColor"></path>
+                </svg>
+            </button>
+
+            <!-- Backskip Button -->
+            <button class="btn-icon" onclick="prev()">
+                <svg width="20" height="20" viewBox="0 0 16 16">
+                    <path d="M3.3 1a.7.7 0 0 1 .7.7v5.15l9.95-5.744a.7.7 0 0 1 1.05.606v12.575a.7.7 0 0 1-1.05.607L4 9.149V14.3a.7.7 0 0 1-.7.7H1.7a.7.7 0 0 1-.7-.7V1.7a.7.7 0 0 1 .7-.7z" fill="currentColor"/>
+                </svg>
+            </button>
+
+            <!-- Play/Pause Button -->
+            <button class="btn-icon" id="play-toggle" onclick="toggle()">
+                <!-- Defaulting to Play SVG -->
+                <svg id="play-svg" width="32" height="32" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="white"/>
+                    <polygon points="40,30 70,50 40,70" fill="black"/>
+                </svg>
+            </button>
+
+            <!-- Skip Button -->
+            <button class="btn-icon" onclick="next()">
+                <svg width="20" height="20" viewBox="0 0 16 16">
+                    <path d="M12.7 1a.7.7 0 0 0-.7.7v5.15L2.05 1.107A.7.7 0 0 0 1 1.712v12.575a.7.7 0 0 0 1.05.607L12 9.149V14.3a.7.7 0 0 0 .7.7h1.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7z" fill="currentColor"/>
+                </svg>
+            </button>
+
+            <!-- Loop (Repeat) Button -->
+            <button class="btn-icon" id="repeat-btn" onclick="toggleRepeat()">
+                <svg width="20" height="20" viewBox="0 0 16 16">
+                    <path id="loop-path" d="M0 4.75A3.75 3.75 0 0 1 3.75 1h8.5A3.75 3.75 0 0 1 16 4.75v5a3.75 3.75 0 0 1-3.75 3.75H9.81l1.018 1.018a.75.75 0 1 1-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 1 1 1.06 1.06L9.811 12h2.439a2.25 2.25 0 0 0 2.25-2.25v-5a2.25 2.25 0 0 0-2.25-2.25h-8.5A2.25 2.25 0 0 0 1.5 4.75v5A2.25 2.25 0 0 0 3.75 12H5v1.5H3.75A3.75 3.75 0 0 1 0 9.75z" fill="currentColor"/>
+                </svg>
+            </button>
         </div>
         <div class="scrubber-row">
             <span id="time-cur">00:00</span>
@@ -975,16 +1008,44 @@ Include up to 4 listings. If no specific listings are found, set found to false 
     }
 
     // ── PLAYBACK ───────────────────────────────────────────────────────────────
-
-    function toggle() {
-        if (audio.paused) { audio.play(); document.getElementById('play-toggle').innerText = '⏸'; }
-        else              { audio.pause(); document.getElementById('play-toggle').innerText = '▶️'; }
+function updatePlayButtonUI() {
+    const playBtn = document.getElementById('play-toggle');
+    if (audio.paused) {
+        playBtn.innerHTML = `
+            <svg width="32" height="32" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="white"/>
+                <polygon points="40,30 70,50 40,70" fill="black"/>
+            </svg>`;
+    } else {
+        playBtn.innerHTML = `
+            <svg width="32" height="32" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="white"/>
+                <rect x="35" y="30" width="10" height="40" fill="black"/>
+                <rect x="55" y="30" width="10" height="40" fill="black"/>
+            </svg>`;
     }
+}
+
+   function toggle() {
+    if (audio.paused) audio.play();
+    else audio.pause();
+    updatePlayButtonUI();
+}
     function next() { if (activeIdx < activeQueue.length - 1) { activeIdx++; loadTrack(); } }
     function prev() { if (activeIdx > 0)                      { activeIdx--; loadTrack(); } }
     function toggleShuffle() { isShuffle = !isShuffle; document.getElementById('shuffle-btn').classList.toggle('btn-active', isShuffle); }
-    function toggleRepeat()  { isRepeat  = !isRepeat;  document.getElementById('repeat-btn').classList.toggle('btn-active', isRepeat); }
-    const fmt = s => isNaN(s) ? '00:00' : `${String(Math.floor(s/60)).padStart(2,'0')}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+   function toggleRepeat() {
+    isRepeat = !isRepeat;
+    audio.loop = isRepeat; // Ensure the actual audio element loops
+    const repeatBtn = document.getElementById('repeat-btn');
+    
+    if (isRepeat) {
+        repeatBtn.style.color = "#1ed760"; // Spotify Green
+    } else {
+        repeatBtn.style.color = "var(--text-bright)"; // Default color
+    }
+}
+   const fmt = s => isNaN(s) ? '00:00' : `${String(Math.floor(s/60)).padStart(2,'0')}:${String(Math.floor(s%60)).padStart(2,'0')}`;
 
     audio.ontimeupdate = () => {
         document.getElementById('seek-bar').max   = audio.duration || 0;
