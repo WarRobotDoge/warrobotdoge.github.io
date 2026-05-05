@@ -724,18 +724,18 @@
     async function openDrawer(albumKey, card) {
         const existing = document.querySelector('.drawer');
         const wasThis  = existing && existing.dataset.owner === albumKey;
-        document.querySelectorAll('.album-card').forEach(c => c.classList.remove('active'));
-        if (existing) existing.remove();
-        if (wasThis) return;
-        card.classList.add('active');
+
+        // Toggle-close: handle immediately, no async gap needed
+        if (wasThis) {
+            document.querySelectorAll('.album-card').forEach(c => c.classList.remove('active'));
+            existing.remove();
+            return;
+        }
+
         const album = library.get(albumKey);
 
-        const coverHtml = album.art
-            ? `<img src="${album.art}" class="drawer-cover">`
-            : `<div class="drawer-cover-placeholder"></div>`;
-
-        // Read ID3 track numbers for all files in parallel, then sort by them.
-        // Files without a track number (no tags, or tag missing) fall back to filename order.
+        // Read ID3 track numbers in parallel BEFORE touching the DOM so the old
+        // drawer stays visible during the tag read — no flicker gap.
         const trackMeta = await Promise.all(
             album.tracks.map((file, origIdx) => new Promise(resolve => {
                 if (NO_TAG_FORMATS.test(file.name)) {
@@ -753,6 +753,15 @@
                 });
             }))
         );
+
+        // Now that tags are read, swap out the old drawer in one shot — no flicker
+        document.querySelectorAll('.album-card').forEach(c => c.classList.remove('active'));
+        if (existing) existing.remove();
+        card.classList.add('active');
+
+        const coverHtml = album.art
+            ? `<img src="${album.art}" class="drawer-cover">`
+            : `<div class="drawer-cover-placeholder"></div>`;
 
         // Sort: numbered tracks ascending, then un-numbered tracks by filename
         trackMeta.sort((a, b) => {
@@ -868,7 +877,7 @@
         }
 
         document.getElementById('sp-title').innerText  = fallbackTitle;
-        document.getElementById('sp-artist').innerText = 'Loading...';
+        document.getElementById('sp-artist').innerText = album.artist;
         document.getElementById('sp-art').src          = album.art || '';
         document.getElementById('mini-art').src        = album.art || '';
         document.getElementById('mini-art').style.display = album.art ? 'block' : 'none';
