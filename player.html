@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -722,7 +721,7 @@
         });
     }
 
-    function openDrawer(albumKey, card) {
+    async function openDrawer(albumKey, card) {
         const existing = document.querySelector('.drawer');
         const wasThis  = existing && existing.dataset.owner === albumKey;
         document.querySelectorAll('.album-card').forEach(c => c.classList.remove('active'));
@@ -735,6 +734,38 @@
             ? `<img src="${album.art}" class="drawer-cover">`
             : `<div class="drawer-cover-placeholder"></div>`;
 
+        // Read ID3 track numbers for all files in parallel, then sort by them.
+        // Files without a track number (no tags, or tag missing) fall back to filename order.
+        const trackMeta = await Promise.all(
+            album.tracks.map((file, origIdx) => new Promise(resolve => {
+                if (NO_TAG_FORMATS.test(file.name)) {
+                    resolve({ file, origIdx, trackNum: null });
+                    return;
+                }
+                jsmediatags.read(file, {
+                    onSuccess: t => {
+                        const raw = t.tags && t.tags.track;
+                        // track tag can be "5" or "5/12"
+                        const trackNum = raw ? parseInt(raw.split('/')[0], 10) : null;
+                        resolve({ file, origIdx, trackNum: isNaN(trackNum) ? null : trackNum });
+                    },
+                    onError: () => resolve({ file, origIdx, trackNum: null })
+                });
+            }))
+        );
+
+        // Sort: numbered tracks ascending, then un-numbered tracks by filename
+        trackMeta.sort((a, b) => {
+            if (a.trackNum !== null && b.trackNum !== null) return a.trackNum - b.trackNum;
+            if (a.trackNum !== null) return -1;
+            if (b.trackNum !== null) return 1;
+            return a.file.name.localeCompare(b.file.name, undefined, { numeric: true, sensitivity: 'base' });
+        });
+
+        // Commit the sorted order back into album.tracks so ignite/next/prev
+        // walk in exactly the same sequence the drawer displays.
+        album.tracks = trackMeta.map(t => t.file);
+
         const drawer = document.createElement('div');
         drawer.className = 'drawer';
         drawer.dataset.owner = albumKey;
@@ -744,12 +775,12 @@
                 <h2 style="margin:0 0 4px 0;">${album.name}</h2>
                 <p style="color:var(--text-dim);margin:0 0 20px 0;">${album.artist}</p>
                 <ul class="track-columns">
-                    ${album.tracks.map((t, i) => `
+                    ${trackMeta.map(({ file, trackNum }, i) => `
                         <li class="track-item ${album.id + '-' + i === activeTrackUid ? 'playing-track' : ''}"
                             data-uid="${album.id + '-' + i}"
                             onclick="ignite('${albumKey}', ${i})">
-                            <span class="track-num">${String(i + 1).padStart(2, '0')}</span>
-                            <span class="track-name">${t.name.replace(/\.[^/.]+$/, '')}</span>
+                            <span class="track-num">${trackNum !== null ? String(trackNum).padStart(2, '0') : String(i + 1).padStart(2, '0')}</span>
+                            <span class="track-name">${file.name.replace(/\.[^/.]+$/, '')}</span>
                             <span class="track-length" id="dur-${album.id + '-' + i}">--:--</span>
                         </li>`).join('')}
                 </ul>
@@ -789,7 +820,7 @@
         loadTrack();
     }
 
- function loadTrack() {
+    function loadTrack() {
         const file  = activeQueue[activeIdx];
         const album = library.get(activeAlbumKey);
 
