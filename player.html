@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -788,9 +789,17 @@
         loadTrack();
     }
 
-    function loadTrack() {
+ function loadTrack() {
         const file  = activeQueue[activeIdx];
         const album = library.get(activeAlbumKey);
+
+        // ── CHANGE 2: find this file's original album index so the uid and
+        //   highlight are always correct, even on auto-next / auto-prev.
+        const origIdx = album.tracks.indexOf(file);
+        activeTrackUid = `${album.id}-${origIdx}`;
+        document.querySelectorAll('.track-item').forEach(el => el.classList.remove('playing-track'));
+        const listEl = document.querySelector(`[data-uid="${activeTrackUid}"]`);
+        if (listEl) listEl.classList.add('playing-track');
 
         if (audio._blobURL) URL.revokeObjectURL(audio._blobURL);
         audio._blobURL = createAudioURL(file);
