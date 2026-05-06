@@ -364,7 +364,6 @@
         .scrubber-row { width: 100%; display: flex; align-items: center; gap: 12px; font-size: 11px; font-family: monospace; color: var(--text-dim); }
 
         input[type="range"] { -webkit-appearance: none; flex: 1; background: #282828; height: 4px; border-radius: 2px; outline: none; cursor: pointer; }
-        #seek-bar { background: linear-gradient(to right, var(--accent) 0%, var(--accent) var(--seek-pct, 0%), #282828 var(--seek-pct, 0%), #282828 100%); }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; transition: transform 0.1s ease; }
         input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.2); }
 
@@ -524,8 +523,9 @@
     function getExt(name) { return (name.split('.').pop() || '').toLowerCase(); }
 
     function createAudioURL(file) {
-        const mime = MIME_MAP[getExt(file.name)] || file.type || 'audio/mpeg';
-        return URL.createObjectURL(new Blob([file], { type: mime }));
+        // URL.createObjectURL(file) works because File extends Blob.
+        // Avoids copying the entire file into a new Blob — critical for large FLACs.
+        return URL.createObjectURL(file);
     }
 
     function parseFilename(filename) {
@@ -793,22 +793,30 @@
         const drawer = document.createElement('div');
         drawer.className = 'drawer';
         drawer.dataset.owner = albumKey;
+
+        // Build track list via createElement so albumKey is never string-embedded
+        // in an onclick — apostrophes/special chars in album names broke inline handlers.
+        const ul = document.createElement('ul');
+        ul.className = 'track-columns';
+        sorted.forEach((t, i) => {
+            const li = document.createElement('li');
+            li.className = 'track-item' + (t.uid === activeTrackUid ? ' playing-track' : '');
+            li.dataset.uid = t.uid;
+            li.innerHTML = `
+                <span class="track-num">${t.trackNum !== null ? String(t.trackNum).padStart(2, '0') : String(i + 1).padStart(2, '0')}</span>
+                <span class="track-name">${esc(t.title)}</span>
+                <span class="track-length" id="dur-${t.uid}">--:--</span>`;
+            li.addEventListener('click', () => ignite(albumKey, i));
+            ul.appendChild(li);
+        });
+
         drawer.innerHTML = `
             <div class="drawer-left">${coverHtml}</div>
             <div class="drawer-right">
-                <h2 style="margin:0 0 4px 0;">${album.name}</h2>
-                <p style="color:var(--text-dim);margin:0 0 20px 0;">${album.artist}</p>
-                <ul class="track-columns">
-                    ${sorted.map((t, i) => `
-                        <li class="track-item ${t.uid === activeTrackUid ? 'playing-track' : ''}"
-                            data-uid="${t.uid}"
-                            onclick="ignite('${albumKey}', ${i})">
-                            <span class="track-num">${t.trackNum !== null ? String(t.trackNum).padStart(2, '0') : String(i + 1).padStart(2, '0')}</span>
-                            <span class="track-name">${t.title}</span>
-                            <span class="track-length" id="dur-${t.uid}">--:--</span>
-                        </li>`).join('')}
-                </ul>
+                <h2 style="margin:0 0 4px 0;">${esc(album.name)}</h2>
+                <p style="color:var(--text-dim);margin:0 0 20px 0;">${esc(album.artist)}</p>
             </div>`;
+        drawer.querySelector('.drawer-right').appendChild(ul);
 
         let target = card;
         while (target.nextElementSibling && target.nextElementSibling.offsetTop === card.offsetTop) {
@@ -1074,28 +1082,56 @@ function updatePlayButtonUI() {
 }
    const fmt = s => isNaN(s) ? '00:00' : `${String(Math.floor(s/60)).padStart(2,'0')}:${String(Math.floor(s%60)).padStart(2,'0')}`;
 
-    // Drive the seek bar at 60fps via rAF — smooth gradient + thumb in sync.
+    // Smooth seek bar: interpolate between real time updates using performance.now().
+    // audio.currentTime only ticks ~4x/sec; we estimate position at 60fps between ticks.
     let _raf = null;
-    function _tickSeek() {
+    let _knownTime = 0;       // last confirmed audio.currentTime
+    let _knownStamp = 0;      // performance.now() when we captured _knownTime
+
+    function _setBar(t) {
         const bar = document.getElementById('seek-bar');
-        if (!audio.duration) { _raf = null; return; }
-        const pct = (audio.currentTime / audio.duration) * 100;
-        bar.max   = audio.duration;
-        bar.value = audio.currentTime;
-        // Set gradient and thumb value in the same rAF frame so they paint together
-        bar.style.background = `linear-gradient(to right, var(--accent) 0%, var(--accent) ${pct.toFixed(3)}%, #282828 ${pct.toFixed(3)}%, #282828 100%)`;
-        document.getElementById('time-cur').innerText   = fmt(audio.currentTime);
-        document.getElementById('time-total').innerText = fmt(audio.duration);
-        if (!audio.paused && !audio.ended) _raf = requestAnimationFrame(_tickSeek);
-        else _raf = null;
+        const d   = audio.duration;
+        if (!d || isNaN(d)) return;
+        t = Math.max(0, Math.min(t, d));
+        const pct = (t / d) * 100;
+        bar.max   = d;
+        bar.value = t;
+        bar.style.background = `linear-gradient(to right,#1db954 ${pct.toFixed(3)}%,#282828 ${pct.toFixed(3)}%)`;
+        document.getElementById('time-cur').innerText   = fmt(t);
+        document.getElementById('time-total').innerText = fmt(d);
     }
-    audio.onplay  = () => { if (!_raf) _raf = requestAnimationFrame(_tickSeek); updatePlayButtonUI(); };
-    audio.onpause = () => { if (_raf) { cancelAnimationFrame(_raf); _raf = null; } updatePlayButtonUI(); _tickSeek(); };
-    audio.ontimeupdate = () => { if (!_raf && !audio.paused) _raf = requestAnimationFrame(_tickSeek); };
+
+    function _rafLoop(now) {
+        if (!audio.paused && !audio.ended && audio.duration) {
+            // Interpolate: estimate how far we've advanced since last real update
+            const elapsed = (now - _knownStamp) / 1000;
+            _setBar(_knownTime + elapsed);
+            _raf = requestAnimationFrame(_rafLoop);
+        } else {
+            _setBar(audio.currentTime);
+            _raf = null;
+        }
+    }
+
+    function _startRaf() {
+        if (!_raf) _raf = requestAnimationFrame(_rafLoop);
+    }
+
+    // Capture real time whenever the browser reports it
+    audio.ontimeupdate = () => {
+        _knownTime  = audio.currentTime;
+        _knownStamp = performance.now();
+        _startRaf();
+    };
+    audio.onplay  = () => { _knownTime = audio.currentTime; _knownStamp = performance.now(); _startRaf(); updatePlayButtonUI(); };
+    audio.onpause = () => { cancelAnimationFrame(_raf); _raf = null; _setBar(audio.currentTime); updatePlayButtonUI(); };
+    audio.onseeked = () => { _knownTime = audio.currentTime; _knownStamp = performance.now(); _setBar(audio.currentTime); };
+
     document.getElementById('seek-bar').oninput = e => {
-        audio.currentTime = e.target.value;
-        const pct = audio.duration ? (e.target.value / audio.duration) * 100 : 0;
-        e.target.style.background = `linear-gradient(to right, var(--accent) 0%, var(--accent) ${pct.toFixed(3)}%, #282828 ${pct.toFixed(3)}%, #282828 100%)`;
+        audio.currentTime = parseFloat(e.target.value);
+        _knownTime  = audio.currentTime;
+        _knownStamp = performance.now();
+        _setBar(audio.currentTime);
     };
     document.getElementById('vol-slider').oninput = e => audio.volume = e.target.value;
     audio.onended = () => { if (isRepeat) { audio.currentTime = 0; audio.play(); } else next(); };
