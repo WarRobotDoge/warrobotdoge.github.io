@@ -616,46 +616,74 @@
     }
 
     async function mapFile(file, fullPath) {
+        const uid = Math.random().toString(36).slice(2, 11);
+
         if (NO_TAG_FORMATS.test(file.name)) {
             const { artist, albumName, albumKey } = resolveNoTagMeta(file, fullPath);
             if (!library.has(albumKey)) {
                 library.set(albumKey, {
                     name: albumName, artist,
-                    id: 'alb-' + Math.random().toString(36).slice(2, 9),
+                    id: 'alb-' + uid,
                     tracks: [], art: null,
                     dateAdded: Date.now(),
                     noTags: true
                 });
             }
-            library.get(albumKey).tracks.push(file);
+            const alb = library.get(albumKey);
+            const parsed = parseFilename(file.name);
+            alb.tracks.push({
+                uid: alb.id + '-' + alb.tracks.length,
+                file,
+                title: parsed.title || file.name.replace(/\.[^/.]+$/, ''),
+                trackNum: alb.tracks.length + 1,
+                year: null, composer: null, genre: null
+            });
             return;
         }
 
         const parts        = fullPath.split('/').filter(Boolean);
-        const folderAlbum  = parts.length >= 2 ? parts[parts.length - 2] : '.OPUS';
+        const folderAlbum  = parts.length >= 2 ? parts[parts.length - 2] : 'Unknown Album';
         const folderArtist = parts.length >= 3 ? parts[parts.length - 3] : null;
 
+        // Read tags exactly once — never touch this file with jsmediatags again
         const tags = await new Promise(r => {
             if (!window.jsmediatags) r({});
-            else window.jsmediatags.read(file, { onSuccess: t => r(t.tags), onError: () => r({}) });
+            else jsmediatags.read(file, { onSuccess: t => r(t.tags || {}), onError: () => r({}) });
         });
 
         const rawAlbum = tags.album  ? tags.album.trim()
                        : tags.artist ? tags.artist.trim() + ' (Single)'
                        : folderAlbum;
-        const albumKey  = rawAlbum.toLowerCase();
-        const artist    = tags.artist ? tags.artist.trim() : (folderArtist || folderAlbum);
+        const albumKey = rawAlbum.toLowerCase();
+        const artist   = tags.artist ? tags.artist.trim() : (folderArtist || folderAlbum);
 
         if (!library.has(albumKey)) {
+            // Extract album art once and store as a blob URL (fast, no re-read)
+            let art = null;
+            if (tags.picture) {
+                const { data, format } = tags.picture;
+                art = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: format }));
+            }
             library.set(albumKey, {
                 name: rawAlbum, artist,
-                id: 'alb-' + Math.random().toString(36).slice(2, 9),
-                tracks: [], art: null,
+                id: 'alb-' + uid,
+                tracks: [], art,
                 dateAdded: Date.now(),
                 noTags: false
             });
         }
-        library.get(albumKey).tracks.push(file);
+
+        const alb = library.get(albumKey);
+        const rawTrack = tags.track ? parseInt(String(tags.track).split('/')[0], 10) : null;
+        alb.tracks.push({
+            uid: alb.id + '-' + alb.tracks.length,
+            file,
+            title: tags.title ? tags.title.trim() : file.name.replace(/\.[^/.]+$/, ''),
+            trackNum: (rawTrack && !isNaN(rawTrack)) ? rawTrack : null,
+            year: tags.year || tags.TDRC?.data || tags['©day']?.data || null,
+            composer: tags.composer || tags['©wrt']?.data || null,
+            genre: tags.genre || null
+        });
     }
 
     function isMusic(n) { return /\.(mp3|flac|m4a|mp4|aac|wav|opus|ogg)$/i.test(n); }
@@ -670,11 +698,6 @@
         else                        albums.sort((a, b) => a[1].dateAdded - b[1].dateAdded);
 
         albums.forEach(([key, album]) => {
-            if (album.noTags) {
-                album.tracks.sort((a, b) =>
-                    a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
-                );
-            }
             const card = document.createElement('div');
             card.className = 'album-card';
             card.id = album.id;
@@ -693,26 +716,10 @@
             }
             card.onclick = () => openDrawer(key, card);
             grid.appendChild(card);
-
-            if (!album.art && !album.noTags && album.tracks.length > 0) {
-                fetchGridArt(album.tracks[0], album);
-            }
         });
         filterGrid();
     }
 
-    function fetchGridArt(file, album) {
-        jsmediatags.read(file, { onSuccess: t => {
-            if (!t.tags.picture) return;
-            const { data, format } = t.tags.picture;
-            let b = ''; for (let i = 0; i < data.length; i++) b += String.fromCharCode(data[i]);
-            album.art = `data:${format};base64,${window.btoa(b)}`;
-            const img = document.getElementById('img-' + album.id);
-            const ph  = document.getElementById('placeholder-' + album.id);
-            if (img) { img.src = album.art; img.style.display = 'block'; }
-            if (ph)  ph.style.display = 'none';
-        }});
-    }
 
     function filterGrid() {
         const q = document.getElementById('search-input').value.toLowerCase();
@@ -721,11 +728,11 @@
         });
     }
 
-    async function openDrawer(albumKey, card) {
+    function openDrawer(albumKey, card) {
         const existing = document.querySelector('.drawer');
         const wasThis  = existing && existing.dataset.owner === albumKey;
 
-        // Toggle-close: handle immediately, no async gap needed
+        // Toggle-close
         if (wasThis) {
             document.querySelectorAll('.album-card').forEach(c => c.classList.remove('active'));
             existing.remove();
@@ -734,27 +741,18 @@
 
         const album = library.get(albumKey);
 
-        // Read ID3 track numbers in parallel BEFORE touching the DOM so the old
-        // drawer stays visible during the tag read — no flicker gap.
-        const trackMeta = await Promise.all(
-            album.tracks.map((file, origIdx) => new Promise(resolve => {
-                if (NO_TAG_FORMATS.test(file.name)) {
-                    resolve({ file, origIdx, trackNum: null });
-                    return;
-                }
-                jsmediatags.read(file, {
-                    onSuccess: t => {
-                        const raw = t.tags && t.tags.track;
-                        // track tag can be "5" or "5/12"
-                        const trackNum = raw ? parseInt(raw.split('/')[0], 10) : null;
-                        resolve({ file, origIdx, trackNum: isNaN(trackNum) ? null : trackNum });
-                    },
-                    onError: () => resolve({ file, origIdx, trackNum: null })
-                });
-            }))
-        );
+        // All metadata already stored at load time — sort instantly, no tag reads
+        const sorted = [...album.tracks].sort((a, b) => {
+            if (a.trackNum !== null && b.trackNum !== null) return a.trackNum - b.trackNum;
+            if (a.trackNum !== null) return -1;
+            if (b.trackNum !== null) return 1;
+            return a.file.name.localeCompare(b.file.name, undefined, { numeric: true, sensitivity: 'base' });
+        });
 
-        // Now that tags are read, swap out the old drawer in one shot — no flicker
+        // Commit sorted order so ignite/next/prev walk the same sequence
+        album.tracks = sorted;
+
+        // Swap DOM in one shot — no async gap, no flicker
         document.querySelectorAll('.album-card').forEach(c => c.classList.remove('active'));
         if (existing) existing.remove();
         card.classList.add('active');
@@ -762,18 +760,6 @@
         const coverHtml = album.art
             ? `<img src="${album.art}" class="drawer-cover">`
             : `<div class="drawer-cover-placeholder"></div>`;
-
-        // Sort: numbered tracks ascending, then un-numbered tracks by filename
-        trackMeta.sort((a, b) => {
-            if (a.trackNum !== null && b.trackNum !== null) return a.trackNum - b.trackNum;
-            if (a.trackNum !== null) return -1;
-            if (b.trackNum !== null) return 1;
-            return a.file.name.localeCompare(b.file.name, undefined, { numeric: true, sensitivity: 'base' });
-        });
-
-        // Commit the sorted order back into album.tracks so ignite/next/prev
-        // walk in exactly the same sequence the drawer displays.
-        album.tracks = trackMeta.map(t => t.file);
 
         const drawer = document.createElement('div');
         drawer.className = 'drawer';
@@ -784,13 +770,13 @@
                 <h2 style="margin:0 0 4px 0;">${album.name}</h2>
                 <p style="color:var(--text-dim);margin:0 0 20px 0;">${album.artist}</p>
                 <ul class="track-columns">
-                    ${trackMeta.map(({ file, trackNum }, i) => `
-                        <li class="track-item ${album.id + '-' + i === activeTrackUid ? 'playing-track' : ''}"
-                            data-uid="${album.id + '-' + i}"
+                    ${sorted.map((t, i) => `
+                        <li class="track-item ${t.uid === activeTrackUid ? 'playing-track' : ''}"
+                            data-uid="${t.uid}"
                             onclick="ignite('${albumKey}', ${i})">
-                            <span class="track-num">${trackNum !== null ? String(trackNum).padStart(2, '0') : String(i + 1).padStart(2, '0')}</span>
-                            <span class="track-name">${file.name.replace(/\.[^/.]+$/, '')}</span>
-                            <span class="track-length" id="dur-${album.id + '-' + i}">--:--</span>
+                            <span class="track-num">${t.trackNum !== null ? String(t.trackNum).padStart(2, '0') : String(i + 1).padStart(2, '0')}</span>
+                            <span class="track-name">${t.title}</span>
+                            <span class="track-length" id="dur-${t.uid}">--:--</span>
                         </li>`).join('')}
                 </ul>
             </div>`;
@@ -801,11 +787,12 @@
         }
         target.after(drawer);
 
-        album.tracks.forEach((t, i) => {
+        // Populate durations without re-reading tags — just probe audio metadata
+        sorted.forEach(t => {
             const tmp = new Audio();
-            tmp.src = createAudioURL(t);
+            tmp.src = createAudioURL(t.file);
             tmp.onloadedmetadata = () => {
-                const el = document.getElementById(`dur-${album.id}-${i}`);
+                const el = document.getElementById('dur-' + t.uid);
                 if (el) el.innerText = fmt(tmp.duration);
                 URL.revokeObjectURL(tmp.src);
             };
@@ -819,10 +806,11 @@
         activeQueue = [...album.tracks];
         activeIdx   = idx;
         if (isShuffle) {
+            const chosen = activeQueue[idx];
             activeQueue = activeQueue.sort(() => Math.random() - 0.5);
-            activeIdx   = activeQueue.indexOf(album.tracks[idx]);
+            activeIdx   = activeQueue.indexOf(chosen);
         }
-        activeTrackUid = `${album.id}-${idx}`;
+        activeTrackUid = activeQueue[activeIdx].uid;
         document.querySelectorAll('.track-item').forEach(el => el.classList.remove('playing-track'));
         const listEl = document.querySelector(`[data-uid="${activeTrackUid}"]`);
         if (listEl) listEl.classList.add('playing-track');
@@ -830,97 +818,50 @@
     }
 
     function loadTrack() {
-        const file  = activeQueue[activeIdx];
+        const track = activeQueue[activeIdx];
         const album = library.get(activeAlbumKey);
 
-        // ── CHANGE 2: find this file's original album index so the uid and
-        //   highlight are always correct, even on auto-next / auto-prev.
-        const origIdx = album.tracks.indexOf(file);
-        activeTrackUid = `${album.id}-${origIdx}`;
+        // Update highlight using stored uid — works instantly, no tag re-read
+        activeTrackUid = track.uid;
         document.querySelectorAll('.track-item').forEach(el => el.classList.remove('playing-track'));
         const listEl = document.querySelector(`[data-uid="${activeTrackUid}"]`);
         if (listEl) listEl.classList.add('playing-track');
 
         if (audio._blobURL) URL.revokeObjectURL(audio._blobURL);
-        audio._blobURL = createAudioURL(file);
+        audio._blobURL = createAudioURL(track.file);
         audio.src = audio._blobURL;
         audio.play().catch(() => {});
 
-        document.getElementById('play-toggle').innerText = '⏸';
+        updatePlayButtonUI();
         document.getElementById('panel-standby').style.display = 'none';
         document.getElementById('panel-active').style.display  = 'block';
-
-        // Reset CD finder whenever a new track loads
         resetCDFinder();
 
-        const fallbackTitle = file.name.replace(/\.[^/.]+$/, '');
-        document.getElementById('sp-type').innerText = getExt(file.name).toUpperCase();
+        // All metadata already available — populate sidebar immediately, no flicker
+        document.getElementById('sp-title').innerText    = track.title;
+        document.getElementById('sp-artist').innerText   = album.artist;
+        document.getElementById('sp-album').innerText    = album.name;
+        document.getElementById('sp-track').innerText    = track.trackNum !== null ? String(track.trackNum) : '—';
+        document.getElementById('sp-year').innerText     = track.year     || '—';
+        document.getElementById('sp-composer').innerText = track.composer || '—';
+        document.getElementById('sp-genre').innerText    = track.genre    || '—';
+        document.getElementById('sp-type').innerText     = getExt(track.file.name).toUpperCase();
 
-        if (NO_TAG_FORMATS.test(file.name)) {
-            const parsed = parseFilename(file.name);
-            document.getElementById('sp-title').innerText    = parsed.title || fallbackTitle;
-            document.getElementById('sp-artist').innerText   = album.artist;
-            document.getElementById('sp-album').innerText    = album.name;
-            document.getElementById('sp-track').innerText    = String(activeIdx + 1);
-            document.getElementById('sp-year').innerText     = '—';
-            document.getElementById('sp-composer').innerText = '—';
-            document.getElementById('sp-genre').innerText    = '—';
-            document.getElementById('mini-title').innerText  = parsed.title || fallbackTitle;
-            document.getElementById('mini-artist').innerText = album.artist;
-            document.getElementById('sp-art').src            = '';
+        document.getElementById('mini-title').innerText  = track.title;
+        document.getElementById('mini-artist').innerText = album.artist;
+
+        if (album.art) {
+            document.getElementById('sp-art').src = album.art;
+            document.getElementById('mini-art').src = album.art;
+            document.getElementById('mini-art').style.display = 'block';
+            document.getElementById('art-indicator').style.display = 'none';
+        } else {
+            document.getElementById('sp-art').src = '';
             document.getElementById('mini-art').style.display = 'none';
             document.getElementById('art-indicator').style.display = 'block';
-
-            // Store context for CD search
-            cdContext = { album: album.name, artist: album.artist };
-            return;
         }
 
-        document.getElementById('sp-title').innerText  = fallbackTitle;
-        document.getElementById('sp-artist').innerText = album.artist;
-        document.getElementById('sp-art').src          = album.art || '';
-        document.getElementById('mini-art').src        = album.art || '';
-        document.getElementById('mini-art').style.display = album.art ? 'block' : 'none';
-        document.getElementById('art-indicator').style.display = 'block';
-
-        // Store fallback context immediately; will be overwritten once tags load
         cdContext = { album: album.name, artist: album.artist };
-
-        jsmediatags.read(file, {
-            onSuccess: t => {
-                const tags = t.tags || {};
-                const title  = tags.title  || fallbackTitle;
-                const artist = tags.artist || album.artist;
-                const alb    = tags.album  || album.name || '—';
-
-                document.getElementById('sp-title').innerText    = title;
-                document.getElementById('sp-artist').innerText   = artist;
-                document.getElementById('mini-title').innerText  = title;
-                document.getElementById('mini-artist').innerText = artist;
-                document.getElementById('sp-album').innerText    = alb;
-                document.getElementById('sp-genre').innerText    = tags.genre    || '—';
-                document.getElementById('sp-year').innerText     = tags.year     || tags.TDRC?.data || tags['©day']?.data || '—';
-                document.getElementById('sp-track').innerText    = tags.track    || '—';
-                document.getElementById('sp-composer').innerText = tags.composer || tags['©wrt']?.data || '—';
-
-                // Update CD context with real tag data
-                cdContext = { album: alb !== '—' ? alb : album.name, artist };
-
-                if (tags.picture) {
-                    const { data, format } = tags.picture;
-                    let b = ''; for (let i = 0; i < data.length; i++) b += String.fromCharCode(data[i]);
-                    const art = `data:${format};base64,${window.btoa(b)}`;
-                    document.getElementById('sp-art').src = art;
-                    document.getElementById('mini-art').src = art;
-                    document.getElementById('mini-art').style.display = 'block';
-                    document.getElementById('art-indicator').style.display = 'none';
-                }
-            },
-            onError: () => {
-                document.getElementById('sp-artist').innerText   = album.artist;
-                document.getElementById('mini-artist').innerText = album.artist;
-            }
-        });
     }
 
     // ── CD FINDER ─────────────────────────────────────────────────────────────
