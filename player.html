@@ -656,8 +656,10 @@
                     const rawAlbum = meta.album  ? meta.album.trim()
                                    : meta.artist ? meta.artist.trim() + ' (Single)'
                                    : folderAlbum;
-                    const albumKey = rawAlbum.toLowerCase();
                     const artist   = meta.artist ? meta.artist.trim() : (folderArtist || folderAlbum);
+                    // Include artist in key so "Greatest Hits" by two different artists
+                    // never get merged into the same album bucket.
+                    const albumKey = (artist + '::' + rawAlbum).toLowerCase();
 
                     if (!library.has(albumKey)) {
                         let art = null;
@@ -676,10 +678,23 @@
 
                     const alb = library.get(albumKey);
                     const rawTrack = meta.track ? parseInt(String(meta.track).split('/')[0], 10) : null;
-                    // FLAC/Vorbis uses DATE → meta.date; ID3 uses TDRC; AAC uses ©day
-                    const year = meta.year || meta.date || meta.DATE
+
+                    // Year: jsmediatags maps Vorbis DATE → meta.year for FLAC,
+                    // but also scan every key in meta for anything date-shaped
+                    // (4-digit year) as a fallback, since field names vary by encoder.
+                    let year = meta.year || meta.date || meta.DATE
                                || (typeof meta.TDRC === 'string' ? meta.TDRC : meta.TDRC?.data)
                                || meta['©day']?.data || null;
+                    if (!year) {
+                        // Brute-force: find any tag value that looks like a year (4 digits)
+                        for (const val of Object.values(meta)) {
+                            const s = typeof val === 'string' ? val
+                                    : (val && typeof val === 'object' && typeof val.data === 'string') ? val.data
+                                    : null;
+                            if (s && /^\d{4}/.test(s.trim())) { year = s.trim().slice(0, 4); break; }
+                        }
+                    }
+
                     alb.tracks.push({
                         uid: alb.id + '-' + alb.tracks.length,
                         file,
