@@ -989,9 +989,29 @@
         }
 
         cdContext = { album: album.name, artist: album.artist };
+
+        // Media Session API: hooks headphone/bluetooth hardware buttons.
+        // Single tap = play/pause, double tap = next, triple tap = previoustrack/restart
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title:  track.title,
+                artist: album.artist,
+                album:  album.name,
+                artwork: album.art ? [{ src: album.art }] : []
+            });
+            navigator.mediaSession.setActionHandler('play',          () => { audio.play();  updatePlayButtonUI(); });
+            navigator.mediaSession.setActionHandler('pause',         () => { audio.pause(); updatePlayButtonUI(); });
+            navigator.mediaSession.setActionHandler('nexttrack',     () => next());
+            navigator.mediaSession.setActionHandler('previoustrack', () => {
+                if (audio.currentTime > 3) audio.currentTime = 0;
+                else prev();
+            });
+            navigator.mediaSession.setActionHandler('seekbackward', null);
+            navigator.mediaSession.setActionHandler('seekforward',  null);
+        }
     }
 
-    // ── CD FINDER ─────────────────────────────────────────────────────────────
+    // ── CD FINDER ───────────────────────────────────────────────────────────────────────────────────────────────────────────
 
     function resetCDFinder() {
         const btn = document.getElementById('btn-find-cds');
