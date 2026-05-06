@@ -616,6 +616,62 @@
         }
     }
 
+    // jsmediatags 3.9.5 does not read the DATE field from FLAC Vorbis Comments
+    // (it's simply missing from the switch statement in FLACTagReader.js).
+    // This function parses the Vorbis Comment block directly from the ArrayBuffer.
+    async function readFLACDate(file) {
+        try {
+            // Read first 512KB — enough to cover all metadata blocks
+            const buffer = await file.slice(0, 524288).arrayBuffer();
+            const view   = new DataView(buffer);
+            const hdr    = String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2), view.getUint8(3));
+            if (hdr !== 'fLaC') return null;
+
+            let offset = 4;
+            while (offset + 4 <= buffer.byteLength) {
+                const byte0     = view.getUint8(offset);
+                const isLast    = (byte0 & 0x80) !== 0;
+                const blockType = byte0 & 0x7F;
+                const blockSize = (view.getUint8(offset + 1) << 16)
+                                | (view.getUint8(offset + 2) <<  8)
+                                |  view.getUint8(offset + 3);
+                offset += 4;
+
+                if (blockType === 4) { // VORBIS_COMMENT block
+                    const dec       = new TextDecoder('utf-8');
+                    let pos         = offset;
+                    const vendorLen = view.getUint32(pos, true); // little-endian
+                    pos += 4 + vendorLen;
+                    if (pos + 4 > buffer.byteLength) return null;
+                    const count = view.getUint32(pos, true);
+                    pos += 4;
+                    for (let i = 0; i < count; i++) {
+                        if (pos + 4 > buffer.byteLength) break;
+                        const len = view.getUint32(pos, true);
+                        pos += 4;
+                        if (pos + len > buffer.byteLength) break;
+                        const comment = dec.decode(new Uint8Array(buffer, pos, len));
+                        pos += len;
+                        const eq  = comment.indexOf('=');
+                        if (eq < 1) continue;
+                        const key = comment.slice(0, eq).toUpperCase();
+                        if (key === 'DATE' || key === 'YEAR') {
+                            const val = comment.slice(eq + 1).trim();
+                            // Return just the 4-digit year portion (DATE can be YYYY-MM-DD)
+                            const m = val.match(/\d{4}/);
+                            return m ? m[0] : null;
+                        }
+                    }
+                    return null; // comment block found but no date field
+                }
+
+                offset += blockSize;
+                if (isLast) break;
+            }
+        } catch (_) {}
+        return null;
+    }
+
     function mapFile(file, fullPath) {
         const uid = Math.random().toString(36).slice(2, 11);
 
@@ -695,15 +751,24 @@
                         }
                     }
 
-                    alb.tracks.push({
-                        uid: alb.id + '-' + alb.tracks.length,
-                        file,
-                        title: meta.title ? meta.title.trim() : file.name.replace(/\.[^/.]+$/, ''),
-                        trackNum: (rawTrack && !isNaN(rawTrack)) ? rawTrack : null,
-                        year, composer: meta.composer || meta['©wrt']?.data || null,
-                        genre: meta.genre || null
-                    });
-                    resolve();
+                    const pushTrack = (finalYear) => {
+                        alb.tracks.push({
+                            uid: alb.id + '-' + alb.tracks.length,
+                            file,
+                            title: meta.title ? meta.title.trim() : file.name.replace(/\.[^/.]+$/, ''),
+                            trackNum: (rawTrack && !isNaN(rawTrack)) ? rawTrack : null,
+                            year: finalYear, composer: meta.composer || meta['©wrt']?.data || null,
+                            genre: meta.genre || null
+                        });
+                        resolve();
+                    };
+                    // jsmediatags never reads DATE from FLAC Vorbis Comments —
+                    // if year is still missing and it's a FLAC, parse it ourselves.
+                    if (!year && /\.flac$/i.test(file.name)) {
+                        readFLACDate(file).then(pushTrack);
+                    } else {
+                        pushTrack(year);
+                    }
                 },
                 onError: () => {
                     // Tag read failed — store file anyway using folder structure for metadata
