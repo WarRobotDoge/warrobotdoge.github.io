@@ -1166,8 +1166,18 @@ function updatePlayButtonUI() {
     else audio.pause();
     updatePlayButtonUI();
 }
-    function next() { if (activeIdx < activeQueue.length - 1) { activeIdx++; loadTrack(); } }
-    function prev() { if (activeIdx > 0)                      { activeIdx--; loadTrack(); } }
+    function next() {
+        if (isShuffle) {
+            if (activeQueue.length <= 1) return;
+            let r;
+            do { r = Math.floor(Math.random() * activeQueue.length); } while (r === activeIdx);
+            activeIdx = r;
+            loadTrack();
+        } else {
+            if (activeIdx < activeQueue.length - 1) { activeIdx++; loadTrack(); }
+        }
+    }
+    function prev() { if (activeIdx > 0) { activeIdx--; loadTrack(); } }
     function toggleShuffle() { isShuffle = !isShuffle; document.getElementById('shuffle-btn').classList.toggle('btn-active', isShuffle); }
    function toggleRepeat() {
     isRepeat = !isRepeat;
