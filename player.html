@@ -364,6 +364,7 @@
         .scrubber-row { width: 100%; display: flex; align-items: center; gap: 12px; font-size: 11px; font-family: monospace; color: var(--text-dim); }
 
         input[type="range"] { -webkit-appearance: none; flex: 1; background: #282828; height: 4px; border-radius: 2px; outline: none; cursor: pointer; }
+        #seek-bar { background: linear-gradient(to right, var(--accent) 0%, var(--accent) var(--seek-pct, 0%), #282828 var(--seek-pct, 0%), #282828 100%); }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; transition: transform 0.1s ease; }
         input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.2); }
 
@@ -615,7 +616,7 @@
         }
     }
 
-    async function mapFile(file, fullPath) {
+    function mapFile(file, fullPath) {
         const uid = Math.random().toString(36).slice(2, 11);
 
         if (NO_TAG_FORMATS.test(file.name)) {
@@ -638,51 +639,79 @@
                 trackNum: alb.tracks.length + 1,
                 year: null, composer: null, genre: null
             });
-            return;
+            return Promise.resolve();
         }
 
         const parts        = fullPath.split('/').filter(Boolean);
         const folderAlbum  = parts.length >= 2 ? parts[parts.length - 2] : 'Unknown Album';
         const folderArtist = parts.length >= 3 ? parts[parts.length - 3] : null;
 
-        // Read tags exactly once — never touch this file with jsmediatags again
-        const tags = await new Promise(r => {
-            if (!window.jsmediatags) r({});
-            else jsmediatags.read(file, { onSuccess: t => r(t.tags || {}), onError: () => r({}) });
-        });
+        // Use the exact callback-Promise pattern from the working version —
+        // avoids any async/await overhead that can interfere with jsmediatags + FLAC.
+        return new Promise(resolve => {
+            jsmediatags.read(file, {
+                onSuccess: (tag) => {
+                    const meta = tag.tags || {};
 
-        const rawAlbum = tags.album  ? tags.album.trim()
-                       : tags.artist ? tags.artist.trim() + ' (Single)'
-                       : folderAlbum;
-        const albumKey = rawAlbum.toLowerCase();
-        const artist   = tags.artist ? tags.artist.trim() : (folderArtist || folderAlbum);
+                    const rawAlbum = meta.album  ? meta.album.trim()
+                                   : meta.artist ? meta.artist.trim() + ' (Single)'
+                                   : folderAlbum;
+                    const albumKey = rawAlbum.toLowerCase();
+                    const artist   = meta.artist ? meta.artist.trim() : (folderArtist || folderAlbum);
 
-        if (!library.has(albumKey)) {
-            // Extract album art once and store as a blob URL (fast, no re-read)
-            let art = null;
-            if (tags.picture) {
-                const { data, format } = tags.picture;
-                art = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: format }));
-            }
-            library.set(albumKey, {
-                name: rawAlbum, artist,
-                id: 'alb-' + uid,
-                tracks: [], art,
-                dateAdded: Date.now(),
-                noTags: false
+                    if (!library.has(albumKey)) {
+                        let art = null;
+                        if (meta.picture) {
+                            const { data, format } = meta.picture;
+                            art = URL.createObjectURL(new Blob([new Uint8Array(data)], { type: format }));
+                        }
+                        library.set(albumKey, {
+                            name: rawAlbum, artist,
+                            id: 'alb-' + uid,
+                            tracks: [], art,
+                            dateAdded: Date.now(),
+                            noTags: false
+                        });
+                    }
+
+                    const alb = library.get(albumKey);
+                    const rawTrack = meta.track ? parseInt(String(meta.track).split('/')[0], 10) : null;
+                    // FLAC/Vorbis uses DATE → meta.date; ID3 uses TDRC; AAC uses ©day
+                    const year = meta.year || meta.date || meta.DATE
+                               || (typeof meta.TDRC === 'string' ? meta.TDRC : meta.TDRC?.data)
+                               || meta['©day']?.data || null;
+                    alb.tracks.push({
+                        uid: alb.id + '-' + alb.tracks.length,
+                        file,
+                        title: meta.title ? meta.title.trim() : file.name.replace(/\.[^/.]+$/, ''),
+                        trackNum: (rawTrack && !isNaN(rawTrack)) ? rawTrack : null,
+                        year, composer: meta.composer || meta['©wrt']?.data || null,
+                        genre: meta.genre || null
+                    });
+                    resolve();
+                },
+                onError: () => {
+                    // Tag read failed — store file anyway using folder structure for metadata
+                    const { artist, albumName, albumKey } = resolveNoTagMeta(file, fullPath);
+                    if (!library.has(albumKey)) {
+                        library.set(albumKey, {
+                            name: albumName, artist,
+                            id: 'alb-' + uid,
+                            tracks: [], art: null,
+                            dateAdded: Date.now(),
+                            noTags: false
+                        });
+                    }
+                    const alb = library.get(albumKey);
+                    alb.tracks.push({
+                        uid: alb.id + '-' + alb.tracks.length,
+                        file,
+                        title: parseFilename(file.name).title || file.name.replace(/\.[^/.]+$/, ''),
+                        trackNum: null, year: null, composer: null, genre: null
+                    });
+                    resolve();
+                }
             });
-        }
-
-        const alb = library.get(albumKey);
-        const rawTrack = tags.track ? parseInt(String(tags.track).split('/')[0], 10) : null;
-        alb.tracks.push({
-            uid: alb.id + '-' + alb.tracks.length,
-            file,
-            title: tags.title ? tags.title.trim() : file.name.replace(/\.[^/.]+$/, ''),
-            trackNum: (rawTrack && !isNaN(rawTrack)) ? rawTrack : null,
-            year: tags.year || tags.TDRC?.data || tags['©day']?.data || null,
-            composer: tags.composer || tags['©wrt']?.data || null,
-            genre: tags.genre || null
         });
     }
 
@@ -787,17 +816,24 @@
         }
         target.after(drawer);
 
-        // Populate durations without re-reading tags — just probe audio metadata
-        sorted.forEach(t => {
-            const tmp = new Audio();
-            tmp.src = createAudioURL(t.file);
-            tmp.onloadedmetadata = () => {
-                const el = document.getElementById('dur-' + t.uid);
-                if (el) el.innerText = fmt(tmp.duration);
-                URL.revokeObjectURL(tmp.src);
-            };
-            tmp.onerror = () => URL.revokeObjectURL(tmp.src);
-        });
+        // Probe durations one at a time so we never read all FLACs into memory at once.
+        // Use createObjectURL(file) directly — no Blob wrapping — to avoid memory pressure.
+        (async () => {
+            for (const t of sorted) {
+                await new Promise(resolve => {
+                    const tmp = new Audio();
+                    const url = URL.createObjectURL(t.file);
+                    tmp.src = url;
+                    tmp.onloadedmetadata = () => {
+                        const el = document.getElementById('dur-' + t.uid);
+                        if (el) el.innerText = fmt(tmp.duration);
+                        URL.revokeObjectURL(url);
+                        resolve();
+                    };
+                    tmp.onerror = () => { URL.revokeObjectURL(url); resolve(); };
+                });
+            }
+        })();
     }
 
     function ignite(albumKey, idx) {
@@ -827,10 +863,13 @@
         const listEl = document.querySelector(`[data-uid="${activeTrackUid}"]`);
         if (listEl) listEl.classList.add('playing-track');
 
-        if (audio._blobURL) URL.revokeObjectURL(audio._blobURL);
+        const prevURL = audio._blobURL || null;
         audio._blobURL = createAudioURL(track.file);
         audio.src = audio._blobURL;
         audio.play().catch(() => {});
+        // Revoke the previous URL only after the new track starts decoding,
+        // so the browser never loses a URL it might still be referencing (fixes FLAC).
+        if (prevURL) audio.addEventListener('canplay', () => URL.revokeObjectURL(prevURL), { once: true });
 
         updatePlayButtonUI();
         document.getElementById('panel-standby').style.display = 'none';
@@ -1035,13 +1074,29 @@ function updatePlayButtonUI() {
 }
    const fmt = s => isNaN(s) ? '00:00' : `${String(Math.floor(s/60)).padStart(2,'0')}:${String(Math.floor(s%60)).padStart(2,'0')}`;
 
-    audio.ontimeupdate = () => {
-        document.getElementById('seek-bar').max   = audio.duration || 0;
-        document.getElementById('seek-bar').value = audio.currentTime;
+    // Drive the seek bar at 60fps via rAF — smooth gradient + thumb in sync.
+    let _raf = null;
+    function _tickSeek() {
+        const bar = document.getElementById('seek-bar');
+        if (!audio.duration) { _raf = null; return; }
+        const pct = (audio.currentTime / audio.duration) * 100;
+        bar.max   = audio.duration;
+        bar.value = audio.currentTime;
+        // Set gradient and thumb value in the same rAF frame so they paint together
+        bar.style.background = `linear-gradient(to right, var(--accent) 0%, var(--accent) ${pct.toFixed(3)}%, #282828 ${pct.toFixed(3)}%, #282828 100%)`;
         document.getElementById('time-cur').innerText   = fmt(audio.currentTime);
         document.getElementById('time-total').innerText = fmt(audio.duration);
+        if (!audio.paused && !audio.ended) _raf = requestAnimationFrame(_tickSeek);
+        else _raf = null;
+    }
+    audio.onplay  = () => { if (!_raf) _raf = requestAnimationFrame(_tickSeek); updatePlayButtonUI(); };
+    audio.onpause = () => { if (_raf) { cancelAnimationFrame(_raf); _raf = null; } updatePlayButtonUI(); _tickSeek(); };
+    audio.ontimeupdate = () => { if (!_raf && !audio.paused) _raf = requestAnimationFrame(_tickSeek); };
+    document.getElementById('seek-bar').oninput = e => {
+        audio.currentTime = e.target.value;
+        const pct = audio.duration ? (e.target.value / audio.duration) * 100 : 0;
+        e.target.style.background = `linear-gradient(to right, var(--accent) 0%, var(--accent) ${pct.toFixed(3)}%, #282828 ${pct.toFixed(3)}%, #282828 100%)`;
     };
-    document.getElementById('seek-bar').oninput  = e => audio.currentTime = e.target.value;
     document.getElementById('vol-slider').oninput = e => audio.volume = e.target.value;
     audio.onended = () => { if (isRepeat) { audio.currentTime = 0; audio.play(); } else next(); };
     window.addEventListener('keydown', e => {
