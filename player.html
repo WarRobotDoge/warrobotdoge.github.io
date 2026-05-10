@@ -373,6 +373,82 @@
         #mini-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
         #mini-artist { font-size: 11px; color: var(--text-dim); font-weight: 500; }
 
+
+        /* ── TABS ──────────────────────────────────────────────────────── */
+        #tab-nav {
+            display: flex;
+            gap: 0;
+            margin-bottom: 28px;
+            border-bottom: 1px solid var(--border-heavy);
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 10px 20px;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            transition: color 0.15s;
+            margin-bottom: -1px;
+        }
+        .tab-btn:hover { color: var(--text-bright); }
+        .tab-btn.active { color: #fff; border-bottom-color: var(--accent); }
+        #tab-grid { display: flex; flex-direction: column; }
+        #tab-scope { display: none; flex: 1; gap: 24px; overflow: hidden; min-height: 0; }
+        #tab-scope.tab-active { display: flex; }
+
+        /* ── OSCILLOSCOPE ───────────────────────────────────────────────── */
+        #scope-canvas-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-width: 0;
+            background: #000;
+            border-radius: 6px;
+            border: 1px solid var(--border-heavy);
+        }
+        #crtCanvas { display: block; max-width: 100%; max-height: 100%; border-radius: 6px; }
+        #clicktostart {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+            font-size: 13px; font-weight: 700;
+            color: var(--accent); letter-spacing: 2px;
+            pointer-events: none; text-transform: uppercase;
+        }
+        #scope-controls {
+            width: 280px; flex-shrink: 0;
+            overflow-y: auto; padding-right: 4px;
+            font-size: 12px; color: var(--text-bright);
+        }
+        .sc-section { border-top: 1px solid var(--border-heavy); padding: 14px 0; }
+        .sc-section:first-child { border-top: none; padding-top: 0; }
+        .sc-head {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.5px; color: var(--text-dim); margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .sc-head input[type=checkbox] { accent-color: var(--accent); }
+        .sc-row { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+        .sc-lbl { font-size: 11px; color: var(--text-dim); width: 76px; flex-shrink: 0; }
+        .sc-row input[type=range] { flex: 1; }
+        .sc-val { font-family: monospace; font-size: 11px; color: var(--accent); width: 36px; text-align: right; }
+        .sc-check { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; font-size: 12px; }
+        .sc-check input[type=checkbox] { accent-color: var(--accent); }
+        .sc-text {
+            width: 100%; background: #1a1a1a; border: 1px solid var(--border-heavy);
+            color: #fff; font-family: monospace; font-size: 11px;
+            padding: 5px 8px; border-radius: 3px; margin-bottom: 5px; outline: none; box-sizing: border-box;
+        }
+        .sc-text:focus { border-color: var(--accent); }
+        .sc-note { font-size: 11px; color: var(--text-dim); font-style: italic; margin-top: 4px; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -380,6 +456,11 @@
 
 <div id="app-shell">
     <main id="main-view">
+        <div id="tab-nav">
+            <button class="tab-btn active" data-tab="grid" onclick="switchTab('grid')">Archive Grid</button>
+            <button class="tab-btn" data-tab="scope" onclick="switchTab('scope')">Oscilloscope</button>
+        </div>
+        <div id="tab-grid">
         <div class="header-row">
             <div>
                 <h1 style="font-size:26px;font-weight:800;margin:0 0 5px 0;">Archive Grid</h1>
@@ -401,6 +482,131 @@
             </div>
         </div>
         <div id="album-grid"></div>
+        </div><!-- /tab-grid -->
+
+        <!-- ── OSCILLOSCOPE TAB ─────────────────────────────────────── -->
+        <div id="tab-scope">
+            <div id="scope-canvas-wrap">
+                <canvas id="crtCanvas" width="700" height="700"></canvas>
+                <div id="clicktostart">▶ Click to activate</div>
+            </div>
+            <div id="scope-controls">
+
+                <div class="sc-section">
+                    <div class="sc-head">Display</div>
+                    <div class="sc-row">
+                        <span class="sc-lbl">Gain</span>
+                        <input id="mainGain" type="range" min="-1" max="4" value="0" step="0.05"
+                            oninput="controls.mainGain=this.value; mainGainOutput.value=parseFloat(this.value).toFixedMinus(2)">
+                        <output id="mainGainOutput" class="sc-val">+0.00</output>
+                    </div>
+                    <div class="sc-row">
+                        <span class="sc-lbl">Intensity</span>
+                        <input id="exposure" type="range" min="-2" max="2" value="0" step="0.1"
+                            oninput="controls.exposureStops=this.value; exposureOutput.value=parseFloat(this.value).toFixedMinus(1)">
+                        <output id="exposureOutput" class="sc-val">+0.0</output>
+                    </div>
+                    <div class="sc-row">
+                        <span class="sc-lbl">Hue</span>
+                        <input id="hue" type="range" min="0" max="359" value="125" step="1"
+                            oninput="controls.hue=this.value; hueOutput.value=this.value">
+                        <output id="hueOutput" class="sc-val">125</output>
+                    </div>
+                    <div class="sc-row">
+                        <span class="sc-lbl">Persistence</span>
+                        <input id="persistence" type="range" min="-1" max="1" value="0" step="0.01"
+                            oninput="controls.persistence=this.value; persistenceOutput.value=parseFloat(this.value).toFixedMinus(1)">
+                        <output id="persistenceOutput" class="sc-val">0.00</output>
+                    </div>
+                    <div class="sc-check">
+                        <input id="swapXY" type="checkbox" onchange="controls.swapXY=this.checked">
+                        <label for="swapXY">Swap X / Y</label>
+                    </div>
+                    <div class="sc-check">
+                        <input id="invertXY" type="checkbox" onchange="controls.invertXY=this.checked">
+                        <label for="invertXY">Invert X and Y</label>
+                    </div>
+                    <div class="sc-check">
+                        <input id="freeze" type="checkbox" onchange="controls.freezeImage=this.checked">
+                        <label for="freeze">Freeze image</label>
+                    </div>
+                    <div class="sc-check">
+                        <input id="disableFilter" type="checkbox" onchange="controls.disableFilter=this.checked">
+                        <label for="disableFilter">Disable upsampling</label>
+                    </div>
+                    <div class="sc-check">
+                        <input id="hideGrid" type="checkbox"
+                            onchange="controls.grid=!controls.grid;">
+                        <label for="hideGrid">Hide graticule</label>
+                    </div>
+                </div>
+
+                <div class="sc-section">
+                    <div class="sc-head">
+                        <input id="sweepCheckbox" type="checkbox" onchange="controls.sweepOn=this.checked">
+                        Sweep
+                    </div>
+                    <div class="sc-row">
+                        <span class="sc-lbl">Trigger</span>
+                        <input id="trigger" type="range" min="-1" max="1" value="0" step="0.001"
+                            oninput="controls.sweepTriggerValue=0.5*this.value*Math.abs(this.value); triggerOutput.value=parseFloat(controls.sweepTriggerValue).toFixedMinus(2)">
+                        <output id="triggerOutput" class="sc-val">+0.00</output>
+                    </div>
+                    <div class="sc-row">
+                        <span class="sc-lbl">ms / div</span>
+                        <input id="msDiv" type="range" min="0" max="7" value="2" step="1"
+                            oninput="controls.sweepMsDiv=Math.pow(2,this.value-2); msDivOutput.value=controls.sweepMsDiv">
+                        <output id="msDivOutput" class="sc-val">1</output>
+                    </div>
+                </div>
+
+                <div class="sc-section">
+                    <div class="sc-head">
+                        <input id="generatorCheckbox" type="checkbox" onchange="controls.signalGeneratorOn=this.checked">
+                        Signal Generator
+                    </div>
+                    <div style="margin-bottom:6px;font-size:11px;color:var(--text-dim)">x =</div>
+                    <input type="text" class="sc-text" id="xInput" value=""
+                        onkeydown="if(event.keyCode==13){UI.compile();xNote.value='';}"
+                        oninput="if(this.value!=controls.xExpression)xNote.value='*';else xNote.value='';">
+                    <output id="xNote" style="font-size:11px;color:var(--accent)"> </output>
+                    <div style="margin-bottom:6px;margin-top:4px;font-size:11px;color:var(--text-dim)">y =</div>
+                    <input type="text" class="sc-text" id="yInput" value=""
+                        onkeydown="if(event.keyCode==13){UI.compile();yNote.value='';}"
+                        oninput="if(this.value!=controls.yExpression)yNote.value='*';else yNote.value='';">
+                    <output id="yNote" style="font-size:11px;color:var(--accent)"> </output>
+                    <div class="sc-row" style="margin-top:10px">
+                        <span class="sc-lbl">Param a</span>
+                        <input id="aExponent" type="range" style="width:70px;flex:none" min="0" max="3" value="0" step="1"
+                            oninput="controls.aExponent=this.value; aExponentOutput.value=['x1','x10','x100','x1k'][this.value]">
+                        <output id="aExponentOutput" class="sc-val" style="width:28px">x1</output>
+                        <input id="aValue" type="range" flex="1" style="flex:1" min="0.5" max="5" value="1" step="0.02"
+                            oninput="controls.aValue=this.value; aValueOutput.value=parseFloat(this.value).toFixed(2)">
+                        <output id="aValueOutput" class="sc-val">1.00</output>
+                    </div>
+                    <div class="sc-row">
+                        <span class="sc-lbl">Param b</span>
+                        <input id="bExponent" type="range" style="width:70px;flex:none" min="0" max="3" value="0" step="1"
+                            oninput="controls.bExponent=this.value; bExponentOutput.value=['x1','x10','x100','x1k'][this.value]">
+                        <output id="bExponentOutput" class="sc-val" style="width:28px">x1</output>
+                        <input id="bValue" type="range" style="flex:1" min="0.5" max="5" value="1" step="0.02"
+                            oninput="controls.bValue=this.value; bValueOutput.value=parseFloat(this.value).toFixed(2)">
+                        <output id="bValueOutput" class="sc-val">1.00</output>
+                    </div>
+                    <div class="sc-note">Use JS expressions, e.g. Math.tan(t). t = time, n = sample count.</div>
+                </div>
+
+                <div class="sc-section">
+                    <div class="sc-head">
+                        <input type="checkbox" id="micCheckbox"
+                            onchange="if(this.checked) AudioSystem.tryToGetMicrophone(); else AudioSystem.disconnectMicrophone()">
+                        Microphone
+                    </div>
+                    <output id="microphoneOutput" style="font-size:11px;color:var(--text-dim)"></output>
+                </div>
+
+            </div>
+        </div><!-- /tab-scope -->
     </main>
 
     <aside id="info-panel">
@@ -1249,5 +1455,671 @@ function updatePlayButtonUI() {
         if (e.code === 'Space' && e.target.tagName !== 'INPUT') { e.preventDefault(); toggle(); }
     });
 </script>
+
+<script id="vertex" type="x-shader">
+    attribute vec2 vertexPosition;
+    void main() { gl_Position = vec4(vertexPosition, 0.0, 1.0); }
+</script>
+<script id="fragment" type="x-shader">
+    precision highp float;
+    uniform vec4 colour;
+    void main() { gl_FragColor = colour; }
+</script>
+<script id="gaussianVertex" type="x-shader">
+    #define EPS 1E-6
+    uniform float uInvert;
+    uniform float uSize;
+    uniform float uNEdges;
+    uniform float uFadeAmount;
+    uniform float uIntensity;
+    uniform float uGain;
+    attribute vec2 aStart, aEnd;
+    attribute float aIdx;
+    varying vec4 uvl;
+    varying vec2 vTexCoord;
+    varying float vLen;
+    varying float vSize;
+    void main () {
+        float tang;
+        vec2 current;
+        float idx = mod(aIdx,4.0);
+        vec2 dir = (aEnd-aStart)*uGain;
+        uvl.z = length(dir);
+        if (uvl.z > EPS) { dir = dir / uvl.z; vSize = 0.006/pow(uvl.z,0.08); }
+        else { dir = vec2(1.0, 0.0); vSize = 0.006/pow(EPS,0.08); }
+        vSize = uSize;
+        vec2 norm = vec2(-dir.y, dir.x);
+        if (idx >= 2.0) { current = aEnd*uGain; tang = 1.0; uvl.x = -vSize; }
+        else { current = aStart*uGain; tang = -1.0; uvl.x = uvl.z + vSize; }
+        float side = (mod(idx, 2.0)-0.5)*2.0;
+        uvl.y = side * vSize;
+        uvl.w = uIntensity*mix(1.0-uFadeAmount, 1.0, floor(aIdx / 4.0 + 0.5)/uNEdges);
+        vec4 pos = vec4((current+(tang*dir+norm*side)*vSize)*uInvert,0.0,1.0);
+        gl_Position = pos;
+        vTexCoord = 0.5*pos.xy+0.5;
+    }
+</script>
+<script id="gaussianFragment" type="x-shader">
+    #define EPS 1E-6
+    #define TAU 6.283185307179586
+    #define TAUR 2.5066282746310002
+    #define SQRT2 1.4142135623730951
+    precision highp float;
+    uniform float uSize;
+    uniform float uIntensity;
+    uniform sampler2D uScreen;
+    varying float vSize;
+    varying vec4 uvl;
+    varying vec2 vTexCoord;
+    float gaussian(float x, float sigma) { return exp(-(x*x)/(2.0*sigma*sigma))/(TAUR*sigma); }
+    float erf(float x) {
+        float s = sign(x), a = abs(x);
+        x = 1.0+(0.278393+(0.230389+0.078108*(a*a))*a)*a;
+        x *= x; return s - s/(x*x);
+    }
+    void main (void) {
+        float len = uvl.z; vec2 xy = uvl.xy; float brightness;
+        float sigma = vSize/5.0;
+        if (len < EPS) brightness = gaussian(length(xy), sigma);
+        else { brightness = erf(xy.x/SQRT2/sigma) - erf((xy.x-len)/SQRT2/sigma);
+               brightness *= exp(-xy.y*xy.y/(2.0*sigma*sigma))/2.0/len; }
+        brightness *= uvl.w;
+        gl_FragColor = 2.0 * texture2D(uScreen, vTexCoord) * brightness;
+        gl_FragColor.a = 1.0;
+    }
+</script>
+<script id="texturedVertex" type="x-shader">
+    precision highp float; attribute vec2 aPos; varying vec2 vTexCoord;
+    void main(void) { gl_Position = vec4(aPos,0.0,1.0); vTexCoord=(0.5*aPos+0.5); }
+</script>
+<script id="texturedVertexWithResize" type="x-shader">
+    precision highp float; attribute vec2 aPos; varying vec2 vTexCoord; uniform float uResizeForCanvas;
+    void main(void) { gl_Position=vec4(aPos,0.0,1.0); vTexCoord=(0.5*aPos+0.5)*uResizeForCanvas; }
+</script>
+<script id="texturedFragment" type="x-shader">
+    precision highp float; uniform sampler2D uTexture0; varying vec2 vTexCoord;
+    void main(void) { gl_FragColor=texture2D(uTexture0,vTexCoord); gl_FragColor.a=1.0; }
+</script>
+<script id="blurFragment" type="x-shader">
+    precision highp float; uniform sampler2D uTexture0; uniform vec2 uOffset; varying vec2 vTexCoord;
+    void main(void) {
+        vec4 sum=vec4(0.0);
+        sum+=texture2D(uTexture0,vTexCoord-uOffset*8.0)*0.000078;
+        sum+=texture2D(uTexture0,vTexCoord-uOffset*7.0)*0.000489;
+        sum+=texture2D(uTexture0,vTexCoord-uOffset*6.0)*0.002403;
+        sum+=texture2D(uTexture0,vTexCoord-uOffset*5.0)*0.009245;
+        sum+=texture2D(uTexture0,vTexCoord-uOffset*4.0)*0.027835;
+        sum+=texture2D(uTexture0,vTexCoord-uOffset*3.0)*0.065592;
+        sum+=texture2D(uTexture0,vTexCoord-uOffset*2.0)*0.12098;
+        sum+=texture2D(uTexture0,vTexCoord-uOffset*1.0)*0.17467;
+        sum+=texture2D(uTexture0,vTexCoord+uOffset*0.0)*0.19742;
+        sum+=texture2D(uTexture0,vTexCoord+uOffset*1.0)*0.17467;
+        sum+=texture2D(uTexture0,vTexCoord+uOffset*2.0)*0.12098;
+        sum+=texture2D(uTexture0,vTexCoord+uOffset*3.0)*0.065592;
+        sum+=texture2D(uTexture0,vTexCoord+uOffset*4.0)*0.027835;
+        sum+=texture2D(uTexture0,vTexCoord+uOffset*5.0)*0.009245;
+        sum+=texture2D(uTexture0,vTexCoord+uOffset*6.0)*0.002403;
+        sum+=texture2D(uTexture0,vTexCoord+uOffset*7.0)*0.000489;
+        sum+=texture2D(uTexture0,vTexCoord+uOffset*8.0)*0.000078;
+        gl_FragColor=sum;
+    }
+</script>
+<script id="outputVertex" type="x-shader">
+    precision highp float; attribute vec2 aPos; varying vec2 vTexCoord; varying vec2 vTexCoordCanvas;
+    uniform float uResizeForCanvas;
+    void main(void) {
+        gl_Position=vec4(aPos,0.0,1.0);
+        vTexCoord=(0.5*aPos+0.5);
+        vTexCoordCanvas=vTexCoord*uResizeForCanvas;
+    }
+</script>
+<script id="outputFragment" type="x-shader">
+    precision highp float;
+    uniform sampler2D uTexture0,uTexture1,uTexture2,uTexture3;
+    uniform float uExposure; uniform vec3 uColour;
+    varying vec2 vTexCoord; varying vec2 vTexCoordCanvas;
+    void main(void) {
+        vec4 line=texture2D(uTexture0,vTexCoordCanvas);
+        vec4 screen=texture2D(uTexture3,vTexCoord);
+        vec4 tightGlow=texture2D(uTexture1,vTexCoord);
+        vec4 scatter=texture2D(uTexture2,vTexCoord)+0.35;
+        float light=line.r+1.5*screen.g*screen.g*tightGlow.r;
+        light+=0.4*scatter.g*(2.0+1.0*screen.g+0.5*screen.r);
+        float tlight=1.0-pow(2.0,-uExposure*light);
+        float tlight2=tlight*tlight*tlight;
+        gl_FragColor.rgb=mix(uColour,vec3(1.0),0.3+tlight2*tlight2*0.5)*tlight;
+        gl_FragColor.a=1.0;
+    }
+</script>
+
+<script>
+// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.tab === tab));
+    document.getElementById('tab-grid').style.display  = tab === 'grid'  ? '' : 'none';
+    var scopeEl = document.getElementById('tab-scope');
+    if (tab === 'scope') {
+        scopeEl.classList.add('tab-active');
+        scopeEl.style.display = '';
+        _initScope();
+    } else {
+        scopeEl.classList.remove('tab-active');
+        scopeEl.style.display = 'none';
+    }
+}
+
+// ── OSCILLOSCOPE ──────────────────────────────────────────────────────────────
+var controls = {
+    swapXY: false, sweepOn: false, sweepMsDiv: 1, sweepTriggerValue: 0,
+    signalGeneratorOn: false, mainGain: 0.0, exposureStops: 0.0, audioVolume: 1.0,
+    hue: 125, freezeImage: false, disableFilter: false,
+    aValue: 1.0, aExponent: 0.0, bValue: 1.0, bExponent: 0.0,
+    invertXY: false, grid: true, persistence: 0,
+    xExpression: "sin(2*PI*a*t)*cos(2*PI*b*t)",
+    yExpression: "cos(2*PI*a*t)*cos(2*PI*b*t)",
+};
+
+Number.prototype.toFixedMinus = function(k) {
+    return this < 0 ? this.toFixed(k) : '+' + this.toFixed(k);
+};
+
+// AnalyserNode-based audio system — taps the stream without intercepting it.
+// Unlike ScriptProcessor, a rendering error can never silence playback.
+var AudioSystem = {
+    microphoneActive: false,
+
+    init: function(bufferSize) {
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        this.audioContext = new window.AudioContext();
+        this.sampleRate   = this.audioContext.sampleRate;
+        this.bufferSize   = bufferSize;
+        this.timePerSample = 1 / this.sampleRate;
+        this.oldXSamples      = new Float32Array(bufferSize);
+        this.oldYSamples      = new Float32Array(bufferSize);
+        this.smoothedXSamples = new Float32Array(Filter.nSmoothedSamples);
+        this.smoothedYSamples = new Float32Array(Filter.nSmoothedSamples);
+    },
+
+    startSound: function() {
+        var ctx = this.audioContext;
+        var playerAudio = document.getElementById('core-audio');
+
+        // createMediaElementSource routes audio through the Web Audio graph.
+        this.source   = ctx.createMediaElementSource(playerAudio);
+        this.splitter = ctx.createChannelSplitter(2);
+        this.merger   = ctx.createChannelMerger(2);
+
+        // Two analysers for stereo X/Y data
+        this.analyserL = ctx.createAnalyser();
+        this.analyserR = ctx.createAnalyser();
+        this.analyserL.fftSize = 2048;
+        this.analyserR.fftSize = 2048;
+
+        // Audio flow: source → splitter → (L analyser, R analyser) → merger → destination
+        // Audio always reaches destination; analysers just read it non-destructively.
+        this.source.connect(this.splitter);
+        this.splitter.connect(this.analyserL, 0, 0);
+        this.splitter.connect(this.analyserR, 1, 0);
+        this.analyserL.connect(this.merger, 0, 0);
+        this.analyserR.connect(this.merger, 0, 1);
+        this.merger.connect(ctx.destination);
+
+        // Signal generator (separate, additive)
+        this.generator = ctx.createScriptProcessor(this.bufferSize, 0, 2);
+        this.generator.onaudioprocess = SignalGenerator.generate;
+        this.generator.connect(ctx.destination);
+
+        this._xBuf = new Float32Array(this.analyserL.fftSize);
+        this._yBuf = new Float32Array(this.analyserR.fftSize);
+    },
+
+    getSamples: function() {
+        if (!this.analyserL) return null;
+        this.analyserL.getFloatTimeDomainData(this._xBuf);
+        this.analyserR.getFloatTimeDomainData(this._yBuf);
+        // Downsample from fftSize (2048) to bufferSize (1024)
+        var step = this._xBuf.length / this.bufferSize;
+        for (var i = 0; i < this.bufferSize; i++) {
+            xSamples[i] = this._xBuf[Math.floor(i * step)];
+            ySamples[i] = this._yBuf[Math.floor(i * step)];
+        }
+        return true;
+    },
+
+    tryToGetMicrophone: function() {
+        if (this.microphoneActive) {
+            this.microphone.connect(this.merger);
+            return;
+        }
+        navigator.mediaDevices.getUserMedia({audio: {echoCancellation: false}})
+            .then(function(stream) {
+                AudioSystem.microphoneActive = true;
+                AudioSystem.microphone = AudioSystem.audioContext.createMediaStreamSource(stream);
+                AudioSystem.microphone.connect(AudioSystem.merger);
+                document.getElementById('microphoneOutput').value = ' active';
+            })
+            .catch(function() {
+                document.getElementById('micCheckbox').checked = false;
+                document.getElementById('microphoneOutput').value = ' unavailable';
+            });
+    },
+
+    disconnectMicrophone: function() {
+        if (this.microphone) this.microphone.disconnect();
+    }
+};
+
+var sweepPosition = -1;
+var belowTrigger  = false;
+var xSamples = new Float32Array(1024);
+var ySamples = new Float32Array(1024);
+
+function drawCRTFrame() {
+    try {
+        if (AudioSystem.getSamples()) {
+            var xs = xSamples, ys = ySamples;
+
+            if (controls.sweepOn) {
+                var gain = Math.pow(2.0, controls.mainGain);
+                var sweepMinTime = controls.sweepMsDiv * 10 / 1000;
+                var tv = controls.sweepTriggerValue;
+                for (var i = 0; i < AudioSystem.bufferSize; i++) {
+                    xs[i] = sweepPosition / gain;
+                    sweepPosition += 2 * AudioSystem.timePerSample / sweepMinTime;
+                    if (sweepPosition > 1.1 && belowTrigger && ys[i] >= tv) sweepPosition = -1.3;
+                    belowTrigger = ys[i] < tv;
+                }
+            }
+
+            if (!controls.freezeImage) {
+                if (!controls.disableFilter) {
+                    Filter.generateSmoothedSamples(AudioSystem.oldXSamples, xs, AudioSystem.smoothedXSamples);
+                    Filter.generateSmoothedSamples(AudioSystem.oldYSamples, ys, AudioSystem.smoothedYSamples);
+                    var rx = controls.swapXY ? AudioSystem.smoothedYSamples : AudioSystem.smoothedXSamples;
+                    var ry = controls.swapXY ? AudioSystem.smoothedXSamples : AudioSystem.smoothedYSamples;
+                    Render.drawLineTexture(rx, ry);
+                } else {
+                    Render.drawLineTexture(controls.swapXY ? ys : xs, controls.swapXY ? xs : ys);
+                }
+                AudioSystem.oldXSamples.set(xs);
+                AudioSystem.oldYSamples.set(ys);
+            }
+        }
+        Render.drawCRT();
+    } catch(e) { /* rendering errors never affect audio */ }
+    requestAnimationFrame(drawCRTFrame);
+}
+
+var SignalGenerator = {
+    oldA: 1.0, oldB: 1.0, timeInSamples: 0,
+    generate: function(event) {
+        var xOut=event.outputBuffer.getChannelData(0);
+        var yOut=event.outputBuffer.getChannelData(1);
+        var newA=controls.aValue*Math.pow(10.0,controls.aExponent);
+        var newB=controls.bValue*Math.pow(10.0,controls.bExponent);
+        var oldA=SignalGenerator.oldA, oldB=SignalGenerator.oldB;
+        var PI=Math.PI, cos=Math.cos, sin=Math.sin;
+        var xFunc=eval("(function(){return "+controls.xExpression+";})");
+        var yFunc=eval("(function(){return "+controls.yExpression+";})");
+        var bufferSize=AudioSystem.bufferSize;
+        var n=SignalGenerator.timeInSamples, sr=AudioSystem.sampleRate;
+        if (!controls.signalGeneratorOn) {
+            for (var i=0;i<bufferSize;i++){xOut[i]=0;yOut[i]=0;}
+        } else {
+            for (var i=0;i<bufferSize;i++) {
+                var t=n/sr, a=newA, b=newB;
+                xOut[i]=xFunc(); yOut[i]=yFunc(); n++;
+            }
+        }
+        SignalGenerator.timeInSamples+=AudioSystem.bufferSize;
+        SignalGenerator.oldA=newA; SignalGenerator.oldB=newB;
+    }
+};
+
+var Filter = {
+    lanczosTweak: 1.5,
+    init: function(bufferSize, a, steps) {
+        this.bufferSize=bufferSize; this.a=a; this.steps=steps;
+        this.radius=a*steps; this.nSmoothedSamples=bufferSize*steps+1;
+        this.allSamples=new Float32Array(2*bufferSize);
+        this.createLanczosKernel();
+    },
+    generateSmoothedSamples: function(oldSamples, samples, smoothedSamples) {
+        var bufferSize=this.bufferSize, allSamples=this.allSamples;
+        var nSmoothedSamples=this.nSmoothedSamples, a=this.a, steps=this.steps, K=this.K;
+        for (var i=0;i<bufferSize;i++){allSamples[i]=oldSamples[i];allSamples[bufferSize+i]=samples[i];}
+        var pStart=bufferSize-2*a, pEnd=pStart+bufferSize, i=0;
+        for (var position=pStart;position<pEnd;position++) {
+            smoothedSamples[i]=allSamples[position]; i++;
+            for (var r=1;r<steps;r++) {
+                var s=0;
+                for (var k=-a+1;k<a;k++) {
+                    var kp=(-r+k*steps); if (kp<0) kp=-kp;
+                    s+=allSamples[position+k]*(kp<K.length?K[kp]:0);
+                }
+                smoothedSamples[i]=s; i++;
+            }
+        }
+        smoothedSamples[nSmoothedSamples-1]=allSamples[2*bufferSize-2*a];
+    },
+    createLanczosKernel: function() {
+        this.K=new Float32Array(this.radius); this.K[0]=1;
+        for (var i=1;i<this.radius;i++) {
+            var piX=(Math.PI*i)/this.steps;
+            var sinc=Math.sin(piX)/piX;
+            var w=this.a*Math.sin(piX/this.a)/piX;
+            this.K[i]=sinc*Math.pow(w,this.lanczosTweak);
+        }
+    }
+};
+
+var UI = {
+    init: function() {
+        this.xInput=document.getElementById("xInput");
+        this.yInput=document.getElementById("yInput");
+        this.xInput.value=controls.xExpression;
+        this.yInput.value=controls.yExpression;
+        document.getElementById("mainGain").oninput();
+        document.getElementById("trigger").oninput();
+    },
+    compile: function() {
+        controls.xExpression=this.xInput.value;
+        controls.yExpression=this.yInput.value;
+    }
+};
+
+var Render = {
+    init: function() {
+        this.canvas = document.getElementById("crtCanvas");
+        this._sizeCanvas();
+        window.gl = this.canvas.getContext("webgl", {preserveDrawingBuffer:true});
+        gl.viewport(0,0,this.canvas.width,this.canvas.height);
+        gl.enable(gl.BLEND);
+        gl.blendEquation(gl.FUNC_ADD);
+        gl.clearColor(0,0,0,1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.getExtension('OES_texture_float');
+        gl.getExtension('OES_texture_float_linear');
+        this.fadeAmount = 0.2*AudioSystem.bufferSize/512;
+        this.fullScreenQuad = new Float32Array([-1,1,1,1,1,-1,-1,1,1,-1,-1,-1]);
+        this.simpleShader = this.createShader("vertex","fragment");
+        this.simpleShader.vertexPosition = gl.getAttribLocation(this.simpleShader,"vertexPosition");
+        this.simpleShader.colour = gl.getUniformLocation(this.simpleShader,"colour");
+        this.lineShader = this.createShader("gaussianVertex","gaussianFragment");
+        this.lineShader.aStart=gl.getAttribLocation(this.lineShader,"aStart");
+        this.lineShader.aEnd=gl.getAttribLocation(this.lineShader,"aEnd");
+        this.lineShader.aIdx=gl.getAttribLocation(this.lineShader,"aIdx");
+        this.lineShader.uGain=gl.getUniformLocation(this.lineShader,"uGain");
+        this.lineShader.uSize=gl.getUniformLocation(this.lineShader,"uSize");
+        this.lineShader.uInvert=gl.getUniformLocation(this.lineShader,"uInvert");
+        this.lineShader.uIntensity=gl.getUniformLocation(this.lineShader,"uIntensity");
+        this.lineShader.uNEdges=gl.getUniformLocation(this.lineShader,"uNEdges");
+        this.lineShader.uFadeAmount=gl.getUniformLocation(this.lineShader,"uFadeAmount");
+        this.lineShader.uScreen=gl.getUniformLocation(this.lineShader,"uScreen");
+        this.outputShader=this.createShader("outputVertex","outputFragment");
+        this.outputShader.aPos=gl.getAttribLocation(this.outputShader,"aPos");
+        this.outputShader.uTexture0=gl.getUniformLocation(this.outputShader,"uTexture0");
+        this.outputShader.uTexture1=gl.getUniformLocation(this.outputShader,"uTexture1");
+        this.outputShader.uTexture2=gl.getUniformLocation(this.outputShader,"uTexture2");
+        this.outputShader.uTexture3=gl.getUniformLocation(this.outputShader,"uTexture3");
+        this.outputShader.uExposure=gl.getUniformLocation(this.outputShader,"uExposure");
+        this.outputShader.uColour=gl.getUniformLocation(this.outputShader,"uColour");
+        this.outputShader.uResizeForCanvas=gl.getUniformLocation(this.outputShader,"uResizeForCanvas");
+        this.texturedShader=this.createShader("texturedVertexWithResize","texturedFragment");
+        this.texturedShader.aPos=gl.getAttribLocation(this.texturedShader,"aPos");
+        this.texturedShader.uTexture0=gl.getUniformLocation(this.texturedShader,"uTexture0");
+        this.texturedShader.uResizeForCanvas=gl.getUniformLocation(this.texturedShader,"uResizeForCanvas");
+        this.blurShader=this.createShader("texturedVertex","blurFragment");
+        this.blurShader.aPos=gl.getAttribLocation(this.blurShader,"aPos");
+        this.blurShader.uTexture0=gl.getUniformLocation(this.blurShader,"uTexture0");
+        this.blurShader.uOffset=gl.getUniformLocation(this.blurShader,"uOffset");
+        this.vertexBuffer=gl.createBuffer();
+        this.setupTextures();
+    },
+    _sizeCanvas: function() {
+        var wrap = document.getElementById('scope-canvas-wrap');
+        var size = Math.min(wrap.clientWidth, wrap.clientHeight) || 600;
+        this.canvas.width = size;
+        this.canvas.height = size;
+    },
+    setupArrays: function(nPoints) {
+        this.nPoints=nPoints; this.nEdges=nPoints-1;
+        this.quadIndexBuffer=gl.createBuffer();
+        var indices=new Float32Array(4*this.nEdges);
+        for(var i=0;i<indices.length;i++) indices[i]=i;
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.quadIndexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,indices,gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        this.vertexIndexBuffer=gl.createBuffer();
+        var len=this.nEdges*2*3, idx=new Uint16Array(len);
+        for(var i=0,pos=0;i<len;){
+            idx[i++]=pos; idx[i++]=pos+2; idx[i++]=pos+1;
+            idx[i++]=pos+1; idx[i++]=pos+2; idx[i++]=pos+3; pos+=4;
+        }
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.vertexIndexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,idx,gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+        this.scratchVertices=new Float32Array(8*nPoints);
+    },
+    setupTextures: function() {
+        this.frameBuffer=gl.createFramebuffer();
+        this.lineTexture=this.makeTexture(1024,1024);
+        this._sizeCanvas();
+        this.blur1Texture=this.makeTexture(256,256);
+        this.blur2Texture=this.makeTexture(256,256);
+        this.blur3Texture=this.makeTexture(32,32);
+        this.blur4Texture=this.makeTexture(32,32);
+        // Blank screen texture (no external noise.jpg needed)
+        this.screenTexture = this.makeBlankTexture(64,64);
+    },
+    makeBlankTexture: function(w,h) {
+        // Simulate a CRT phosphor screen texture.
+        // R = grid phosphor (slightly dim), G = no-grid phosphor (bright),
+        // matching what the original noise.jpg provided to the output shader.
+        var t=gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D,t);
+        var pixels=new Uint8Array(w*h*4);
+        for(var i=0;i<pixels.length;i+=4){
+            var px=(i/4)%w, py=Math.floor((i/4)/w);
+            var onGrid=(px%8===0||py%8===0)?1:0;
+            pixels[i]   = onGrid ? 210 : 140;   // R: grid channel
+            pixels[i+1] = 185;                   // G: no-grid phosphor (outputFragment squares this)
+            pixels[i+2] = 80;                    // B: warm green tint
+            pixels[i+3] = 255;
+        }
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);
+        gl.bindTexture(gl.TEXTURE_2D,null);
+        t.width=w; t.height=h; return t;
+    },
+    drawLineTexture: function(xPoints,yPoints) {
+        this.fadeAmount=Math.pow(0.5,controls.persistence)*0.2*AudioSystem.bufferSize/512;
+        this.activateTargetTexture(this.lineTexture);
+        this.fade(); this.drawLine(xPoints,yPoints);
+        gl.bindTexture(gl.TEXTURE_2D,this.targetTexture);
+        gl.generateMipmap(gl.TEXTURE_2D);
+    },
+    drawCRT: function() {
+        this.setNormalBlending();
+        this.activateTargetTexture(this.blur1Texture);
+        this.setShader(this.texturedShader);
+        gl.uniform1f(this.texturedShader.uResizeForCanvas,this.lineTexture.width/1024);
+        this.drawTexture(this.lineTexture);
+        this.activateTargetTexture(this.blur2Texture);
+        this.setShader(this.blurShader);
+        gl.uniform2fv(this.blurShader.uOffset,[1/256,0]);
+        this.drawTexture(this.blur1Texture);
+        this.activateTargetTexture(this.blur3Texture);
+        this.setShader(this.blurShader);
+        gl.uniform2fv(this.blurShader.uOffset,[0,1/256]);
+        this.drawTexture(this.blur2Texture);
+        this.activateTargetTexture(this.blur4Texture);
+        this.setShader(this.blurShader);
+        gl.uniform2fv(this.blurShader.uOffset,[1/32,0]);
+        this.drawTexture(this.blur3Texture);
+        var scatterTexture=this.blur4Texture;
+        this.activateTargetTexture(null);
+        gl.viewport(0,0,this.canvas.width,this.canvas.height);
+        this.setShader(this.outputShader);
+        gl.uniform1i(this.outputShader.uTexture0,0);
+        gl.uniform1i(this.outputShader.uTexture1,1);
+        gl.uniform1i(this.outputShader.uTexture2,2);
+        gl.uniform1i(this.outputShader.uTexture3,3);
+        var exp=Math.pow(2,controls.exposureStops);
+        gl.uniform1f(this.outputShader.uExposure,exp);
+        var h=controls.hue/360;
+        function hsl(h,s,l){
+            var r,g,b;
+            if(!s){r=g=b=l;}
+            else{
+                function hue2rgb(p,q,t){if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;}
+                var q=l<0.5?l*(1+s):l+s-l*s, p=2*l-q;
+                r=hue2rgb(p,q,h+1/3); g=hue2rgb(p,q,h); b=hue2rgb(p,q,h-1/3);
+            }
+            return [r,g,b];
+        }
+        var col=hsl(h,1,0.5);
+        gl.uniform3fv(this.outputShader.uColour,col);
+        gl.uniform1f(this.outputShader.uResizeForCanvas,this.lineTexture.width/1024);
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,this.lineTexture);
+        gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,this.blur1Texture);
+        gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D,scatterTexture);
+        gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D,this.screenTexture);
+        this.drawFullScreen();
+    },
+    activateTargetTexture: function(texture) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, texture ? this.frameBuffer : null);
+        if (texture) {
+            gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0);
+            gl.viewport(0,0,texture.width,texture.height);
+        }
+        this.targetTexture=texture;
+    },
+    fade: function() {
+        // colorMask must include RGB so we actually reduce line brightness each frame.
+        // Original used alpha-only mask which left RGB accumulating forever.
+        this.setNormalBlending();
+        gl.colorMask(true,true,true,true);
+        var prog=this.simpleShader;
+        gl.useProgram(prog);
+        gl.enableVertexAttribArray(prog.vertexPosition);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.fullScreenQuad,gl.STATIC_DRAW);
+        gl.vertexAttribPointer(prog.vertexPosition,2,gl.FLOAT,false,0,0);
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.uniform4fv(prog.colour,[0,0,0,this.fadeAmount]);
+        gl.drawArrays(gl.TRIANGLES,0,6);
+    },
+    drawLine: function(xPoints,yPoints) {
+        var n=this.nEdges;
+        var buf=this.scratchVertices;
+        for(var i=0;i<n;i++){
+            buf[8*i]=xPoints[i]; buf[8*i+1]=yPoints[i];
+            buf[8*i+2]=xPoints[i+1]; buf[8*i+3]=yPoints[i+1];
+            buf[8*i+4]=xPoints[i]; buf[8*i+5]=yPoints[i];
+            buf[8*i+6]=xPoints[i+1]; buf[8*i+7]=yPoints[i+1];
+        }
+        var prog=this.lineShader;
+        this.setAdditiveBlending();
+        gl.colorMask(true,true,true,true);
+        gl.useProgram(prog);
+        var stride=16;
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,buf,gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(prog.aStart);
+        gl.vertexAttribPointer(prog.aStart,2,gl.FLOAT,false,stride,0);
+        gl.enableVertexAttribArray(prog.aEnd);
+        gl.vertexAttribPointer(prog.aEnd,2,gl.FLOAT,false,stride,8);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.quadIndexBuffer);
+        gl.enableVertexAttribArray(prog.aIdx);
+        gl.vertexAttribPointer(prog.aIdx,1,gl.FLOAT,false,0,0);
+        var gain=Math.pow(2,controls.mainGain);
+        gl.uniform1f(prog.uGain,gain);
+        gl.uniform1f(prog.uSize,0.007);
+        gl.uniform1f(prog.uInvert, controls.invertXY ? -1 : 1);
+        gl.uniform1f(prog.uIntensity,0.5);
+        gl.uniform1f(prog.uNEdges,n);
+        gl.uniform1f(prog.uFadeAmount,this.fadeAmount);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D,this.screenTexture);
+        gl.uniform1i(prog.uScreen,0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.vertexIndexBuffer);
+        gl.drawElements(gl.TRIANGLES,6*n,gl.UNSIGNED_SHORT,0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.colorMask(true,true,true,true);
+    },
+    drawTexture: function(texture) {
+        var prog=this.texturedShader;
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D,texture);
+        gl.uniform1i(prog.uTexture0,0);
+        this.drawFullScreen();
+    },
+    drawFullScreen: function() {
+        var prog=gl.getParameter(gl.CURRENT_PROGRAM);
+        var aPos=gl.getAttribLocation(prog,"aPos");
+        gl.enableVertexAttribArray(aPos);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.fullScreenQuad,gl.STATIC_DRAW);
+        gl.vertexAttribPointer(aPos,2,gl.FLOAT,false,0,0);
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.drawArrays(gl.TRIANGLES,0,6);
+    },
+    setShader: function(prog) { gl.useProgram(prog); },
+    makeTexture: function(w,h) {
+        var t=gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D,t);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.FLOAT,null);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.bindTexture(gl.TEXTURE_2D,null);
+        t.width=w; t.height=h; return t;
+    },
+    setAdditiveBlending: function() { gl.blendFunc(gl.ONE,gl.ONE); },
+    setNormalBlending: function() { gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); },
+    createShader: function(vsTag,fsTag) {
+        var vs=gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vs,document.getElementById(vsTag).firstChild.nodeValue);
+        gl.compileShader(vs);
+        var fs=gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fs,document.getElementById(fsTag).firstChild.nodeValue);
+        gl.compileShader(fs);
+        var prog=gl.createProgram();
+        gl.attachShader(prog,vs); gl.deleteShader(vs);
+        gl.attachShader(prog,fs); gl.deleteShader(fs);
+        gl.linkProgram(prog);
+        return prog;
+    }
+};
+
+var _scopeInitialized = false;
+function _initScope() {
+    if (_scopeInitialized) return;
+    _scopeInitialized = true;
+    var ct = document.getElementById('clicktostart');
+    if (ct) ct.remove();
+    Filter.init(1024, 8, 6);
+    AudioSystem.init(1024);
+    Render.init();
+    Render.setupArrays(Filter.nSmoothedSamples);
+    UI.init();
+    AudioSystem.startSound();
+    requestAnimationFrame(drawCRTFrame);
+}
+
+// Allow click-to-start within the scope canvas area
+document.getElementById('scope-canvas-wrap').addEventListener('click', function() {
+    _initScope();
+});
+</script>
+
 </body>
 </html>
