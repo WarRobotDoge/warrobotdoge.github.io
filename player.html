@@ -375,11 +375,19 @@
 
 
         /* ── TABS ──────────────────────────────────────────────────────── */
+        #main-view { position: relative; }
         #tab-nav {
+            position: sticky;
+            top: -35px;          /* offset to cancel main-view padding */
+            margin: -35px -35px 28px -35px;
+            padding: 0 35px;
             display: flex;
             gap: 0;
-            margin-bottom: 28px;
-            border-bottom: 1px solid var(--border-heavy);
+            z-index: 50;
+            background: rgba(9,9,9,0.75);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
         .tab-btn {
             background: none;
@@ -389,7 +397,7 @@
             font-family: inherit;
             font-size: 13px;
             font-weight: 700;
-            padding: 10px 20px;
+            padding: 14px 20px;
             cursor: pointer;
             letter-spacing: 0.3px;
             transition: color 0.15s;
@@ -594,15 +602,6 @@
                         <output id="bValueOutput" class="sc-val">1.00</output>
                     </div>
                     <div class="sc-note">Use JS expressions, e.g. Math.tan(t). t = time, n = sample count.</div>
-                </div>
-
-                <div class="sc-section">
-                    <div class="sc-head">
-                        <input type="checkbox" id="micCheckbox"
-                            onchange="if(this.checked) AudioSystem.tryToGetMicrophone(); else AudioSystem.disconnectMicrophone()">
-                        Microphone
-                    </div>
-                    <output id="microphoneOutput" style="font-size:11px;color:var(--text-dim)"></output>
                 </div>
 
             </div>
@@ -1832,7 +1831,6 @@ var UI = {
 var Render = {
     init: function() {
         this.canvas = document.getElementById("crtCanvas");
-        this._sizeCanvas();
         window.gl = this.canvas.getContext("webgl", {preserveDrawingBuffer:true});
         gl.viewport(0,0,this.canvas.width,this.canvas.height);
         gl.enable(gl.BLEND);
@@ -1900,18 +1898,18 @@ var Render = {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.vertexIndexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,idx,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
-        this.scratchVertices=new Float32Array(8*nPoints);
+        this.scratchVertices=new Float32Array(8*(nPoints+1)); // +1 for aEnd of last edge
     },
     setupTextures: function() {
         this.frameBuffer=gl.createFramebuffer();
         this.lineTexture=this.makeTexture(1024,1024);
-        this._sizeCanvas();
         this.blur1Texture=this.makeTexture(256,256);
         this.blur2Texture=this.makeTexture(256,256);
         this.blur3Texture=this.makeTexture(32,32);
         this.blur4Texture=this.makeTexture(32,32);
         // Blank screen texture (no external noise.jpg needed)
         this.screenTexture = this.makeBlankTexture(64,64);
+        // Canvas sized after layout settles — see _initScope
     },
     makeBlankTexture: function(w,h) {
         // Simulate a CRT phosphor screen texture.
@@ -1923,9 +1921,11 @@ var Render = {
         for(var i=0;i<pixels.length;i+=4){
             var px=(i/4)%w, py=Math.floor((i/4)/w);
             var onGrid=(px%8===0||py%8===0)?1:0;
-            pixels[i]   = onGrid ? 210 : 140;   // R: grid channel
-            pixels[i+1] = 185;                   // G: no-grid phosphor (outputFragment squares this)
-            pixels[i+2] = 80;                    // B: warm green tint
+            // R=grid phosphor, G=no-grid phosphor (squared in shader so keep modest).
+            // Dim values prevent the ambient +0.35 scatter constant from glowing green.
+            pixels[i]   = onGrid ? 180 : 120;   // R: grid
+            pixels[i+1] = 60;                    // G: low — reduces ambient background glow
+            pixels[i+2] = 20;                    // B: minimal
             pixels[i+3] = 255;
         }
         gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
@@ -1945,57 +1945,59 @@ var Render = {
     },
     drawCRT: function() {
         this.setNormalBlending();
+        // Step 1: downsample lineTexture → blur1 (256x256)
         this.activateTargetTexture(this.blur1Texture);
         this.setShader(this.texturedShader);
         gl.uniform1f(this.texturedShader.uResizeForCanvas,this.lineTexture.width/1024);
         this.drawTexture(this.lineTexture);
+        // Step 2: horizontal blur → blur2
         this.activateTargetTexture(this.blur2Texture);
         this.setShader(this.blurShader);
         gl.uniform2fv(this.blurShader.uOffset,[1/256,0]);
         this.drawTexture(this.blur1Texture);
-        this.activateTargetTexture(this.blur3Texture);
-        this.setShader(this.blurShader);
+        // Step 3: vertical blur → blur1 (overwrites; now blur1 = tight glow)
+        this.activateTargetTexture(this.blur1Texture);
         gl.uniform2fv(this.blurShader.uOffset,[0,1/256]);
         this.drawTexture(this.blur2Texture);
+        // Step 4: copy blur1 → blur3 to preserve tight glow
+        this.activateTargetTexture(this.blur3Texture);
+        this.setShader(this.texturedShader);
+        gl.uniform1f(this.texturedShader.uResizeForCanvas,1.0);
+        this.drawTexture(this.blur1Texture);
+        // Step 5+6: wide diagonal blurs for scatter (32x32)
         this.activateTargetTexture(this.blur4Texture);
         this.setShader(this.blurShader);
-        gl.uniform2fv(this.blurShader.uOffset,[1/32,0]);
+        gl.uniform2fv(this.blurShader.uOffset,[1/32,1/60]);
         this.drawTexture(this.blur3Texture);
-        var scatterTexture=this.blur4Texture;
+        this.activateTargetTexture(this.blur3Texture);
+        gl.uniform2fv(this.blurShader.uOffset,[-1/60,1/32]);
+        this.drawTexture(this.blur4Texture);
+        // Step 7: composite to screen
         this.activateTargetTexture(null);
-        gl.viewport(0,0,this.canvas.width,this.canvas.height);
         this.setShader(this.outputShader);
-        gl.uniform1i(this.outputShader.uTexture0,0);
-        gl.uniform1i(this.outputShader.uTexture1,1);
-        gl.uniform1i(this.outputShader.uTexture2,2);
-        gl.uniform1i(this.outputShader.uTexture3,3);
-        var exp=Math.pow(2,controls.exposureStops);
-        gl.uniform1f(this.outputShader.uExposure,exp);
-        var h=controls.hue/360;
-        function hsl(h,s,l){
-            var r,g,b;
-            if(!s){r=g=b=l;}
-            else{
-                function hue2rgb(p,q,t){if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;}
-                var q=l<0.5?l*(1+s):l+s-l*s, p=2*l-q;
-                r=hue2rgb(p,q,h+1/3); g=hue2rgb(p,q,h); b=hue2rgb(p,q,h-1/3);
-            }
-            return [r,g,b];
-        }
-        var col=hsl(h,1,0.5);
-        gl.uniform3fv(this.outputShader.uColour,col);
+        // Exposure offset -2.0 matches original calibration (prevents overexposure)
+        gl.uniform1f(this.outputShader.uExposure,Math.pow(2,controls.exposureStops-2.0));
         gl.uniform1f(this.outputShader.uResizeForCanvas,this.lineTexture.width/1024);
-        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,this.lineTexture);
-        gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,this.blur1Texture);
-        gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D,scatterTexture);
-        gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D,this.screenTexture);
-        this.drawFullScreen();
+        gl.uniform3fv(this.outputShader.uColour,this.getColourFromHue(controls.hue));
+        this.drawTexture(this.lineTexture,this.blur1Texture,this.blur3Texture,this.screenTexture);
+    },
+
+    getColourFromHue: function(hue) {
+        // Original sqrt-interpolation for smooth phosphor colour (not HSL)
+        var alpha=(hue/120.0)%1.0;
+        var start=Math.sqrt(1.0-alpha), end=Math.sqrt(alpha);
+        if(hue<120) return [start,end,0.0];
+        else if(hue<240) return [0.0,start,end];
+        else return [end,0.0,start];
     },
     activateTargetTexture: function(texture) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, texture ? this.frameBuffer : null);
         if (texture) {
             gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0);
             gl.viewport(0,0,texture.width,texture.height);
+        } else {
+            // Final composite — restore full canvas viewport (was left at 32x32 from last blur)
+            gl.viewport(0,0,this.canvas.width,this.canvas.height);
         }
         this.targetTexture=texture;
     },
@@ -2015,50 +2017,56 @@ var Render = {
         gl.drawArrays(gl.TRIANGLES,0,6);
     },
     drawLine: function(xPoints,yPoints) {
-        var n=this.nEdges;
-        var buf=this.scratchVertices;
-        for(var i=0;i<n;i++){
-            buf[8*i]=xPoints[i]; buf[8*i+1]=yPoints[i];
-            buf[8*i+2]=xPoints[i+1]; buf[8*i+3]=yPoints[i+1];
-            buf[8*i+4]=xPoints[i]; buf[8*i+5]=yPoints[i];
-            buf[8*i+6]=xPoints[i+1]; buf[8*i+7]=yPoints[i+1];
+        // Vertex layout matches original: each point repeated 4 times as 4 quad verts.
+        // aStart reads from offset 0, aEnd reads 8 floats (32 bytes) ahead — the next point.
+        var nPoints=xPoints.length;
+        var buf=this.scratchVertices; // sized for nPoints*4*2 floats in setupArrays
+        for(var i=0;i<nPoints;i++){
+            buf[8*i]=buf[8*i+2]=buf[8*i+4]=buf[8*i+6]=xPoints[i];
+            buf[8*i+1]=buf[8*i+3]=buf[8*i+5]=buf[8*i+7]=yPoints[i];
         }
-        var prog=this.lineShader;
         this.setAdditiveBlending();
-        gl.colorMask(true,true,true,true);
+        var prog=this.lineShader;
         gl.useProgram(prog);
-        var stride=16;
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,buf,gl.STATIC_DRAW);
         gl.enableVertexAttribArray(prog.aStart);
-        gl.vertexAttribPointer(prog.aStart,2,gl.FLOAT,false,stride,0);
+        gl.vertexAttribPointer(prog.aStart,2,gl.FLOAT,false,0,0);
         gl.enableVertexAttribArray(prog.aEnd);
-        gl.vertexAttribPointer(prog.aEnd,2,gl.FLOAT,false,stride,8);
+        gl.vertexAttribPointer(prog.aEnd,2,gl.FLOAT,false,0,8*4); // 8 floats ahead
         gl.bindBuffer(gl.ARRAY_BUFFER,this.quadIndexBuffer);
         gl.enableVertexAttribArray(prog.aIdx);
         gl.vertexAttribPointer(prog.aIdx,1,gl.FLOAT,false,0,0);
-        var gain=Math.pow(2,controls.mainGain);
-        gl.uniform1f(prog.uGain,gain);
-        gl.uniform1f(prog.uSize,0.007);
-        gl.uniform1f(prog.uInvert, controls.invertXY ? -1 : 1);
-        gl.uniform1f(prog.uIntensity,0.5);
-        gl.uniform1f(prog.uNEdges,n);
-        gl.uniform1f(prog.uFadeAmount,this.fadeAmount);
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.screenTexture);
         gl.uniform1i(prog.uScreen,0);
+        gl.uniform1f(prog.uSize,0.015);
+        gl.uniform1f(prog.uGain,Math.pow(2,controls.mainGain)*450/512);
+        gl.uniform1f(prog.uInvert,controls.invertXY?-1:1);
+        gl.uniform1f(prog.uIntensity,controls.disableFilter?0.005*(Filter.steps+1.5):0.005);
+        gl.uniform1f(prog.uFadeAmount,this.fadeAmount);
+        gl.uniform1f(prog.uNEdges,this.nEdges);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.vertexIndexBuffer);
-        gl.drawElements(gl.TRIANGLES,6*n,gl.UNSIGNED_SHORT,0);
+        gl.drawElements(gl.TRIANGLES,(nPoints-1)*6,gl.UNSIGNED_SHORT,0);
+        gl.disableVertexAttribArray(prog.aStart);
+        gl.disableVertexAttribArray(prog.aEnd);
+        gl.disableVertexAttribArray(prog.aIdx);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
-        gl.colorMask(true,true,true,true);
     },
-    drawTexture: function(texture) {
-        var prog=this.texturedShader;
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D,texture);
-        gl.uniform1i(prog.uTexture0,0);
-        this.drawFullScreen();
+    drawTexture: function(t0,t1,t2,t3) {
+        gl.enableVertexAttribArray(this.program.aPos);
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,t0); gl.uniform1i(this.program.uTexture0,0);
+        if(t1){gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,t1); gl.uniform1i(this.program.uTexture1,1);}
+        if(t2){gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D,t2); gl.uniform1i(this.program.uTexture2,2);}
+        if(t3){gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D,t3); gl.uniform1i(this.program.uTexture3,3);}
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.fullScreenQuad,gl.STATIC_DRAW);
+        gl.vertexAttribPointer(this.program.aPos,2,gl.FLOAT,false,0,0);
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.drawArrays(gl.TRIANGLES,0,6);
+        gl.disableVertexAttribArray(this.program.aPos);
+        if(this.targetTexture){gl.bindTexture(gl.TEXTURE_2D,this.targetTexture); gl.generateMipmap(gl.TEXTURE_2D);}
     },
     drawFullScreen: function() {
         var prog=gl.getParameter(gl.CURRENT_PROGRAM);
@@ -2070,7 +2078,7 @@ var Render = {
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.drawArrays(gl.TRIANGLES,0,6);
     },
-    setShader: function(prog) { gl.useProgram(prog); },
+    setShader: function(prog) { this.program=prog; gl.useProgram(prog); },
     makeTexture: function(w,h) {
         var t=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,t);
@@ -2106,13 +2114,27 @@ function _initScope() {
     _scopeInitialized = true;
     var ct = document.getElementById('clicktostart');
     if (ct) ct.remove();
+
     Filter.init(1024, 8, 6);
     AudioSystem.init(1024);
-    Render.init();
-    Render.setupArrays(Filter.nSmoothedSamples);
-    UI.init();
-    AudioSystem.startSound();
-    requestAnimationFrame(drawCRTFrame);
+
+    // Size the canvas BEFORE WebGL init — changing canvas dimensions after
+    // context creation resets the entire GL state (textures, shaders, buffers lost).
+    // One rAF lets the flex layout settle so offsetWidth/Height are correct.
+    requestAnimationFrame(function() {
+        var wrap = document.getElementById('scope-canvas-wrap');
+        var size = Math.max(300, Math.min(wrap.offsetWidth, wrap.offsetHeight));
+        var canvas = document.getElementById('crtCanvas');
+        canvas.width  = size;
+        canvas.height = size;
+
+        // Now init WebGL on the correctly-sized canvas — context is fresh
+        Render.init();
+        Render.setupArrays(Filter.nSmoothedSamples);
+        UI.init();
+        AudioSystem.startSound();
+        requestAnimationFrame(drawCRTFrame);
+    });
 }
 
 // Allow click-to-start within the scope canvas area
