@@ -1644,30 +1644,23 @@ var AudioSystem = {
         var ctx = this.audioContext;
         var playerAudio = document.getElementById('core-audio');
 
-        // createMediaElementSource routes audio through the Web Audio graph.
-        this.source   = ctx.createMediaElementSource(playerAudio);
-        this.splitter = ctx.createChannelSplitter(2);
-        this.merger   = ctx.createChannelMerger(2);
+        this.source = ctx.createMediaElementSource(playerAudio);
 
-        // Two analysers for stereo X/Y data
+        // Direct passthrough — audio ALWAYS reaches speakers regardless of
+        // anything the oscilloscope does. No merger means no failure point.
+        this.source.connect(ctx.destination);
+
+        // Stereo tap: splitter pulls L/R for X/Y visualisation only.
+        // The analysers are NOT in the main audio path — they don't affect output.
+        this.splitter  = ctx.createChannelSplitter(2);
         this.analyserL = ctx.createAnalyser();
         this.analyserR = ctx.createAnalyser();
         this.analyserL.fftSize = 2048;
         this.analyserR.fftSize = 2048;
-
-        // Audio flow: source → splitter → (L analyser, R analyser) → merger → destination
-        // Audio always reaches destination; analysers just read it non-destructively.
         this.source.connect(this.splitter);
-        this.splitter.connect(this.analyserL, 0, 0);
-        this.splitter.connect(this.analyserR, 1, 0);
-        this.analyserL.connect(this.merger, 0, 0);
-        this.analyserR.connect(this.merger, 0, 1);
-        this.merger.connect(ctx.destination);
-
-        // Signal generator (separate, additive)
-        this.generator = ctx.createScriptProcessor(this.bufferSize, 0, 2);
-        this.generator.onaudioprocess = SignalGenerator.generate;
-        this.generator.connect(ctx.destination);
+        this.splitter.connect(this.analyserL, 0);
+        this.splitter.connect(this.analyserR, 1);
+        // analyserL / analyserR are NOT connected to destination
 
         this._xBuf = new Float32Array(this.analyserL.fftSize);
         this._yBuf = new Float32Array(this.analyserR.fftSize);
