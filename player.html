@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1593,7 +1594,15 @@ function updatePlayButtonUI() {
 
 <script>
 // ── TAB SWITCHING ─────────────────────────────────────────────────────────────
+var _scrollPos = { grid: 0, scope: 0 };
+var _currentTab = 'grid';
+
 function switchTab(tab) {
+    if (tab === _currentTab) return;
+
+    var mainView = document.getElementById('main-view');
+    _scrollPos[_currentTab] = mainView.scrollTop;
+
     document.querySelectorAll('.tab-btn').forEach(b =>
         b.classList.toggle('active', b.dataset.tab === tab));
     document.getElementById('tab-grid').style.display  = tab === 'grid'  ? '' : 'none';
@@ -1606,6 +1615,9 @@ function switchTab(tab) {
         scopeEl.classList.remove('tab-active');
         scopeEl.style.display = 'none';
     }
+
+    _currentTab = tab;
+    mainView.scrollTop = _scrollPos[tab];
 }
 
 // ── OSCILLOSCOPE ──────────────────────────────────────────────────────────────
@@ -2136,5 +2148,6 @@ document.getElementById('scope-canvas-wrap').addEventListener('click', function(
 });
 </script>
 
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
