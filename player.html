@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -480,7 +481,7 @@
                     <span id="load-text">0/0 loaded</span>
                     <div class="load-track"><div id="load-bar"></div></div>
                 </div>
-                <input type="text" class="search-bar" id="search-input" placeholder="Search archive..." oninput="filterGrid()">
+                <input type="text" class="search-bar" id="search-input" placeholder="Search archive..." oninput="filterGridDebounced()">
                 <select id="sort-select" class="search-bar" onchange="drawGrid()">
                     <option value="added">Sort: Date Added</option>
                     <option value="title">Sort: Title (A-Z)</option>
@@ -1029,6 +1030,7 @@
                 card.querySelector(`#img-${album.id}`).style.display = 'block';
                 card.querySelector(`#placeholder-${album.id}`).style.display = 'none';
             }
+            card.dataset.search = (album.name + ' ' + album.artist + ' ' + album.tracks.map(t => t.title).join(' ')).toLowerCase();
             card.onclick = () => openDrawer(key, card);
             grid.appendChild(card);
         });
@@ -1036,12 +1038,23 @@
     }
 
 
-    function filterGrid() {
-        const q = document.getElementById('search-input').value.toLowerCase();
-        document.querySelectorAll('.album-card').forEach(c => {
-            c.style.display = c.innerText.toLowerCase().includes(q) ? 'block' : 'none';
-        });
+ function filterGrid() {
+    const q = document.getElementById('search-input').value.toLowerCase().trim();
+    const cards = document.querySelectorAll('.album-card');
+    if (!q) {
+        cards.forEach(c => c.style.display = 'block');
+        return;
     }
+    cards.forEach(c => {
+        c.style.display = c.dataset.search.includes(q) ? 'block' : 'none';
+    });
+}
+
+let _filterTimer = null;
+function filterGridDebounced() {
+    clearTimeout(_filterTimer);
+    _filterTimer = setTimeout(filterGrid, 120);
+}
 
     function openDrawer(albumKey, card) {
         const existing = document.querySelector('.drawer');
@@ -2148,6 +2161,7 @@ document.getElementById('scope-canvas-wrap').addEventListener('click', function(
 });
 </script>
 
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
