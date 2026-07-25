@@ -91,19 +91,19 @@
         font-weight: bold;
       }
 
-      .white-section {
-        background-color: white;
-        width: 100%; /* Make the navbar take the full width */
-        max-width: 931px; /* Match the width of the navbar */
-        height: 192vh;  /* Full viewport height to extend down to the footer */
-        margin: 0 auto;
-        position: relative;
-        z-index: 1;
-        top: -20px;   /* Moves the white section upward */
-        padding-top: 20px;   /* Adds spacing above the content for a clean layout */
-        flex-grow: 1;
-        padding-bottom: 200px;  /* Add space between content and footer */
-      }
+     .white-section {
+  background-color: white;
+  width: 100%;
+  max-width: 931px;
+  min-height: 192vh;  /* ← grows with content instead of capping it */
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  top: -20px;
+  padding-top: 20px;
+  flex-grow: 1;
+  padding-bottom: 200px;
+}
 
       .navbar-links {
         list-style-type: none;
