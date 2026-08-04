@@ -78,10 +78,12 @@
       background-color: black; /* Black box placeholder */
       transition: width 0.25s ease, height 0.25s ease, opacity 0.2s ease;
       opacity: 1;
+      z-index: 3; /* topmost -- always wins normally, since it's the thing
+                     you're meant to click on except while on the Java tab */
     }
       .game-container.game-hidden {
         opacity: 0;
-        pointer-events: none;
+        pointer-events: none; /* punches through to the layers below once hidden */
       }
 
     .game-container embed {
@@ -96,16 +98,16 @@
          CheerpJ appears to anchor its real rendering canvas to wherever the
          <applet> sits at init time, and moving that container later doesn't
          reliably drag CheerpJ's actual surface along with it. So instead of
-         hiding/moving the applet itself, a plain blocker div sits on top of
-         it (higher in DOM order = default higher stacking) whenever Java
-         isn't the active view, physically intercepting clicks without
-         touching or relying on anything about how CheerpJ behaves. */
+         hiding/moving the applet itself, a plain blocker div sits between
+         it and the normal game box (fixed z-index order below, not an
+         arbitrarily high one) whenever Java isn't the active view. */
       #java-applet-wrapper {
         position: absolute;
         top: 50%; left: 50%;
         width: 411px; height: 330px;
         margin-top: -165px; margin-left: -205.5px;
         opacity: 0;
+        z-index: 1; /* bottommost -- only reachable once both layers above step aside */
         transition: opacity 0.2s ease;
       }
       #java-applet-wrapper.java-active {
@@ -116,11 +118,11 @@
         top: 50%; left: 50%;
         width: 411px; height: 330px;
         margin-top: -165px; margin-left: -205.5px;
-        z-index: 5;
+        z-index: 2; /* middle -- sits above the applet, below the game box */
         background: transparent;
       }
       #java-click-blocker.java-active {
-        display: none;
+        display: none; /* removed from hit-testing entirely once on Java */
       }
 
       .language-buttons button:hover {
