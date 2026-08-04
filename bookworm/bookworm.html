@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -91,21 +92,35 @@
   object-fit: contain; /* Adjust how the SWF scales */
 }
 
+      /* The applet's own position and size never change after page load --
+         CheerpJ appears to anchor its real rendering canvas to wherever the
+         <applet> sits at init time, and moving that container later doesn't
+         reliably drag CheerpJ's actual surface along with it. So instead of
+         hiding/moving the applet itself, a plain blocker div sits on top of
+         it (higher in DOM order = default higher stacking) whenever Java
+         isn't the active view, physically intercepting clicks without
+         touching or relying on anything about how CheerpJ behaves. */
       #java-applet-wrapper {
         position: absolute;
-        top: 50%;
-        left: -9999px;   /* physically off-screen by default, not just invisible-in-place */
+        top: 50%; left: 50%;
         width: 411px; height: 330px;
-        margin-top: -165px;
+        margin-top: -165px; margin-left: -205.5px;
         opacity: 0;
-        pointer-events: none;
         transition: opacity 0.2s ease;
       }
       #java-applet-wrapper.java-active {
-        left: 50%;
-        margin-left: -205.5px;
         opacity: 1;
-        pointer-events: auto;
+      }
+      #java-click-blocker {
+        position: absolute;
+        top: 50%; left: 50%;
+        width: 411px; height: 330px;
+        margin-top: -165px; margin-left: -205.5px;
+        z-index: 5;
+        background: transparent;
+      }
+      #java-click-blocker.java-active {
+        display: none;
       }
 
       .language-buttons button:hover {
@@ -592,10 +607,11 @@
           </div>
 
           <!-- Real applet tag, present from page load so CheerpJ picks it up
-               correctly -- hidden by relocating it off-screen (not just
-               opacity) until the Java button reveals it. codebase points
-               back at the folder where the actual game files (wordfall.jar,
-               images/, sounds/) are hosted. -->
+               correctly. Its position/size never change after this -- see
+               the CSS note above for why. A separate blocker div covers it
+               (and only it) whenever Java isn't the active view. codebase
+               points back at the folder where the actual game files
+               (wordfall.jar, images/, sounds/) are hosted. -->
           <div id="java-applet-wrapper">
             <applet vspace="0" hspace="0" code="wordfall.WordFallApplet.class" name="gameApplet" id="gameApplet" archive="wordfall.jar" codebase="https://warrobotdoge.com/bookwormapplet/" width="411" height="330" mayscript viewastext>
               <param name="requiredgifzip" value="images/bookworm.zip">
@@ -610,6 +626,7 @@
               <param name="hosterrhash" value="362cf4af545aabb24ba0760c4d8735fd">
             </applet>
           </div>
+          <div id="java-click-blocker"></div>
         </div>
 
       </div>
@@ -633,6 +650,7 @@
           var gamePath;
           const gameContainer = document.getElementById('game-container');
           const javaWrapper = document.getElementById('java-applet-wrapper');
+          const javaBlocker = document.getElementById('java-click-blocker');
 
           if (language === 'java') {
               // Just reveal the applet layer -- it's been sitting in the DOM
@@ -641,14 +659,15 @@
               // time is instant instead of re-booting the JVM.
               gameContainer.classList.add('game-hidden');
               javaWrapper.classList.add('java-active');
+              javaBlocker.classList.add('java-active'); // hides the blocker
               return;
           }
 
-          // Any non-Java selection: physically move the applet layer
-          // off-screen (see .java-active CSS -- default position is far off
-          // to the left) and show the normal SWF/iframe box, rebuilding its
-          // contents as before.
+          // Any non-Java selection: fade the applet out and drop the blocker
+          // back over it (the applet itself never moves -- see CSS note),
+          // then show the normal SWF/iframe box and rebuild its contents.
           javaWrapper.classList.remove('java-active');
+          javaBlocker.classList.remove('java-active'); // blocker reappears
           gameContainer.classList.remove('game-hidden');
           gameContainer.innerHTML = '';
           gameContainer.style.width = "800px";
