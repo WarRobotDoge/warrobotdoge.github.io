@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -57,10 +56,11 @@
 
 
       /* #game-stage holds both the normal SWF/iframe box and the inline Java
-         applet stacked on top of each other, so switching between them is
-         just an opacity swap -- neither element is ever removed from the
-         DOM or set to display:none, which keeps the applet's real pixel
-         size intact for CheerpJ at all times, not just while visible. */
+         applet. The Java layer is now hidden by physically relocating it far
+         off-screen (not just opacity/pointer-events) when inactive -- CheerpJ
+         likely renders its own interactive surface that isn't perfectly
+         scoped by CSS visibility tricks alone, so moving it away in actual
+         page-space is the reliable fix rather than hiding it in place. */
       #game-stage {
         position: relative;
         width: 800px;
@@ -93,14 +93,17 @@
 
       #java-applet-wrapper {
         position: absolute;
-        top: 50%; left: 50%;
+        top: 50%;
+        left: -9999px;   /* physically off-screen by default, not just invisible-in-place */
         width: 411px; height: 330px;
-        margin-top: -165px; margin-left: -205.5px;
+        margin-top: -165px;
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.2s ease;
       }
       #java-applet-wrapper.java-active {
+        left: 50%;
+        margin-left: -205.5px;
         opacity: 1;
         pointer-events: auto;
       }
@@ -588,12 +591,11 @@
             <!-- BookWorm Deluxe Steam Key -->
           </div>
 
-          <!-- Real applet tag, present from page load (same setup that's
-               already confirmed working on its own page) so CheerpJ picks
-               it up correctly -- just stacked behind the SWF box until the
-               Java button reveals it. codebase points back at the folder
-               where the actual game files (wordfall.jar, images/, sounds/)
-               are hosted; CONFIRM this path matches your real upload. -->
+          <!-- Real applet tag, present from page load so CheerpJ picks it up
+               correctly -- hidden by relocating it off-screen (not just
+               opacity) until the Java button reveals it. codebase points
+               back at the folder where the actual game files (wordfall.jar,
+               images/, sounds/) are hosted. -->
           <div id="java-applet-wrapper">
             <applet vspace="0" hspace="0" code="wordfall.WordFallApplet.class" name="gameApplet" id="gameApplet" archive="wordfall.jar" codebase="https://warrobotdoge.com/bookwormapplet/" width="411" height="330" mayscript viewastext>
               <param name="requiredgifzip" value="images/bookworm.zip">
@@ -617,7 +619,7 @@
       <script>commentBox('5680061592109056-proj')</script>
     </div>
     </div>
-<script src="https://cjrtnc.leaningtech.com/3.1/cj3loader.js"></script>
+
 <br>
 <br>
 <br>
@@ -642,8 +644,10 @@
               return;
           }
 
-          // Any non-Java selection: hide the applet layer, show the normal
-          // SWF/iframe box, and rebuild its contents as before.
+          // Any non-Java selection: physically move the applet layer
+          // off-screen (see .java-active CSS -- default position is far off
+          // to the left) and show the normal SWF/iframe box, rebuilding its
+          // contents as before.
           javaWrapper.classList.remove('java-active');
           gameContainer.classList.remove('game-hidden');
           gameContainer.innerHTML = '';
