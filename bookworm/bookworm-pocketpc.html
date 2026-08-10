@@ -11,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookWorm Palm OS & Pocket PC</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/i.png" type="image/png">
-    <meta name="description" content="Download and Play BookWorm Deluxe for Palm OS! Download and Play BookWorm Deluxe for Pocket PCs!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/BookWorm_PPC_Cover.jpg" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm Palm OS &amp; Pocket PC Download — The 2002 Original</title>
+    <meta name="description" content="Download BookWorm for Palm OS and Pocket PC, released November 2002 — months before the PC version. Includes the Palm OS simulator, screenshots, and the idle Easter egg." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-pocketpc" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm Palm OS &amp; Pocket PC Download — The 2002 Original" />
+    <meta property="og:description" content="Download BookWorm for Palm OS and Pocket PC, released November 2002 — months before the PC version. Includes the Palm OS simulator and the idle Easter egg." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-pocketpc" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/BookWorm_PPC_Cover.jpg" />
+    <meta property="og:image:alt" content="BookWorm for Palm OS and Pocket PC cover art" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm Palm OS &amp; Pocket PC Download — The 2002 Original" />
+    <meta name="twitter:description" content="Download BookWorm for Palm OS and Pocket PC, released November 2002 — months before the PC version." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/coverart/BookWorm_PPC_Cover.jpg" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/i.png" type="image/png">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -100,7 +117,9 @@
         align-items: center;
         z-index: 2;
         box-shadow: inset 0 10px 10px -8px white; /* Inner white shadow */
-       
+        /* NOTE: every other page also has this line here — it's missing on this
+           page only, so the navbar renders flat red with no white fade:
+           background: linear-gradient(to bottom, #ED1C24 90%, white 100%); */
       }
 
       .navbar-text {
@@ -114,7 +133,7 @@
         background-color: white;
         width: 100%; /* Make the navbar take the full width */
         max-width: 931px; /* Match the width of the navbar */
-        height: 120vh;  /* Full viewport height to extend down to the footer */
+        min-height: 120vh;  /* ← grows with content instead of capping it */
         margin: 0 auto;
         position: relative;
         z-index: 1;
@@ -316,22 +335,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the file size in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -346,7 +408,7 @@
        /* Make container responsive */
         max-width: 344px;   /* Limit max size */
         max-height: 456px;
-        aspect-ratio: 1 / 1;  /* Maintain 4:3 aspect ratio */
+        aspect-ratio: 1 / 1;  /* Square, to suit the portrait handheld screenshots */
         background-color: #e0e0e0;   /* Light gray background */
         border: 2px solid #ccc;   /* Subtle border */
         border-radius: 12px;  /* Rounded corners */
@@ -413,7 +475,8 @@
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="Bookworm Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="BookWorm logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -475,10 +538,10 @@
         </div>
         <div class="content-wrapper">
             <div class="dropdown2">
-                <button class="dropdown2-button">Download for Palm & Pocket PC<span class="dropdown2-arrow"></span>
+                <button class="dropdown2-button">Download for Palm &amp; Pocket PC<span class="dropdown2-arrow"></span>
                 </button>
                 <div class="dropdown2-menu">
-                  <a href="https://archive.org/download/bookworm-ppc/BookWorm_PPC.zip" target="_blank">BookWorm for Palm and Pocket PCs (50MB)</a>
+                  <a href="https://archive.org/download/bookworm-ppc/BookWorm_PPC.zip" target="_blank" rel="noopener"><span>Palm OS + Pocket PC bundle</span><span class="dropdown2-size">50 MB</span></a>
                   </div>
               </div>
             </div>
@@ -489,38 +552,37 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc.jpg" alt="Bookworm Pocket PC Screenshot 1"   height="642px" class="active"> 
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_2.jpg" alt="Bookworm Pocket PC Screenshot 2" height="642px">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_3.jpg" alt="Bookworm Pocket PC Screenshot 3" height="642px">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_4.jpg" alt="Bookworm Pocket PC Screenshot 4" height="642px">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_9.jpg" alt="Bookworm Pocket PC Screenshot 9" height="642px">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_10.jpg" alt="Bookworm Pocket PC Screenshot 10" height="642px">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_easteregg.jpg" alt="BookWorm Palm OS Easter Egg" height="642px">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/worm2.gif" alt="Bookworm Pocket PC Screenshot 5" height="642px">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_6.jpg" alt="Bookworm Pocket PC Screenshot 6" height="642px">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_7.jpg" alt="Bookworm Pocket PC Screenshot 7" height="642px">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_8.jpg" alt="Bookworm Pocket PC Screenshot 8" height="642px">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc.jpg" alt="BookWorm on Palm OS showing the letter grid and Lex" height="642" class="active"> 
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_2.jpg" alt="BookWorm Palm OS gameplay with a word being formed" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_3.jpg" alt="BookWorm Palm OS title screen" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_4.jpg" alt="BookWorm Palm OS score display" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_9.jpg" alt="BookWorm Palm OS menu screen" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_10.jpg" alt="BookWorm Palm OS burning tiles" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_easteregg.jpg" alt="BookWorm Palm OS Easter egg with Lex wearing a disguise while idle" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/worm2.gif" alt="Animated BookWorm Palm OS gameplay" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_6.jpg" alt="BookWorm Pocket PC gameplay" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_7.jpg" alt="BookWorm Pocket PC bonus word" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_8.jpg" alt="BookWorm Pocket PC high score screen" height="642">
           </div>
         </div>
 
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-    <p>BookWorm was released on <a href="https://www.mobygames.com/game/8639/bookworm-deluxe/releases/">Nov 29, 2002</a> for Palm OS devices and Pocket PCs. It was originally sold for <a href="https://www.palminfocenter.com/news/7285/astraware-releases-bookworm-v20/">$14.95</a>. The game is nice and compact and has a very similar look to the Java version. BookWorm for Palm OS had an <a href="https://youtube.com/shorts/w0RazqqZJcI?si=T1wirAWK6ZLr3HCV">Easter Egg</a>, where if you're AFK for a few moments, Lex will put on a mask, or a mustache. It seems to be that there a few variaties to this version, but I'm unable to track them down (See: <a href="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_5.jpg">Screenshot 5</a>). I was able to play the Palm OS version via a Palm OS Simulator, which I have included in the download. Perhaps it was the Deluxe version for these devices, as you needed to register them after <a href="https://palmarchive.com/files/Aliosa27%27s%20Archive/Astraware%20Bookworm.html">10</a> plays. Despite this, there's only a <a href="https://youtu.be/xF8ByVIyiQo?si=BQnXmnEk_43oLMGL">few</a> videos of this game, and <a href="https://youtu.be/nKNP7VuZ-BU?si=V-Ty5HhPdTOxp6Fg">1</a> of the Pocket PC version. I also included an .exe for the <a href="http://www.114pda.com/ppc/game/text/bookworm.htm">Pocket PC</a> in the download. <a href="https://warrobotdoge.com/bookworm/bookworm-blackberry">BookWorm Blackberry</a> is very similar to this port.</p>
-    <p>I found a <a href="https://web.archive.org/web/20100410064523/http://www.starlitskies.co.uk/games.asp">site</a> where someone who helped develop BookWorm talked about what they did. They rewrote the game to use the new framework and dictionary system for the game.</p>
-  </div>
-</div>
-</div>
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>BookWorm was released on <a href="https://www.mobygames.com/game/8639/bookworm-deluxe/releases/" rel="noopener">Nov 29, 2002</a> for Palm OS devices and Pocket PCs. It was originally sold for <a href="https://www.palminfocenter.com/news/7285/astraware-releases-bookworm-v20/" rel="noopener">$14.95</a>. The game is nice and compact and has a very similar look to the Java version. BookWorm for Palm OS had an <a href="https://youtube.com/shorts/w0RazqqZJcI?si=T1wirAWK6ZLr3HCV" rel="noopener">Easter Egg</a>, where if you're AFK for a few moments, Lex will put on a mask, or a mustache. It seems to be that there are a few varieties of this version, but I'm unable to track them down (See: <a href="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_5.jpg">Screenshot 5</a>). I was able to play the Palm OS version via a Palm OS Simulator, which I have included in the download. Perhaps it was the Deluxe version for these devices, as you needed to register them after <a href="https://palmarchive.com/files/Aliosa27%27s%20Archive/Astraware%20Bookworm.html" rel="noopener">10</a> plays. Despite this, there are only a <a href="https://youtu.be/xF8ByVIyiQo?si=BQnXmnEk_43oLMGL" rel="noopener">few</a> videos of this game, and <a href="https://youtu.be/nKNP7VuZ-BU?si=V-Ty5HhPdTOxp6Fg" rel="noopener">1</a> of the Pocket PC version. I also included an .exe for the <a href="http://www.114pda.com/ppc/game/text/bookworm.htm" rel="noopener">Pocket PC</a> in the download. <a href="https://warrobotdoge.com/bookworm/bookworm-blackberry">BookWorm Blackberry</a> is very similar to this port.</p>
+            <p>I found a <a href="https://web.archive.org/web/20100410064523/http://www.starlitskies.co.uk/games.asp" rel="noopener">site</a> where someone who helped develop BookWorm talked about what they did. They rewrote the game to use the new framework and dictionary system for the game.</p>
+          </div>
+        </div>
+      </div>
 
       <div class="filler"></div>
       <div class="section">
         <h2>BookWorm for Palm OS Gameplay</h2>
-      <div class="text">
-        <p>Gameplay taken on the emululator provided in the download.</p>
-        <iframe width="231" height="346" src="https://www.youtube.com/embed/MV2hoQf4UkM?si=Pu5Wny3SJWJz72SD" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-    </div>
-    </div>
-    </div>
+        <div class="text">
+          <p>Gameplay taken on the emulator provided in the download.</p>
+          <iframe width="231" height="346" src="https://www.youtube.com/embed/MV2hoQf4UkM?si=Pu5Wny3SJWJz72SD" title="BookWorm for Palm OS gameplay footage" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
     </div>
 
 <br>
@@ -529,7 +591,6 @@
 <br>
 <br>
 
-    </div>
     <footer></footer>
     <script>
       // Dropdown toggle functionality
@@ -560,5 +621,75 @@
       // Change images every 3 seconds
       setInterval(showNextImage, 3000);
     </script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm (Palm OS and Pocket PC)",
+  "alternateName": ["Astraware Bookworm", "BookWorm Palm OS", "BookWorm Pocket PC", "Bookworm PPC"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-pocketpc",
+  "image": "https://warrobotdoge.com/bookworm/images/coverart/BookWorm_PPC_Cover.jpg",
+  "description": "The handheld release of PopCap's BookWorm for Palm OS devices and Pocket PC, published by Astraware on 29 November 2002 at $14.95. Notably, this predates the Windows release of BookWorm Deluxe by roughly three months, making the Palm OS build one of the earliest commercially released versions of the game. Players link adjacent letter tiles on the library wall to form words and feed Lex the bookworm, clearing burning letters before they reach the bottom and set the library alight. The visual design closely resembles the original Java applet version. The port contains an Easter egg not present elsewhere in the series: leaving the game idle for a few moments causes Lex to put on a disguise such as a mask or a moustache. The build required registration after ten plays, suggesting it corresponds to the Deluxe edition. Very little footage of either version survives online. This archive hosts the game together with a Palm OS Simulator and a Pocket PC executable so both can be run on modern hardware.",
+  "datePublished": "2002-11-29",
+  "genre": ["Puzzle", "Word Game"],
+  "gamePlatform": ["Palm OS", "Pocket PC", "Windows Mobile", "PDA"],
+  "operatingSystem": ["Palm OS", "Windows Mobile"],
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": "en",
+  "keywords": "bookworm palm os download, bookworm pocket pc, astraware bookworm, bookworm pda game, bookworm palm simulator, bookworm easter egg",
+  "publisher": [
+    {
+      "@type": "Organization",
+      "name": "Astraware"
+    },
+    {
+      "@type": "Organization",
+      "name": "PopCap Games",
+      "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+    }
+  ],
+  "author": {
+    "@type": "Person",
+    "name": "Jason Kapalka"
+  },
+  "character": {
+    "@type": "Person",
+    "name": "Lex",
+    "description": "The green bookworm mascot, who dons a mask or moustache when the Palm OS version is left idle."
+  },
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_(video_game)",
+    "https://www.mobygames.com/game/8639/bookworm-deluxe/"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  },
+  "gameTip": {
+    "@type": "CreativeWork",
+    "name": "Idle Easter egg",
+    "text": "Leave BookWorm for Palm OS running without input for a few moments and Lex will put on a disguise, such as a mask or a moustache."
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm Palm OS and Pocket PC",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-pocketpc" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
   </body>
 </html>
