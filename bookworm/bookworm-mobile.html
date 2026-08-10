@@ -11,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookWorm Mobile</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/i.png" type="image/png">
-    <meta name="description" content="Download and Play BookWorm Java for Mobile!!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/BookWorm_Mobile_Poster.png" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm Mobile (Java) Download — The 2007 J2ME Phone Version</title>
+    <meta name="description" content="Download BookWorm Mobile, the 2007 Java ME phone release. Built for Nokia, Samsung and Sony handsets, it shipped with more features than the iOS version, including a tutorial." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-mobile" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm Mobile (Java) Download — The 2007 J2ME Phone Version" />
+    <meta property="og:description" content="Download BookWorm Mobile, the 2007 Java ME phone release for Nokia, Samsung and Sony handsets — with more features than the iOS version." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-mobile" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/BookWorm_Mobile_Poster.png" />
+    <meta property="og:image:alt" content="BookWorm Mobile promotional poster" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm Mobile (Java) Download — The 2007 J2ME Phone Version" />
+    <meta name="twitter:description" content="Download BookWorm Mobile, the 2007 Java ME phone release for Nokia, Samsung and Sony handsets." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/coverart/BookWorm_Mobile_Poster.png" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/i.png" type="image/png">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -114,7 +131,7 @@
         background-color: white;
         width: 100%; /* Make the navbar take the full width */
         max-width: 931px; /* Match the width of the navbar */
-        height: 120vh;  /* Full viewport height to extend down to the footer */
+        min-height: 120vh;  /* ← grows with content instead of capping it */
         margin: 0 auto;
         position: relative;
         z-index: 1;
@@ -316,22 +333,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the file size in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -346,7 +406,7 @@
        /* Make container responsive */
         max-width: 230px;   /* Limit max size */
         max-height: 304px;
-          /* 4/5 aspect ratioi */
+          /* roughly 4:5, to suit the portrait phone screen */
         background-color: #e0e0e0;   /* Light gray background */
         border: 2px solid #ccc;   /* Subtle border */
         border-radius: 12px;  /* Rounded corners */
@@ -406,7 +466,8 @@
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/Bookworm_Mobile.png" alt="Bookworm Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/Bookworm_Mobile.png" alt="BookWorm Mobile logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -471,7 +532,7 @@
                 <button class="dropdown2-button">Download for Mobile (Java)<span class="dropdown2-arrow"></span>
                 </button>
                 <div class="dropdown2-menu">
-                  <a href="https://warrobotdoge.com/bookworm/downloads/bookworm_259748.jar" target="_blank">BookWorm for Mobile (623 KB) </a>
+                  <a href="https://warrobotdoge.com/bookworm/downloads/bookworm_259748.jar" target="_blank" rel="noopener"><span>Java ME (.jar)</span><span class="dropdown2-size">623 KB</span></a>
                   </div>
               </div>
             </div>
@@ -482,26 +543,26 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <embed src="/bookworm/bookworm_demo.swf" type="application/x-shockwave-flash" height="304" width="230"  autoplay="true" alt="BookWorm Mobile Advertisement">
+            <embed src="/bookworm/bookworm_demo.swf" type="application/x-shockwave-flash" height="304" width="230" autoplay="true">
           </div>
         </div>
 
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-    <p>BookWorm Mobile is lesser knwon than the <a href="https://warrobotdoge/bookworm/bookworm-ios">iOS</a> counterpart. Despite being made for weak phones, it actually has more <a href="https://youtu.be/Z7XjLf3LJTM?si=MDWS90dNUTM2V4JZ">features</a>. Released on <a href="https://www.gamesindustry.biz/popcap-launches-bookworm-mobile-game">November 21, 2007</a>, the BookWorm Mobile was designed to be compatible with a wide range of mobile devices, including those from manufacturers like Nokia, Samsung, and Sony. It's similar to the iOS version, but it has more features, such as a tutorial, and Lex is on the left, and not the top of the screen. The Mobile version had multiple downloads depending on screensize. The game does take on a similar look to the <a href="https://warrobotdoge.com/bookworm/bookworm-pocketpc">Palm OS BookWorm</a>. There's only 1 video of gameplay, and I've put it below. </p>
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>BookWorm Mobile is lesser known than the <a href="https://warrobotdoge.com/bookworm/bookworm-ios">iOS</a> counterpart. Despite being made for weak phones, it actually has more <a href="https://youtu.be/Z7XjLf3LJTM?si=MDWS90dNUTM2V4JZ" rel="noopener">features</a>. Released on <a href="https://www.gamesindustry.biz/popcap-launches-bookworm-mobile-game" rel="noopener">November 21, 2007</a>, BookWorm Mobile was designed to be compatible with a wide range of mobile devices, including those from manufacturers like Nokia, Samsung, and Sony. It's similar to the iOS version, but it has more features, such as a tutorial, and Lex is on the left, and not the top of the screen. The Mobile version had multiple downloads depending on screen size. The game does take on a similar look to the <a href="https://warrobotdoge.com/bookworm/bookworm-pocketpc">Palm OS BookWorm</a>. There's only 1 video of gameplay, and I've put it below.</p>
+          </div>
+        </div>
+      </div>
 
-    </div>
-</div>
-</div>
       <div class="filler"></div>
+
       <div class="section">
         <h2>Mobile Gameplay</h2>
-      <div class="text">
-        <iframe width="266" height="420" src="https://www.youtube.com/embed/Z7XjLf3LJTM?si=0XeDfpFC_w1suH4d" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-    </div>
-    </div>
-    </div>
+        <div class="text">
+          <iframe width="266" height="420" src="https://www.youtube.com/embed/Z7XjLf3LJTM?si=0XeDfpFC_w1suH4d" title="BookWorm Mobile Java version gameplay footage" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
     </div>
 
 <br>
@@ -510,7 +571,6 @@
 <br>
 <br>
 
-    </div>
     <footer></footer>
     <script>
       // Dropdown toggle functionality
@@ -538,9 +598,78 @@
         // Add the "active" class to the next image
         images[currentIndex].classList.add('active');
       }
-      // Change images every 3 seconds
-      setInterval(showNextImage, 3000);
+      // On this page the screenshot box holds a Flash <embed>, not <img>
+      // elements, so `images` is empty. Without this guard the interval
+      // throws an uncaught TypeError every 3 seconds, forever.
+      if (images.length > 0) {
+        // Change images every 3 seconds
+        setInterval(showNextImage, 3000);
+      }
     </script>
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm Mobile",
+  "alternateName": ["BookWorm Java", "Bookworm J2ME", "BookWorm mobile phone version"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-mobile",
+  "image": "https://warrobotdoge.com/bookworm/images/coverart/BookWorm_Mobile_Poster.png",
+  "description": "The Java ME phone release of PopCap's BookWorm, launched on 21 November 2007 and distributed as a .jar file. It was built to run across a wide range of feature phones, including handsets from Nokia, Samsung and Sony, and shipped in multiple builds tailored to different screen sizes. Players link letter tiles to build words and feed Lex the bookworm, scoring higher for longer words while clearing burning letters before they reach the bottom. Despite targeting far weaker hardware, the Java version contains more features than the later iOS release, including a tutorial mode, and positions Lex along the left edge of the screen rather than across the top. Its visual design closely follows the earlier Palm OS build. Almost no footage of this version survives; a single gameplay video is known to exist. This archive hosts the .jar file and that recording.",
+  "datePublished": "2007-11-21",
+  "genre": ["Puzzle", "Word Game", "Casual"],
+  "gamePlatform": ["Java ME", "Mobile Phone", "Feature Phone"],
+  "operatingSystem": "Java ME",
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": "en",
+  "fileFormat": "application/java-archive",
+  "keywords": "bookworm mobile download, bookworm java jar, bookworm j2me, popcap bookworm phone, bookworm nokia samsung sony",
+  "publisher": {
+    "@type": "Organization",
+    "name": "PopCap Games",
+    "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Jason Kapalka"
+  },
+  "character": {
+    "@type": "Person",
+    "name": "Lex",
+    "description": "The green bookworm mascot, positioned at the left of the screen in the Java version."
+  },
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_(video_game)"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  },
+  "gameTip": {
+    "@type": "CreativeWork",
+    "name": "Screen size variants",
+    "text": "BookWorm Mobile was distributed as several separate builds matched to different handset screen resolutions, so the correct .jar depended on the specific phone model."
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm Mobile",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-mobile" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
   </body>
 </html>
