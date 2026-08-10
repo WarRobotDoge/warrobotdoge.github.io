@@ -11,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookWorm Xbox</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/xbox_logo.png" type="image/png">
-    <meta name="description" content="Download and Play BookWorm Deluxe for Xbox!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/Xbox_Coverart.png" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm Xbox Live Arcade — Download &amp; Xemu Setup Guide</title>
+    <meta name="description" content="Download the delisted Xbox Live Arcade version of BookWorm Deluxe, with full step-by-step Xemu emulator setup instructions. Released 2005, delisted and unavailable since." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-xbox" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm Xbox Live Arcade — Download &amp; Xemu Setup Guide" />
+    <meta property="og:description" content="Download the delisted Xbox Live Arcade version of BookWorm Deluxe, with full step-by-step Xemu emulator setup instructions." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-xbox" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/Xbox_Coverart.png" />
+    <meta property="og:image:alt" content="BookWorm Deluxe Xbox Live Arcade cover art" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm Xbox Live Arcade — Download &amp; Xemu Setup Guide" />
+    <meta name="twitter:description" content="Download the delisted Xbox Live Arcade version of BookWorm Deluxe, with full step-by-step Xemu emulator setup instructions." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/coverart/Xbox_Coverart.png" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/xbox_logo.png" type="image/png">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -114,7 +131,7 @@
         background-color: white;
         width: 100%; /* Make the navbar take the full width */
         max-width: 931px; /* Match the width of the navbar */
-        height: 120vh;  /* Full viewport height to extend down to the footer */
+        min-height: 120vh;  /* ← grows with content instead of capping it */
         margin: 0 auto;
         position: relative;
         z-index: 1;
@@ -316,22 +333,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the file size in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -400,13 +460,23 @@
       ol {
     text-align: left;
 }
+
+      /* Sub-steps under step 4. Nested inside the <li> and indented 40px,
+         which reproduces exactly what the old <dd> elements rendered as,
+         but is valid HTML (<dd> is only legal inside a <dl>). */
+      .substeps {
+        list-style: none;
+        margin: 0 0 1em 40px;
+        padding: 0;
+      }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   </head>
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="Bookworm Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="BookWorm logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -471,7 +541,7 @@
                 <button class="dropdown2-button">Download for Xbox for Windows<span class="dropdown2-arrow"></span>
                 </button>
                 <div class="dropdown2-menu">
-                  <a href="https://download1325.mediafire.com/anacjnoyuyfgWwVWM_S9usJIyWaWduTN5HJY5nvUUrDGhcVP9Od_ggcb5xFyZcCdxtQcHo67UTFWv7dijRh3aWKmc20eWBG5NM819ZJkY0bhKnYlTT177TQnFuZeud8UVwy_naeeNHI9zWqp_UfTra_w0kBQl7AwbV7sE7-eN1F3/u2uef24njubei98/Xbox+Emulator+with+BookWorm.zip" target="_blank">BookWorm for Xbox with Emulator (627MB)</a>
+                  <a href="https://download1325.mediafire.com/anacjnoyuyfgWwVWM_S9usJIyWaWduTN5HJY5nvUUrDGhcVP9Od_ggcb5xFyZcCdxtQcHo67UTFWv7dijRh3aWKmc20eWBG5NM819ZJkY0bhKnYlTT177TQnFuZeud8UVwy_naeeNHI9zWqp_UfTra_w0kBQl7AwbV7sE7-eN1F3/u2uef24njubei98/Xbox+Emulator+with+BookWorm.zip" target="_blank" rel="noopener"><span>Xemu bundle</span><span class="dropdown2-size">627 MB</span></a>
                   </div>
               </div>
             </div>
@@ -482,45 +552,46 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Xbox_1.png" alt="Screenshot 1" class="active">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Xbox_2.png" alt="Screenshot 2">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Xbox_4.png" alt="Screenshot 3">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Xbox_3.png" alt="Screenshot 4">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Xbox_1.png" alt="BookWorm Deluxe on Xbox Live Arcade showing the letter grid" class="active">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Xbox_2.png" alt="BookWorm Xbox gameplay with burning tiles">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Xbox_4.png" alt="BookWorm Xbox Live Arcade title screen">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Xbox_3.png" alt="BookWorm Xbox scoreboard screen">
           </div>
         </div>
 
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-    <p>Not much is known about BookWorm for the Xbox Live Arcade. It was released on <a href="https://news.xbox.com/en-us/2005/08/26/new-xbox-live-arcade-title-bookworm-deluxe/">Aug 26, 2005</a>. This version doesn't change much from the PC version of BookWorm Deluxe. The Xbox version uses some of the image files used in the Flash version. Though it was only avaliable to Xbox Live Members (<a href="https://web.archive.org/web/20081104034029/http://www.xbox.com/en-US/games/livearcadexbox/default.htm">$9.99</a>), the archived files are still playable on an emulator. For some reason this port of the game does not accept words such as "<a href="https://en.wikipedia.org/wiki/Criticism_of_Microsoft#Xbox_Live_prohibition_on_use_of_the_word_%22gay%22">gay</a>", or "queer", but it is Microsoft, the king (or should I say they/them...) of censorship. Instructions to play this BookWorm are below.</p>
-    </div>
-</div>
-</div>
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>Not much is known about BookWorm for the Xbox Live Arcade. It was released on <a href="https://news.xbox.com/en-us/2005/08/26/new-xbox-live-arcade-title-bookworm-deluxe/" rel="noopener">Aug 26, 2005</a>. This version doesn't change much from the PC version of BookWorm Deluxe. The Xbox version uses some of the image files used in the Flash version. Though it was only available to Xbox Live Members (<a href="https://web.archive.org/web/20081104034029/http://www.xbox.com/en-US/games/livearcadexbox/default.htm" rel="noopener">$9.99</a>), the archived files are still playable on an emulator. For some reason this port of the game does not accept words such as "<a href="https://en.wikipedia.org/wiki/Criticism_of_Microsoft#Xbox_Live_prohibition_on_use_of_the_word_%22gay%22" rel="noopener">gay</a>", or "queer", but it is Microsoft, the king of censorship. Instructions to play this BookWorm are below.</p>
+          </div>
+        </div>
+      </div>
 
       <div class="filler"></div>
       <div class="section">
-        <h2>Installment Instructions</h2>
-      <div class="text">
-        <ol>
-          <li>Download the Xbox emulator included with BookWorm</li>
-          <li>Unzip the file and open Xemu</li>
-          <li>In Xemu, click on settings and go to "System"</li>
-          <li>In <a href="https://warrobotdoge.com/bookworm/images/Xbox-details.jpg">System</a>, we're going to need to congfiure a few things, but this'll only take a minute!</li>
-          <dd>-</dd>
-          <dd>1. Set System Memory to 128 MiB</dd>
-          <dd>2. Link files to their corresponding directories:</dd>
-          <dd>3. MCPX Boot ROM - mcpx_1.0.bin</dd>
-          <dd>4. Flash ROM (BIOS) - Complex_4627v1.03.bin</dd>
-          <dd>5. Hard Disk - xbox_hdd.qcow2</dd>
-          <dd>6. EEPROM - eeprom.bin</dd>
-          <br>
-          <li>Save and Restart Xemu</li>
-          <li>Insert the "Xbox Live Arcade Final" disk file and wait for the Arcade to load</li>
-          <li>Click on BookWorm, and have fun!</li>
-        </ol>
-    </div>
-    </div>
-    </div>
+        <h2>Installation Instructions</h2>
+        <div class="text">
+          <ol>
+            <li>Download the Xbox emulator included with BookWorm</li>
+            <li>Unzip the file and open Xemu</li>
+            <li>In Xemu, click on settings and go to "System"</li>
+            <li>In <a href="https://warrobotdoge.com/bookworm/images/Xbox-details.jpg">System</a>, we're going to need to configure a few things, but this'll only take a minute!
+              <ul class="substeps">
+                <li>-</li>
+                <li>1. Set System Memory to 128 MiB</li>
+                <li>2. Link files to their corresponding directories:</li>
+                <li>3. MCPX Boot ROM - mcpx_1.0.bin</li>
+                <li>4. Flash ROM (BIOS) - Complex_4627v1.03.bin</li>
+                <li>5. Hard Disk - xbox_hdd.qcow2</li>
+                <li>6. EEPROM - eeprom.bin</li>
+              </ul>
+            </li>
+            <li>Save and Restart Xemu</li>
+            <li>Insert the "Xbox Live Arcade Final" disk file and wait for the Arcade to load</li>
+            <li>Click on BookWorm, and have fun!</li>
+          </ol>
+        </div>
+      </div>
     </div>
 
 <br>
@@ -529,7 +600,6 @@
 <br>
 <br>
 
-    </div>
     <footer></footer>
     <script>
       // Dropdown toggle functionality
@@ -560,5 +630,123 @@
       // Change images every 3 seconds
       setInterval(showNextImage, 3000);
     </script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm Deluxe (Xbox Live Arcade)",
+  "alternateName": ["BookWorm Xbox", "Bookworm Deluxe Xbox", "BookWorm Xbox Live Arcade"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-xbox",
+  "image": "https://warrobotdoge.com/bookworm/images/coverart/Xbox_Coverart.png",
+  "description": "The Xbox Live Arcade release of PopCap's BookWorm Deluxe, launched on 26 August 2005 for the original Xbox. Players link adjacent letter tiles to form words and feed Lex the bookworm, scoring higher for longer words, rarer letters and green or gold tiles, while keeping burning tiles from reaching the bottom of the board. The port is close to the PC version of BookWorm Deluxe and reuses several image assets from the Flash release. It supported one player, online scoreboards and Xbox Live connectivity, and cost $9.99 for Xbox Live members. Unusually, the Xbox dictionary rejects certain words that the PC version accepts, including 'gay' and 'queer', a consequence of Microsoft's Xbox Live word filtering at the time. The title is long delisted and cannot be purchased. This archive hosts the files together with a preconfigured Xemu emulator bundle and full setup instructions.",
+  "datePublished": "2005-08-26",
+  "genre": ["Puzzle", "Word Game"],
+  "gamePlatform": "Xbox",
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": "en",
+  "keywords": "bookworm xbox, bookworm xbox live arcade, bookworm deluxe xbox download, xemu bookworm, delisted xbox live arcade games",
+  "publisher": {
+    "@type": "Organization",
+    "name": "PopCap Games",
+    "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Jason Kapalka"
+  },
+  "character": {
+    "@type": "Person",
+    "name": "Lex",
+    "description": "The green bookworm mascot who eats the words players spell."
+  },
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_(video_game)"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to play BookWorm for Xbox on the Xemu emulator",
+  "description": "Step-by-step setup for running the delisted Xbox Live Arcade release of BookWorm Deluxe on Windows using the Xemu original Xbox emulator.",
+  "totalTime": "PT10M",
+  "tool": [
+    { "@type": "HowToTool", "name": "Xemu original Xbox emulator" },
+    { "@type": "HowToTool", "name": "MCPX Boot ROM (mcpx_1.0.bin)" },
+    { "@type": "HowToTool", "name": "Flash ROM BIOS (Complex_4627v1.03.bin)" },
+    { "@type": "HowToTool", "name": "Xbox hard disk image (xbox_hdd.qcow2)" },
+    { "@type": "HowToTool", "name": "EEPROM file (eeprom.bin)" }
+  ],
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "name": "Download the bundle",
+      "text": "Download the Xbox emulator bundle that includes BookWorm."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "name": "Unzip and launch Xemu",
+      "text": "Unzip the downloaded file and open Xemu."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "name": "Open System settings",
+      "text": "In Xemu, click Settings and go to the System tab."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 4,
+      "name": "Configure system files",
+      "text": "Set System Memory to 128 MiB, then link each file to its directory: MCPX Boot ROM to mcpx_1.0.bin, Flash ROM (BIOS) to Complex_4627v1.03.bin, Hard Disk to xbox_hdd.qcow2, and EEPROM to eeprom.bin."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 5,
+      "name": "Save and restart",
+      "text": "Save the settings and restart Xemu."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 6,
+      "name": "Load the Arcade disc",
+      "text": "Insert the 'Xbox Live Arcade Final' disk file and wait for the Arcade to load."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 7,
+      "name": "Launch BookWorm",
+      "text": "Click on BookWorm to start playing."
+    }
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm Xbox",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-xbox" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
   </body>
 </html>
