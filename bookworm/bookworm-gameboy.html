@@ -11,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookWorm for GameBoy Advance</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/bookworm_gameboy_icon.png" type="image/png">
-    <meta name="description" content="Play and Download BookWorm for the GameBoy Advance!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/Bookworm_GBA.jpg" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm GBA ROM Download — Play Game Boy Advance Online</title>
+    <meta name="description" content="Download the BookWorm Game Boy Advance ROM, or play it free in your browser with no emulator setup. Screenshots, controls and history of the 2004 GBA port." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-gameboy" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm GBA ROM Download — Play Game Boy Advance Online" />
+    <meta property="og:description" content="Download the BookWorm Game Boy Advance ROM, or play it free in your browser with no emulator setup." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-gameboy" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/Bookworm_GBA.jpg" />
+    <meta property="og:image:alt" content="BookWorm Game Boy Advance box art" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm GBA ROM Download — Play Game Boy Advance Online" />
+    <meta name="twitter:description" content="Download the BookWorm Game Boy Advance ROM, or play it free in your browser with no emulator setup." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/coverart/Bookworm_GBA.jpg" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/bookworm_gameboy_icon.png" type="image/png">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -316,22 +333,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the file size in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -343,10 +403,9 @@
       }
 
       .screenshot-container {
-       
         max-width: 344px;   /* Limit max size */
         max-height: 456px;
-        aspect-ratio: 3 / 2;  /* Maintain 4:3 aspect ratio */
+        aspect-ratio: 3 / 2;  /* Maintain 3:2 aspect ratio (GBA screen) */
         background-color: #e0e0e0;   /* Light gray background */
         border: 2px solid #ccc;   /* Subtle border */
         border-radius: 12px;  /* Rounded corners */
@@ -402,7 +461,8 @@
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_OG_Title.png" alt="Bookworm Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_OG_Title.png" alt="BookWorm logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -460,14 +520,14 @@
       
       <div class="content-wrapper">
         <div class="texty">
-          <p>The Bookworm game for the Game Boy Advance (GBA) is a word-forming puzzle game that blends elements of <a href="https://warrobotdoge.com/bookworm/bespelled">Bespelled</a> and Scrabble. Players connect letter tiles to form words and score points. The tiles are randomly placed on the playfield, and if no words can be created, the player has the option to scramble them. However, excessive scrambling introduces "fire tiles," which, if they reach the bottom of the screen, will burn down the library and end the game. The goal is to form as many high-scoring words as possible while managing the risks of scrambling</p>
+          <p>The Bookworm game for the Game Boy Advance (GBA) is a word-forming puzzle game that blends elements of <a href="https://warrobotdoge.com/bookworm/bespelled">Bespelled</a> and Scrabble. Players connect letter tiles to form words and score points. The tiles are randomly placed on the playfield, and if no words can be created, the player has the option to scramble them. However, excessive scrambling introduces "fire tiles," which, if they reach the bottom of the screen, will burn down the library and end the game. The goal is to form as many high-scoring words as possible while managing the risks of scrambling.</p>
           </div>
         <div class="content-wrapper">
           <div class="dropdown2">
             <button class="dropdown2-button">Download for GBA<span class="dropdown2-arrow"></span>
             </button>
             <div class="dropdown2-menu">
-              <a href="https://warrobotdoge.com/bookworm/Bookworm.gba" target="_blank">BookWorm GBA (4MB)</a>
+              <a href="https://warrobotdoge.com/bookworm/Bookworm.gba" target="_blank" rel="noopener"><span>BookWorm (USA) ROM</span><span class="dropdown2-size">4 MB</span></a>
               <!--<embed src="/bookworm/bwgba233x89.swf" type="application/x-shockwave-flash"> width="800" height="600"  BookWorm_Original.swf -->
             </div>
             <br>
@@ -480,21 +540,21 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/GameBoy_1.jpg" alt="Screenshot 1" class="active">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/GameBoy_2.jpg" alt="Screenshot 2">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/GameBoy_4.jpg" alt="Screenshot 3">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/GameBoy_3.jpg" alt="Screenshot 4">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/GameBoy_1.jpg" alt="BookWorm Game Boy Advance gameplay showing the letter grid and Lex" class="active">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/GameBoy_2.jpg" alt="BookWorm GBA gameplay with fire tiles on the board">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/GameBoy_4.jpg" alt="BookWorm GBA title screen">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/GameBoy_3.jpg" alt="BookWorm GBA score and bonus word display">
           </div>
         </div>
 
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-<p>BookWorm for the GameBoy Advance is an interesting one. For being released in <a href="https://web.archive.org/web/20181231052552/https://www.gamespot.com/articles/majesco-announces-two-for-gba/1100-6087185/">2004</a>, the game still does not have much popularity for the GBA. I actually own a copy of it for the GBA, though I do not own a GameBoy. This version is similar to the Deluxe version, except for the obvious graphical differences. I like Lex's cute burp at the beginning, he's such an adorable bookworm. You can play the GameBoy version of BookWorm below.</p>
-<embed src="/bookworm/bwgba233x89.swf" type="application/x-shockwave-flash" width="233" height="89" autoplay="true" alt="Bookworm for Gameboy Advance Advertisement"> <!--width="800" height="600"  BookWorm_Original.swf -->
-</div>
-</div>
-</div>
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>BookWorm for the GameBoy Advance is an interesting one. For being released in <a href="https://web.archive.org/web/20181231052552/https://www.gamespot.com/articles/majesco-announces-two-for-gba/1100-6087185/" rel="noopener">2004</a>, the game still does not have much popularity for the GBA. I actually own a copy of it for the GBA, though I do not own a GameBoy. This version is similar to the Deluxe version, except for the obvious graphical differences. I like Lex's cute burp at the beginning, he's such an adorable bookworm. You can play the GameBoy version of BookWorm below.</p>
+            <embed src="/bookworm/bwgba233x89.swf" type="application/x-shockwave-flash" width="233" height="89" autoplay="true"> <!--width="800" height="600"  BookWorm_Original.swf -->
+          </div>
+        </div>
+      </div>
     
 
       <div class="filler"></div>
@@ -512,11 +572,10 @@
                 EJS_core = "gba";
                 EJS_gameName = "Bookworm";
                 EJS_color = "#1ae40c";
-                EJS_backgroundImage = '/bookworm/images/screenshots/GameBoy_1.jpg'
-                EJS_volume = 1
+                EJS_backgroundImage = "/bookworm/images/screenshots/GameBoy_1.jpg";
+                EJS_volume = 1;
                 EJS_startOnLoaded = true;
                 EJS_pathtodata = "/bookworm/";
-                EJS_volume = 1
                 EJS_gameUrl = "/bookworm/Bookworm.gba";
                 EJS_biosUrl = "/bookworm/GBAbios.bin";
               </script>
@@ -565,5 +624,68 @@
       setInterval(showNextImage, 3000);
     </script>
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm (Game Boy Advance)",
+  "alternateName": ["Bookworm GBA", "BookWorm Game Boy Advance", "Bookworm (USA)"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-gameboy",
+  "image": "https://warrobotdoge.com/bookworm/images/coverart/Bookworm_GBA.jpg",
+  "description": "The Game Boy Advance port of PopCap's BookWorm, released on cartridge in 2004. Players link adjacent letter tiles to form words and score points, in a system blending Scrabble-style scoring with Bejeweled-style tile mechanics. Tiles are randomly placed on the playfield, and the board can be scrambled when no words are available, but repeated scrambling introduces fire tiles that end the game if they reach the bottom of the screen. The GBA version follows the same rules as BookWorm Deluxe on PC with reduced graphics for the handheld, and opens with a distinctive burp animation from Lex. It remains one of the least documented entries in the BookWorm series. This archive hosts the ROM and provides a browser-playable version requiring no emulator installation.",
+  "datePublished": "2004",
+  "genre": ["Puzzle", "Word Game"],
+  "gamePlatform": "Game Boy Advance",
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": "en",
+  "keywords": "bookworm gba rom, bookworm game boy advance, play bookworm gba online, bookworm gba download, popcap bookworm handheld",
+  "publisher": {
+    "@type": "Organization",
+    "name": "PopCap Games",
+    "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Jason Kapalka"
+  },
+  "character": {
+    "@type": "Person",
+    "name": "Lex",
+    "description": "The green bookworm mascot who eats the words players spell."
+  },
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_(video_game)",
+    "https://tcrf.net/Bookworm_(Game_Boy_Advance)"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  },
+  "gameTip": {
+    "@type": "CreativeWork",
+    "name": "Browser controls",
+    "text": "In the in-browser emulator: Enter starts the game, WASD moves the cursor, and Spacebar acts as the A button. A touchpad can be enabled from the settings menu."
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm GameBoy",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-gameboy" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
   </body>
 </html>
