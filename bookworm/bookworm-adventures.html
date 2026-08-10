@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookworm Adventures</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/BWA.ico" type="image/ico">
-    <meta name="description" content="Download and Play BookWorm Adventures!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/BWA_4.png" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm Adventures Download — Free Full Version (2006)</title>
+    <meta name="description" content="Download BookWorm Adventures free, the 2006 PopCap word RPG. English, Spanish, German, French and Italian versions, plus how to play the lost web build on Flashpoint." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-adventures" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm Adventures Download — Free Full Version (2006)" />
+    <meta property="og:description" content="Download BookWorm Adventures free, the 2006 PopCap word RPG. Five language versions, plus how to play the lost web build on Flashpoint." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-adventures" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/BWA_4.png" />
+    <meta property="og:image:alt" content="BookWorm Adventures gameplay showing Lex battling a monster with spelled words" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm Adventures Download — Free Full Version (2006)" />
+    <meta name="twitter:description" content="Download BookWorm Adventures free, the 2006 PopCap word RPG. Five language versions, plus how to play the lost web build on Flashpoint." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/screenshots/BWA_4.png" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/BWA.ico" type="image/x-icon">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -317,22 +333,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the file size in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -402,7 +461,8 @@
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Adventures_Logo.png" alt="Bookworm Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Adventures_Logo.png" alt="BookWorm Adventures logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -469,11 +529,14 @@
             <button class="dropdown2-button"> Download for Windows <span class="dropdown2-arrow"></span>
             </button>
             <div class="dropdown2-menu">
-              <a href="https://archive.org/download/book-worm-adventures/BookWorm_Adventures.zip" target="_blank">BookWorm Adventures (32.2MB)</a>
-              <a href="https://archive.org/download/bookworm-adventures-es/Bookworm_Adventures_ES.zip" target="_blank">BookWorm Adventures Spanish</a>
-              <a href="https://archive.org/download/bookworm-adventures-de/Bookworm_Adventures_DE.zip" target="_blank">BookWorm Adventures German</a>
-              <a href="https://archive.org/download/bookworm-adventures-fr/Bookworm_Adventures_FR.zip" target="_blank">BookWorm Adventures French</a>
-              <a href="https://downloads.warrobotdoge.com/Bookworm_Adventures_IT.zip" target="_blank">BookWorm Adventures Italian</a>
+              <div class="dropdown2-label">English</div>
+              <a href="https://archive.org/download/book-worm-adventures/BookWorm_Adventures.zip" target="_blank" rel="noopener"><span>Full version</span><span class="dropdown2-size">32.2 MB</span></a>
+
+              <div class="dropdown2-label">Other languages</div>
+              <a href="https://archive.org/download/bookworm-adventures-es/Bookworm_Adventures_ES.zip" target="_blank" rel="noopener"><span>Spanish</span></a>
+              <a href="https://archive.org/download/bookworm-adventures-de/Bookworm_Adventures_DE.zip" target="_blank" rel="noopener"><span>German</span></a>
+              <a href="https://archive.org/download/bookworm-adventures-fr/Bookworm_Adventures_FR.zip" target="_blank" rel="noopener"><span>French</span></a>
+              <a href="https://downloads.warrobotdoge.com/Bookworm_Adventures_IT.zip" target="_blank" rel="noopener"><span>Italian</span></a>
             </div>
           </div>
         </div>
@@ -484,33 +547,33 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA_4.png" alt="Screenshot 1" class="active">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA_1.png" alt="Screenshot 2">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA_2.png" alt="Screenshot 3">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA_3.png" alt="Screenshot 4">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA_4.png" alt="BookWorm Adventures battle screen with Lex facing a monster" class="active">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA_1.png" alt="BookWorm Adventures letter tile grid used to attack enemies">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA_2.png" alt="BookWorm Adventures storybook chapter map">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA_3.png" alt="BookWorm Adventures treasure and potion inventory screen">
           </div>
         </div>
 
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-    BookWorm Adventures is one of PopCap's most known games! It costed $700,000 to produce, and the game had over <a href="https://web.archive.org/web/20070209180025/http://www.igda.org/casual/quarterly/2_2/index.php?id=2">150,000</a> lines of code, 10,000 lines of dialogue, and over 4,500 images. It was released on November 28, 2006, and won the <a href="https://web.archive.org/web/20120510074523/http://www.interactive.org/awards/award_category_details.asp?idAward=2007&idGameAwardType=59">"Downloadable Game of the Year"</a> award from the Academy of Interactive Arts & Sciences in 2007. I own an original, unsealed, BookWorm Adventures box. As of 12/15/24, I have complete the game! You can see the post-mortem of the game <a href="https://youtu.be/BwGwZ2DNAng?si=Q-djQ2KEKlJIqeZp">here</a>. In 2006, BookWorm Adventures won multiple awards at Zeebys, they interviewed Jason Kapalka twice about the game, you can watch them <a href="https://youtu.be/8WURyuUFAXQ?si=gBuXLz41Q5TJaEfm">here</a>, and <a href="https://youtu.be/KZXREIvBJwI?si=P3s4lm2KjLfOOKmw">here</a>. If you <a href="https://www.reddit.com/r/BookwormAdventures/comments/n8xdgd/in_the_games_files_there_is_an_audio_clip_of_lex/">spell</a> "<a href="https://youtu.be/4QxXRFm8n10?si=8B8wxhzSpvxduc60">Jason</a>", "Julie", or "Tiffany", Lex will say "I love you".</p>
-</div>
-</div>
-</div>
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>BookWorm Adventures is one of PopCap's best-known games! It cost $700,000 to produce, and the game had over <a href="https://web.archive.org/web/20070209180025/http://www.igda.org/casual/quarterly/2_2/index.php?id=2" rel="noopener">150,000</a> lines of code, 10,000 lines of dialogue, and over 4,500 images. It was released on November 28, 2006, and won the <a href="https://web.archive.org/web/20120510074523/http://www.interactive.org/awards/award_category_details.asp?idAward=2007&amp;idGameAwardType=59" rel="noopener">"Downloadable Game of the Year"</a> award from the Academy of Interactive Arts &amp; Sciences in 2007. I own an original, unsealed, BookWorm Adventures box. As of 12/15/24, I have completed the game! You can see the post-mortem of the game <a href="https://youtu.be/BwGwZ2DNAng?si=Q-djQ2KEKlJIqeZp" rel="noopener">here</a>. In 2006, BookWorm Adventures won multiple awards at Zeebys. They interviewed Jason Kapalka twice about the game; you can watch them <a href="https://youtu.be/8WURyuUFAXQ?si=gBuXLz41Q5TJaEfm" rel="noopener">here</a> and <a href="https://youtu.be/KZXREIvBJwI?si=P3s4lm2KjLfOOKmw" rel="noopener">here</a>. If you <a href="https://www.reddit.com/r/BookwormAdventures/comments/n8xdgd/in_the_games_files_there_is_an_audio_clip_of_lex/" rel="noopener">spell</a> "<a href="https://youtu.be/4QxXRFm8n10?si=8B8wxhzSpvxduc60" rel="noopener">Jason</a>", "Julie", or "Tiffany", Lex will say "I love you".</p>
+          </div>
+        </div>
+      </div>
 
       <div class="filler"></div>
+
       <div class="section">
         <h2>BookWorm Adventures Web</h2>
-      <div class="text">
-       <p>The <a href="https://tcrf.net/images/2/2e/Bookworm_Adventures_PopCapLoader-title.png">original</a> web version of BookWorm Adventures can no longer be locally played because of the way the PopCap framework was set up. Fortunatley, you can still play the archived web version on this game on <a href="https://github.com/FlashpointProject/FlashpointComponentTools/releases/latest/download/FlashpointInstaller.exe">Flashpoint</a>. To play the web version, download Flashpoint, and search for "BookWorm Adventures". Click play, and you're all set to go! If you just want to download the normal Deluxe version of BookWorm Adventures, you can download it above!</p>
+        <div class="text">
+          <p>The <a href="https://tcrf.net/images/2/2e/Bookworm_Adventures_PopCapLoader-title.png" rel="noopener">original</a> web version of BookWorm Adventures can no longer be locally played because of the way the PopCap framework was set up. Fortunately, you can still play the archived web version of this game on <a href="https://github.com/FlashpointProject/FlashpointComponentTools/releases/latest/download/FlashpointInstaller.exe" rel="noopener">Flashpoint</a>. To play the web version, download Flashpoint, and search for "BookWorm Adventures". Click play, and you're all set to go! If you just want to download the normal Deluxe version of BookWorm Adventures, you can download it above!</p>
+        </div>
       </div>
-    </div>
-    <div class="commentbox"></div>
-    <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
-    <script>commentBox('5680061592109056-proj')</script>
-     </div>
-    </div>
+
+      <div class="commentbox"></div>
+      <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
+      <script>commentBox('5680061592109056-proj')</script>
     </div>
 
 <br>
@@ -519,7 +582,6 @@
 <br>
 <br>
 
-    </div>
     <footer></footer>
     <script>
       // Dropdown toggle functionality
@@ -550,7 +612,82 @@
       // Change images every 3 seconds
       setInterval(showNextImage, 3000);
     </script>
-    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
-  </body>
-</html>
 
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm Adventures",
+  "alternateName": ["Bookworm Adventures", "BookWorm Adventures Deluxe"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-adventures",
+  "image": "https://warrobotdoge.com/bookworm/images/screenshots/BWA_4.png",
+  "description": "BookWorm Adventures is a word-forming role-playing game released by PopCap Games on 28 November 2006, following the 2003 puzzle game BookWorm. Lex the bookworm sets out to rescue Cassandra the oracle, using words spelled from a letter grid as attacks against enemies drawn from mythology and literature. The Adventure mode spans three storybooks of ten chapters each, with over 150 opponents, alongside gems, potions and treasures that modify word power. Completing Book 1 unlocks the Tome of Knowledge, Book 2 unlocks the mini-games, and finishing Book 3 unlocks Arena mode. The game reportedly cost around $700,000 to produce and shipped with over 150,000 lines of code, 10,000 lines of dialogue and more than 4,500 images. It won Downloadable Game of the Year at the 2007 Interactive Achievement Awards from the Academy of Interactive Arts & Sciences. EA delisted the BookWorm series in 2016. This archive hosts English, Spanish, German, French and Italian builds, and documents how to run the discontinued browser version through Flashpoint.",
+  "datePublished": "2006-11-28",
+  "genre": ["Puzzle", "Role-Playing Game", "Word Game", "Casual"],
+  "gamePlatform": ["PC", "Windows", "Android"],
+  "operatingSystem": "Windows",
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": ["en", "es", "de", "fr", "it"],
+  "keywords": "bookworm adventures download, bookworm adventures free, popcap word rpg, lex the bookworm, bookworm adventures deluxe, bookworm adventures flashpoint",
+  "publisher": {
+    "@type": "Organization",
+    "name": "PopCap Games",
+    "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Jason Kapalka"
+  },
+  "composer": {
+    "@type": "Person",
+    "name": "Staffan Melin"
+  },
+  "character": [
+    {
+      "@type": "Person",
+      "name": "Lex",
+      "description": "The green bookworm protagonist, who attacks enemies using words the player spells."
+    },
+    {
+      "@type": "Person",
+      "name": "Cassandra",
+      "description": "The kidnapped oracle whose rescue drives the Adventure mode."
+    }
+  ],
+  "award": "Downloadable Game of the Year, 2007 Interactive Achievement Awards",
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_Adventures",
+    "https://tvtropes.org/pmwiki/pmwiki.php/VideoGame/BookwormAdventures"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  },
+  "gameTip": {
+    "@type": "CreativeWork",
+    "name": "Easter egg",
+    "text": "Spelling \"Jason\", \"Julie\" or \"Tiffany\" makes Lex say \"I love you\", using an audio clip found in the game files."
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm Adventures",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-adventures" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1}' crossorigin="anonymous"></script>
+</body>
+</html>
