@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookworm Deluxe</title>
-    <link rel="icon" href="/bookworm/images/icon/bw-40-b1.gif" type="image/gif">
-    <meta name="description" content="Play and Download BookWorm Deluxe! Play BookWorm Deluxe in Spanish, French, German, Italian, and Dutch!" />
-    <meta property="og:image" content="/bookworm/images/coverart/BookWorm_Cover.jpg" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm Deluxe Download — All Versions + 6 Languages</title>
+    <meta name="description" content="Download BookWorm Deluxe free. Every version from 1.00 to 1.20, plus Spanish, French, German, Italian, Dutch and Swedish builds. Play the Flash and Java originals in your browser." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm Deluxe Download — All Versions + 6 Languages" />
+    <meta property="og:description" content="Download BookWorm Deluxe free. Every version from 1.00 to 1.20, plus six language builds. Play the Flash and Java originals in your browser." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/BookWorm_Cover.jpg" />
+    <meta property="og:image:alt" content="BookWorm Deluxe box art featuring Lex the bookworm" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm Deluxe Download — All Versions + 6 Languages" />
+    <meta name="twitter:description" content="Download BookWorm Deluxe free. Every version from 1.00 to 1.20, plus six language builds. Play the Flash and Java originals in your browser." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/coverart/BookWorm_Cover.jpg" />
+
+    <link rel="icon" href="/bookworm/images/icon/bw-40-b1.gif" type="image/gif">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -395,22 +411,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the file size in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -485,7 +544,8 @@
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="/bookworm/images/logo/BookWorm_Logo.png" alt="Bookworm Logo">
+        <img src="/bookworm/images/logo/BookWorm_Logo.png" alt="BookWorm Games Archive logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -550,17 +610,20 @@
             <button class="dropdown2-button">Download for Windows<span class="dropdown2-arrow"></span>
             </button>
             <div class="dropdown2-menu">
-              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13.zip" target="_blank">BookWorm Deluxe 1.13 (4.4MB)</a>
-              <a href="https://warrobotdoge.com/bookworm/downloads/BookWorm_1.03.zip" target="_blank">BookWorm Deluxe 1.03 (7.9MB)</a>
-              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.02.zip" target="_blank">BookWorm Deluxe 1.02 (7.2MB)</a>
-              <a href="https://download1478.mediafire.com/4jzutfasempgLH8ICp63IvZxp0_xnh8TpX0H57fqriTyoXiTeMhu1A2CaNeICSnkFnpTAvJJ9N4OnI3T-1Age0AjbEk23qhkoJwJEvpauJP7k9P-QukAq2H9rFYzrz7spdHGNM1NybEO6_L66FRKEr5xv_hLHVyu5va0elyYVGM/hl330g958wmbx6t/BookWorm_1.01.zip" target="_blank">BookWorm Deluxe 1.01 (33MB)</a>
-              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.0.zip" target="_blank">BookWorm Deluxe 1.00 (7.7MB)</a>
-              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13_Spanish.zip" target="_blank">BookWorm Deluxe 1.13 Spanish (12MB)</a>
-              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13_Italian.zip" target="_blank">BookWorm Deluxe 1.13 Italian (5MB)</a>
-              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13_German.zip" target="_blank">BookWorm Deluxe 1.13 German (5MB)</a>
-              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13_French.zip" target="_blank">BookWorm Deluxe 1.13 French (5MB)</a>
-              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.02_Dutch_Zylom.zip" target="_blank">BookWorm Deluxe 1.02 Dutch (4MB)</a>
-              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.20_Swedish.zip" target="_blank">BookWorm Deluxe 1.20 Swedish (9MB)</a>
+              <div class="dropdown2-label">English</div>
+              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13.zip" target="_blank" rel="noopener"><span>Version 1.13</span><span class="dropdown2-size">4.4 MB</span></a>
+              <a href="https://warrobotdoge.com/bookworm/downloads/BookWorm_1.03.zip" target="_blank" rel="noopener"><span>Version 1.03</span><span class="dropdown2-size">7.9 MB</span></a>
+              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.02.zip" target="_blank" rel="noopener"><span>Version 1.02</span><span class="dropdown2-size">7.2 MB</span></a>
+              <a href="https://download1478.mediafire.com/4jzutfasempgLH8ICp63IvZxp0_xnh8TpX0H57fqriTyoXiTeMhu1A2CaNeICSnkFnpTAvJJ9N4OnI3T-1Age0AjbEk23qhkoJwJEvpauJP7k9P-QukAq2H9rFYzrz7spdHGNM1NybEO6_L66FRKEr5xv_hLHVyu5va0elyYVGM/hl330g958wmbx6t/BookWorm_1.01.zip" target="_blank" rel="noopener"><span>Version 1.01</span><span class="dropdown2-size">33 MB</span></a>
+              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.0.zip" target="_blank" rel="noopener"><span>Version 1.00</span><span class="dropdown2-size">7.7 MB</span></a>
+
+              <div class="dropdown2-label">Other languages</div>
+              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13_Spanish.zip" target="_blank" rel="noopener"><span>Spanish &middot; 1.13</span><span class="dropdown2-size">12 MB</span></a>
+              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13_Italian.zip" target="_blank" rel="noopener"><span>Italian &middot; 1.13</span><span class="dropdown2-size">5 MB</span></a>
+              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13_German.zip" target="_blank" rel="noopener"><span>German &middot; 1.13</span><span class="dropdown2-size">5 MB</span></a>
+              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.13_French.zip" target="_blank" rel="noopener"><span>French &middot; 1.13</span><span class="dropdown2-size">5 MB</span></a>
+              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.02_Dutch_Zylom.zip" target="_blank" rel="noopener"><span>Dutch &middot; 1.02</span><span class="dropdown2-size">4 MB</span></a>
+              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_1.20_Swedish.zip" target="_blank" rel="noopener"><span>Swedish &middot; 1.20</span><span class="dropdown2-size">9 MB</span></a>
             </div>
           </div>
         </div>
@@ -571,18 +634,18 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="/bookworm/images/screenshots/BookWorm_1.jpg" alt="Screenshot 1" class="active">
-            <img src="/bookworm/images/screenshots/BookWorm_2.jpg" alt="Screenshot 2">
-            <img src="/bookworm/images/screenshots/BookWorm_4.jpg" alt="Screenshot 3">
-            <img src="/bookworm/images/screenshots/BookWorm_3.jpg" alt="Screenshot 4">
+            <img src="/bookworm/images/screenshots/BookWorm_1.jpg" alt="BookWorm Deluxe gameplay showing the letter grid and Lex the bookworm" class="active">
+            <img src="/bookworm/images/screenshots/BookWorm_2.jpg" alt="BookWorm Deluxe gameplay with burning tiles descending the board">
+            <img src="/bookworm/images/screenshots/BookWorm_4.jpg" alt="BookWorm Deluxe showing gold and sapphire bonus tiles">
+            <img src="/bookworm/images/screenshots/BookWorm_3.jpg" alt="BookWorm Deluxe Hall of Fame high score screen">
           </div>
         </div>
 
 <div class="section">
   <h2>About</h2>
   <div class="text">
-<p>I love Bookworm. I own the game on Steam and EA. I own 3 original BookWorm boxes, multiple disks (some sealed!), and I have hundreds of hours on the game. BookWorm was released on February 25, 2003, being a predecesor to the MSN game, <a href="https://warrobotdoge.com/bookworm/bespelled">Bespelled</a>. It was <a href="https://web.archive.org/web/20240911022953/https://www.guinnessworldrecords.com/world-records/most-downloaded-word-puzzle-game">awarded</a> the world's most downloaded word puzzle game in June, 2010, with 100 million downloads. This version of BookWorm was originally a <a href="https://warrobotdoge.com/bookwormapplet/">Java</a> game on the PopCap website, but was later changed to a flash version after HTML5 was in debut. There are multiple Flash remakes. There's a Java clone (one with and without a timer), and theres a Flash remake of the final update of BookWorm. You can play both versions below. Learn more at the <a href="https://warrobotdoge/bookworm/archives">Archives</a> page.</p>
-<p>PopCap actually had a <a href="https://web.archive.org/web/20040913005931/http://www.cafepress.com/popcapgames/">BookWorm Store</a> from 2003-2005. It sold things from <a href="https://web.archive.org/web/20030810020656/http://www.cafeshops.com/popcapgames/98132">Mugs</a> to Lunchboxes. No pictures of these products exist. I'll keep searching though!</p>
+<p>I love Bookworm. I own the game on Steam and EA. I own 3 original BookWorm boxes, multiple disks (some sealed!), and I have hundreds of hours on the game. BookWorm was released on February 25, 2003, being a predecessor to the MSN game, <a href="https://warrobotdoge.com/bookworm/bespelled">Bespelled</a>. It was <a href="https://web.archive.org/web/20240911022953/https://www.guinnessworldrecords.com/world-records/most-downloaded-word-puzzle-game" rel="noopener">awarded</a> the world's most downloaded word puzzle game in June 2010, with 100 million downloads. This version of BookWorm was originally a <a href="https://warrobotdoge.com/bookwormapplet/">Java</a> game on the PopCap website, but was later changed to a Flash version after HTML5 debuted. There are multiple Flash remakes. There's a Java clone (one with and without a timer), and there's a Flash remake of the final update of BookWorm. You can play both versions below. Learn more at the <a href="https://warrobotdoge.com/bookworm/archives">Archives</a> page.</p>
+<p>PopCap actually had a <a href="https://web.archive.org/web/20040913005931/http://www.cafepress.com/popcapgames/" rel="noopener">BookWorm Store</a> from 2003-2005. It sold things from <a href="https://web.archive.org/web/20030810020656/http://www.cafeshops.com/popcapgames/98132" rel="noopener">mugs</a> to lunchboxes. No pictures of these products exist. I'll keep searching though!</p>
 </div>
 </div>
 </div>
@@ -642,7 +705,6 @@
   <div class="commentbox"></div>
       <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
       <script>commentBox('5680061592109056-proj')</script>
-    </div>
     </div>
 
 <br>
@@ -764,6 +826,75 @@
         // Change images every 3 seconds
         setInterval(showNextImage, 3000);
       </script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm Deluxe",
+  "alternateName": ["Bookworm", "BookWorm", "Bookworm Deluxe"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm",
+  "image": "https://warrobotdoge.com/bookworm/images/coverart/BookWorm_Cover.jpg",
+  "description": "BookWorm is a word-forming puzzle game released by PopCap Games on 25 February 2003. Players link adjacent letter tiles on a 7x7 grid to build words and feed Lex the bookworm, scoring on word length and letter rarity in a system modelled on Scrabble. Longer words produce green, gold, sapphire and diamond bonus tiles; short words produce burning tiles that end the game if they reach the bottom of the board. The Deluxe release added updated graphics, an Action mode with a timer, and a Hall of Fame. Computer Gaming World named it Puzzle Game of the Year for 2003, and in June 2010 Guinness World Records recognised it as the most downloaded word puzzle game with over 100 million downloads. The game was originally distributed as a Java applet on the PopCap website before moving to Flash. This archive hosts every known Windows build — 1.00, 1.01, 1.02, 1.03, 1.13 and the Swedish 1.20 — alongside Spanish, French, German, Italian and Dutch Zylom localisations, plus playable Flash and Java versions in-browser.",
+  "datePublished": "2003-02-25",
+  "genre": ["Puzzle", "Word Game", "Casual"],
+  "gamePlatform": ["PC", "Windows", "Macintosh", "Web Browser"],
+  "operatingSystem": ["Windows", "macOS"],
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": ["en", "es", "fr", "de", "it", "nl", "sv"],
+  "softwareVersion": "1.13",
+  "keywords": "bookworm deluxe download, play bookworm online, popcap bookworm, lex the bookworm, word puzzle game, bookworm free download, bookworm flash, bookworm java applet",
+  "publisher": {
+    "@type": "Organization",
+    "name": "PopCap Games",
+    "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Jason Kapalka"
+  },
+  "character": {
+    "@type": "Person",
+    "name": "Lex",
+    "description": "The green bookworm mascot who eats the words players spell."
+  },
+  "award": [
+    "Computer Gaming World Puzzle Game of the Year 2003",
+    "Guinness World Record: Most Downloaded Word Puzzle Game (June 2010)"
+  ],
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_(video_game)",
+    "https://tvtropes.org/pmwiki/pmwiki.php/VideoGame/Bookworm2003"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  },
+  "gameTip": {
+    "@type": "CreativeWork",
+    "name": "Scoring strategy",
+    "text": "Score depends on level, word length and letter rarity. Look for suffixes such as -ing, -er, -ed and -tion to extend words. Words of five letters or more produce gold tiles. Clicking Lex scrambles the board but adds burning tiles."
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm Deluxe",
+      "item": "https://warrobotdoge.com/bookworm/bookworm" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
