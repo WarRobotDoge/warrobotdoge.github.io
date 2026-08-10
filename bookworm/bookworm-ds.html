@@ -11,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookworm for Nintendo DS</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/DS_Icon.png" type="image/png">
-    <meta name="description" content="Download and Play BookWorm for the Nintendo DS!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/Bookworm_DS.jpg" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm Nintendo DS ROM — Download &amp; Play Online Free</title>
+    <meta name="description" content="Download the BookWorm Nintendo DS ROM, or play it free in your browser with no emulator setup. Covers the 2009 DS and DSiWare releases, plus the cancelled Adventures port." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-ds" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm Nintendo DS ROM — Download &amp; Play Online Free" />
+    <meta property="og:description" content="Download the BookWorm Nintendo DS ROM, or play it free in your browser with no emulator setup. Covers the 2009 DS and DSiWare releases." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-ds" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/Bookworm_DS.jpg" />
+    <meta property="og:image:alt" content="BookWorm Nintendo DS box art" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm Nintendo DS ROM — Download &amp; Play Online Free" />
+    <meta name="twitter:description" content="Download the BookWorm Nintendo DS ROM, or play it free in your browser with no emulator setup." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/coverart/Bookworm_DS.jpg" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/DS_Icon.png" type="image/png">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -316,22 +333,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the file size in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -401,7 +461,8 @@
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="Bookworm Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="BookWorm logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -468,8 +529,11 @@
             <button class="dropdown2-button">Download for DS<span class="dropdown2-arrow"></span>
             </button>
             <div class="dropdown2-menu">
-              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_DS.nds" target="_blank">BookWorm DS (8MB)</a>
-              <a href="https://warrobotdoge.com/bookworm/downloads/BookWorm_French_Brew.nds" target="_blank">BookWorm DS Brewed French (167 KB)</a>
+              <div class="dropdown2-label">English</div>
+              <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_DS.nds" target="_blank" rel="noopener"><span>Full ROM</span><span class="dropdown2-size">8 MB</span></a>
+
+              <div class="dropdown2-label">Other languages</div>
+              <a href="https://warrobotdoge.com/bookworm/downloads/BookWorm_French_Brew.nds" target="_blank" rel="noopener"><span>French (brewed)</span><span class="dropdown2-size">167 KB</span></a>
             </div>
             <br>
           </div>
@@ -481,22 +545,22 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/DS_1.jpg" alt="Screenshot 1" class="active">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/DS_2.jpg" alt="Screenshot 2">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/DS_3.jpg" alt="Screenshot 3">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/DS_4.jpg" alt="Screenshot 4">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/DS_1.jpg" alt="BookWorm Nintendo DS gameplay showing the letter grid on the touch screen" class="active">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/DS_2.jpg" alt="BookWorm DS gameplay with Lex and a bonus word">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/DS_3.jpg" alt="BookWorm DS prize card screen">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/DS_4.jpg" alt="BookWorm DS Hall of Fame high score table">
           </div>
         </div>
 
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-<p>BookWorm for the DS was released in (very) late 2009, it had a DSI release too, with contained more features. I currently owne a sealed version of this game. Lex, was given the sprite of Lex from <a href="https://warrobotdoge.com/bookworm/bookworm-adventures">BookWorm Adventures</a> instead of the <a href="https://warrobotdoge.com/bookworm/bookworm">BookWorm Deluxe</a> sprite. This game actually features local multiplayer, though, I'm not sure if it works on this eumlated version. PopCap was in the making of porting BookWorm Adventures to the DS, but was later <a href="https://web.archive.org/web/20181204051952/https://gamefaqs.gamespot.com/ds/978330-bookworm-adventures">cancelled</a>. You can play the DS version of BookWorm below. (Rotate by 90 degrees in settings)</p>
-<p>I did some deep digging and found the advertisement for this game on an old GameStop server. PopCap removed the video from YouTube, but <a href="https://youtu.be/UzeqC-WHTbo">I reuploaded it</a>!</p>
-    <center><img src="https://warrobotdoge.com/bookworm/images/ads/BWDS_AD.png" width="191px" height="88px" alt="BookWorm DS advertisement"></center>
-</div>
-</div>
-</div>
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>BookWorm for the DS was released in (very) late 2009. It had a DSi release too, which contained more features. I currently own a sealed version of this game. Lex was given the sprite of Lex from <a href="https://warrobotdoge.com/bookworm/bookworm-adventures">BookWorm Adventures</a> instead of the <a href="https://warrobotdoge.com/bookworm/bookworm">BookWorm Deluxe</a> sprite. This game actually features local multiplayer, though I'm not sure if it works on this emulated version. PopCap was in the process of porting BookWorm Adventures to the DS, but it was later <a href="https://web.archive.org/web/20181204051952/https://gamefaqs.gamespot.com/ds/978330-bookworm-adventures" rel="noopener">cancelled</a>. You can play the DS version of BookWorm below. (Rotate by 90 degrees in settings)</p>
+            <p>I did some deep digging and found the advertisement for this game on an old GameStop server. PopCap removed the video from YouTube, but <a href="https://youtu.be/UzeqC-WHTbo" rel="noopener">I reuploaded it</a>!</p>
+            <center><img src="https://warrobotdoge.com/bookworm/images/ads/BWDS_AD.png" width="191" height="88" alt="BookWorm DS advertisement recovered from an old GameStop server"></center>
+          </div>
+        </div>
+      </div>
       <div class="filler"></div>
       <div class="section">
         <h2>BookWorm DS</h2>
@@ -511,11 +575,10 @@
                 EJS_core = "nds";
                 EJS_gameName = "Bookworm";
                 EJS_color = "#1ae40c";
-                EJS_backgroundImage = '/bookworm/images/logo/BookWorm_Logo.png'
-                EJS_volume = 1
+                EJS_backgroundImage = "/bookworm/images/logo/BookWorm_Logo.png";
+                EJS_volume = 1;
                 EJS_startOnLoaded = true;
                 EJS_pathtodata = "/bookworm/";
-                EJS_volume = 1
                 EJS_gameUrl = "/bookworm/downloads/Bookworm_DS.nds";
                 EJS_biosUrl = "/bookworm/bios7.bin";
               </script>
@@ -564,6 +627,72 @@
       // Change images every 3 seconds
       setInterval(showNextImage, 3000);
     </script>
-  </body>
-</html>
 
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm (Nintendo DS)",
+  "alternateName": ["Bookworm DS", "BookWorm Nintendo DS", "Bookworm DSiWare"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-ds",
+  "image": "https://warrobotdoge.com/bookworm/images/coverart/Bookworm_DS.jpg",
+  "description": "The Nintendo DS conversion of PopCap's BookWorm, developed by Black Lantern Studios and released on 30 November 2009 for the DSiWare download service and on standard DS cartridge. Players link adjacent letter tiles to build words and feed Lex the bookworm, using prize cards and bonus words to raise their score and reach the Hall of Fame, while keeping burning letters from reaching the bottom of the board. The DSi release carried additional features over the cartridge version. Notably, this port uses Lex's sprite from BookWorm Adventures rather than the BookWorm Deluxe design, and it is one of only two BookWorm releases to support multiplayer, via local wireless play. A Nintendo DS conversion of BookWorm Adventures was in development at PopCap but was cancelled before release. This archive hosts the ROM, a browser-playable version requiring no emulator installation, and a recovered television advertisement retrieved from an old GameStop server after PopCap removed it from YouTube.",
+  "datePublished": "2009-11-30",
+  "genre": ["Puzzle", "Word Game"],
+  "gamePlatform": ["Nintendo DS", "DSiWare"],
+  "applicationCategory": "GameApplication",
+  "playMode": ["SinglePlayer", "MultiPlayer"],
+  "inLanguage": ["en", "fr"],
+  "keywords": "bookworm ds rom, bookworm nintendo ds download, play bookworm ds online, bookworm dsiware, popcap bookworm nintendo",
+  "publisher": {
+    "@type": "Organization",
+    "name": "PopCap Games",
+    "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+  },
+  "creator": {
+    "@type": "Organization",
+    "name": "Black Lantern Studios"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Jason Kapalka"
+  },
+  "character": {
+    "@type": "Person",
+    "name": "Lex",
+    "description": "The green bookworm mascot, drawn here using his BookWorm Adventures sprite."
+  },
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_(video_game)"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  },
+  "gameTip": {
+    "@type": "CreativeWork",
+    "name": "Browser playback",
+    "text": "The DS screens are stacked vertically by default. Rotate the display by 90 degrees in the emulator settings menu for a more comfortable layout."
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm DS",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-ds" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1}' crossorigin="anonymous"></script>
+</body>
+</html>
