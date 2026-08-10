@@ -11,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookworm Adventures 2</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/BWA2.ico" type="image/ico">
-    <meta name="description" content="Download and Play BookWorm Adventures 2!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_1.png" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm Adventures 2 Download — Free Full Version (2009)</title>
+    <meta name="description" content="Download BookWorm Adventures Volume 2 free, the 2009 PopCap word RPG. Full English and Spanish versions, plus the standalone Fractured Fairytales and Astounding Planet episodes." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-adventures-2" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm Adventures 2 Download — Free Full Version (2009)" />
+    <meta property="og:description" content="Download BookWorm Adventures Volume 2 free, the 2009 PopCap word RPG. English and Spanish versions, plus the standalone episode releases." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-adventures-2" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_1.png" />
+    <meta property="og:image:alt" content="BookWorm Adventures 2 gameplay showing Lex in battle" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm Adventures 2 Download — Free Full Version (2009)" />
+    <meta name="twitter:description" content="Download BookWorm Adventures Volume 2 free, the 2009 PopCap word RPG. English and Spanish versions, plus the standalone episode releases." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_1.png" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/BWA2.ico" type="image/x-icon">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -316,22 +333,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the file size in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -401,7 +461,8 @@
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Adventures_2_Logo.png" alt="Bookworm Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Adventures_2_Logo.png" alt="BookWorm Adventures 2 logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -468,10 +529,15 @@
             <button class="dropdown2-button">Download for Windows<span class="dropdown2-arrow"></span>
             </button>
             <div class="dropdown2-menu">
-              <a href="https://archive.org/download/bookworm-adventures-2/BookWorm_Adventures_2.zip" target="_blank">BookWorm Adventures 2 (59 MB)</a>
-              <a href="https://archive.org/download/bookworm-adventures-2-spanish/Bookworm%20Adventures%20Volumen%202.zip" target="_blank">BookWorm Adventures 2 en español (Gracias a @ElJoky1)</a>
-              <a href="https://archive.org/download/bookworm-adventures-fractured-fairytales_202502/Bookworm-Adventures_Fractured_Fairytales.zip" target="_blank">BookWorm Adventures Fractured Fairytales</a>
-              <a href="https://archive.org/download/bookworm-adventures-astounding-planet/Bookworm-Adventures_Astounding_Planet.zip" target="_blank">BookWorm Adventures Astounding Planet</a>
+              <div class="dropdown2-label">English</div>
+              <a href="https://archive.org/download/bookworm-adventures-2/BookWorm_Adventures_2.zip" target="_blank" rel="noopener"><span>Bookworm Adventures Full</span><span class="dropdown2-size">59 MB</span></a>
+
+              <div class="dropdown2-label">Other languages</div>
+              <a href="https://archive.org/download/bookworm-adventures-2-spanish/Bookworm%20Adventures%20Volumen%202.zip" target="_blank" rel="noopener"><span>Español</span><span class="dropdown2-size">Gracias a @ElJoky1</span></a>
+
+              <div class="dropdown2-label">Individual episodes</div>
+              <a href="https://archive.org/download/bookworm-adventures-fractured-fairytales_202502/Bookworm-Adventures_Fractured_Fairytales.zip" target="_blank" rel="noopener"><span>Fractured Fairytales</span></a>
+              <a href="https://archive.org/download/bookworm-adventures-astounding-planet/Bookworm-Adventures_Astounding_Planet.zip" target="_blank" rel="noopener"><span>Astounding Planet</span></a>
             </div>
           </div>
         </div>
@@ -482,36 +548,36 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_1.png" alt="Screenshot 1" class="active">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_2.png" alt="Screenshot 2">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_3.png" alt="Screenshot 3">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_5.png" alt="Screenshot 4">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_1.png" alt="BookWorm Adventures 2 battle screen with Lex facing an enemy" class="active">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_2.png" alt="BookWorm Adventures 2 letter grid with Rainbow Tiles">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_3.png" alt="BookWorm Adventures 2 storybook chapter selection">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_5.png" alt="BookWorm Adventures 2 treasures and companion screen">
             <!--<img src="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_4.png" alt="Screenshot 5"> -->
           </div>
         </div>
 
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-    <p>BookWorm Adventures 2 is a masterpeice. I own an Australian BookWorm Adventures 2 disk, though I'd like to eventually find the original cardboard box version. I've only played the first chapter of the game, but I can tell it's a blast! BookWorm Adventures 2 was released on July 30, 2009, and was a long-awaited sequel. The game has three more books: Fractured Fairytales, The Monkey King, and  Astounding Planet, which were sometimes released as individual episodes. In the summer of 2009, PopCap <a href="https://youtu.be/McdZJOfHp9s?si=ZKv-0zgD3bbVJ8wd&t=400">customized soda cans</a> with BookWorm Adventures 2 characters and gave them away in a picnic. </p>
-    <center><img src="https://warrobotdoge.com/bookworm/images/ads/BWA2_AD.jpg" width="150px" height="125px" alt="BookWorm Adventures 2 joke advertisement"></center>
-  </div>
-</div>
-</div>
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>BookWorm Adventures 2 is a masterpiece. I own an Australian BookWorm Adventures 2 disk, though I'd like to eventually find the original cardboard box version. I've only played the first chapter of the game, but I can tell it's a blast! BookWorm Adventures 2 was released on July 30, 2009, and was a long-awaited sequel. The game has three more books: Fractured Fairytales, The Monkey King, and Astounding Planet, which were sometimes released as individual episodes. In the summer of 2009, PopCap <a href="https://youtu.be/McdZJOfHp9s?si=ZKv-0zgD3bbVJ8wd&amp;t=400" rel="noopener">customized soda cans</a> with BookWorm Adventures 2 characters and gave them away in a picnic.</p>
+            <center><img src="https://warrobotdoge.com/bookworm/images/ads/BWA2_AD.jpg" width="150" height="125" alt="BookWorm Adventures 2 joke advertisement"></center>
+          </div>
+        </div>
+      </div>
 
       <div class="filler"></div>
+
       <div class="section">
-        <h2>BookWorm Adventures Trailer</h2>
-      <div class="text">
-      <p>There was no web version for BookWorm Adventures 2. But the trailer for the game is still on YouTube!</p>
-      <iframe width="470" height="353" src="https://www.youtube.com/embed/xI0E9dBsWCM?si=4sy6awIa6_FbEher" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-     </div>
-    </div>
-    <div class="commentbox"></div>
-<script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
-<script>commentBox('5680061592109056-proj')</script>
- </div>
-    </div>
+        <h2>BookWorm Adventures 2 Trailer</h2>
+        <div class="text">
+          <p>There was no web version for BookWorm Adventures 2. But the trailer for the game is still on YouTube!</p>
+          <iframe width="470" height="353" src="https://www.youtube.com/embed/xI0E9dBsWCM?si=4sy6awIa6_FbEher" title="BookWorm Adventures 2 official trailer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <div class="commentbox"></div>
+      <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
+      <script>commentBox('5680061592109056-proj')</script>
     </div>
 
 <br>
@@ -520,7 +586,6 @@
 <br>
 <br>
 
-    </div>
     <footer></footer>
     <script>
       // Dropdown toggle functionality
@@ -551,7 +616,86 @@
       // Change images every 3 seconds
       setInterval(showNextImage, 3000);
     </script>
-    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm Adventures Volume 2",
+  "alternateName": ["BookWorm Adventures 2", "Bookworm Adventures Vol. 2", "Bookworm Adventures Volumen 2"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-adventures-2",
+  "image": "https://warrobotdoge.com/bookworm/images/screenshots/BWA2_1.png",
+  "description": "BookWorm Adventures Volume 2 is the 2009 sequel to PopCap's BookWorm Adventures, released on 30 July 2009. The walls of fiction collapse and characters escape into the Great Library, leaving Lex the bookworm to restore order. Players spell words from a letter grid to attack over 130 enemies across three storybooks of ten chapters each: Fractured Fairytales, which draws on classic fairy tales and Alice in Wonderland; The Monkey King, based on Chinese mythology; and Astounding Planet, a science fiction setting. Volume 2 introduced Rainbow Tiles that act as wildcards, companion characters who assist every few turns, more than 20 treasures, four game modes and six mini-games. Unlike the first game, Adventure mode can be replayed for high scores after completion. The three books were sometimes sold as standalone episodes. EA delisted the BookWorm series in 2016. This archive hosts the full English release, a Spanish translation, and the separate Fractured Fairytales and Astounding Planet episode builds.",
+  "datePublished": "2009-07-30",
+  "genre": ["Puzzle", "Role-Playing Game", "Word Game", "Casual"],
+  "gamePlatform": ["PC", "Windows", "Android"],
+  "operatingSystem": "Windows",
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": ["en", "es"],
+  "keywords": "bookworm adventures 2 download, bookworm adventures volume 2, popcap word rpg, fractured fairytales, astounding planet, the monkey king, rainbow tiles",
+  "publisher": {
+    "@type": "Organization",
+    "name": "PopCap Games",
+    "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Jason Kapalka"
+  },
+  "character": {
+    "@type": "Person",
+    "name": "Lex",
+    "description": "The green bookworm protagonist, who attacks enemies using words the player spells."
+  },
+  "hasPart": [
+    {
+      "@type": "CreativeWork",
+      "name": "Fractured Fairytales",
+      "description": "Book one, drawing on classic fairy tales and Alice in Wonderland."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "The Monkey King",
+      "description": "Book two, based on Chinese mythology."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Astounding Planet",
+      "description": "Book three, set in a science fiction world."
+    }
+  ],
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_Adventures",
+    "https://tvtropes.org/pmwiki/pmwiki.php/VideoGame/BookwormAdventures"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  },
+  "trailer": {
+    "@type": "VideoObject",
+    "name": "BookWorm Adventures 2 official trailer",
+    "embedUrl": "https://www.youtube.com/embed/xI0E9dBsWCM"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm Adventures 2",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-adventures-2" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
   </body>
 </html>
-
