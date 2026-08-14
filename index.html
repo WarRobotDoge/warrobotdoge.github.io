@@ -220,7 +220,6 @@
         .comments-section table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed; /* stops a long image or URL from stretching the table */
         }
         
         .comments-section th {
@@ -287,13 +286,22 @@
 
 /* Images posted inside a comment.
    - display:block puts the image on its own line below the text
-   - max-width:100% keeps it inside the comment column, never wider
    - max-height caps absurdly tall images; aspect ratio is preserved
-     automatically because both dimensions are constraints, not sizes */
+     automatically because both dimensions are constraints, not sizes
+
+   The width cap needs a definite pixel value, not just 100%. In a normal
+   (auto) table layout a percentage max-width does not restrain how much a
+   wide image contributes to the cell's minimum width, so a big image would
+   still stretch the whole comments table. A px value does restrain it.
+
+   320px = 800 container - 300 sidebar - 20 gap - 140 name column
+           - 20 comment padding. If the layout widths ever change,
+   this is the number to update. min() keeps it responsive if the
+   column is ever narrower than 320px. */
 .comment-image {
     display: block;
     margin-top: 1em;
-    max-width: 100%;
+    max-width: min(100%, 320px);
     max-height: 400px;
     height: auto;
     border: 1px solid #ccc;
