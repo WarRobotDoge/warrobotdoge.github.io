@@ -11,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookWorm HD</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/logo/BookWorm_HD.png" type="image/png">
-    <meta name="description" content="Play BookWorm Deluxe HD!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd.jpg" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm HD on Pogo — The Only BookWorm Still Playable</title>
+    <meta name="description" content="BookWorm HD launched on EA's Pogo in 2019, three years after the series was delisted, and is the only BookWorm still officially available. Screenshots, history and gameplay." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-hd" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm HD on Pogo — The Only BookWorm Still Playable" />
+    <meta property="og:description" content="BookWorm HD launched on EA's Pogo in 2019, three years after the series was delisted, and is the only BookWorm still officially available." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-hd" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd.jpg" />
+    <meta property="og:image:alt" content="BookWorm HD gameplay on Pogo" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm HD on Pogo — The Only BookWorm Still Playable" />
+    <meta name="twitter:description" content="BookWorm HD launched on EA's Pogo in 2019, three years after the series was delisted, and is the only BookWorm still officially available." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd.jpg" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/logo/BookWorm_HD.png" type="image/png">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -114,7 +131,7 @@
         background-color: white;
         width: 100%; /* Make the navbar take the full width */
         max-width: 931px; /* Match the width of the navbar */
-        height: 120vh;  /* Full viewport height to extend down to the footer */
+        min-height: 120vh;  /* ← grows with content instead of capping it */
         margin: 0 auto;
         position: relative;
         z-index: 1;
@@ -316,22 +333,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the note in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -413,7 +473,8 @@
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_HD_Logo.png" alt="Bookworm Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_HD_Logo.png" alt="BookWorm HD logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -477,7 +538,7 @@
                 <button class="dropdown2-button">Play BookWorm HD<span class="dropdown2-arrow"></span>
                 </button>
                 <div class="dropdown2-menu">
-                  <a href="https://www.pogo.com/games/bookworm" target="_blank">BookWorm HD on Pogo (Subscription Required)</a>
+                  <a href="https://www.pogo.com/games/bookworm" target="_blank" rel="noopener"><span>Play on Pogo</span><span class="dropdown2-size">Subscription required</span></a>
                   </div>
               </div>
             </div>
@@ -488,30 +549,36 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd.jpg" alt="Bookworm HD Screenshot 1"  class="active"> 
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd_2.jpg" alt="Bookworm HD Screenshot 2">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd_3.jpg" alt="Bookworm HD Screenshot 3">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd_4.jpg" alt="Bookworm HD Screenshot 4">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd_5.jpg" alt="Bookworm HD Screenshot 5">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd.jpg" alt="BookWorm HD on Pogo showing the widescreen letter grid"  class="active"> 
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd_2.jpg" alt="BookWorm HD gameplay with the redesigned Lex">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd_3.jpg" alt="BookWorm HD badge progression screen">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd_4.jpg" alt="BookWorm HD burning tiles and bonus letters">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd_5.jpg" alt="BookWorm HD level and score display">
           </div>
         </div>
 
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-    <p>BookWorm HD was released for Pogo on <a href="https://www.pogocheats.net/forum/index.php/topic,49870.0.html">August 13, 2019</a>. The game is pretty similar to the original <a href="https://warrobotdoge.com/bookworm/bookworm">BookWorm Deluxe</a>, except for a reskin. They made Lex fucking ugly, in all honesty. This BookWorm features <a href="https://youtu.be/Qq-1XqPNEP4?si=YRm1sg1FZ50sb1GQ" alt-text>badges</a>, and goes to level 100. What's unfortunate about this BookWorm is that you have to pay to play it. It's a mid reskin, with the same mechanics, and we have to pay for it, doesn't seem very fair. You can play BookWorm HD by clicking the button above. </p>
-    </div>
-</div>
-</div>
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>BookWorm HD was released for Pogo on <a href="https://www.pogocheats.net/forum/index.php/topic,49870.0.html" rel="noopener">August 13, 2019</a>. The game is pretty similar to the original <a href="https://warrobotdoge.com/bookworm/bookworm">BookWorm Deluxe</a>, except for a reskin. They made Lex fucking ugly, in all honesty. This BookWorm features <a href="https://youtu.be/Qq-1XqPNEP4?si=YRm1sg1FZ50sb1GQ" rel="noopener">badges</a>, and goes to level 100. What's unfortunate about this BookWorm is that you have to pay to play it. It's a mid reskin, with the same mechanics, and we have to pay for it, doesn't seem very fair. You can play BookWorm HD by clicking the button above.</p>
+          </div>
+        </div>
+      </div>
 
       <div class="filler"></div>
+
       <div class="section">
         <h2>BookWorm HD Gameplay</h2>
-      <div class="text">
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/uUoE9PrIpRo?si=Fdi1BEwUvaRM8eV9" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-    </div>
-    </div>
-    </div>
+        <div class="text">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/uUoE9PrIpRo?si=Fdi1BEwUvaRM8eV9" title="BookWorm HD gameplay footage on Pogo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <div class="filler"></div>
+      <div class="commentbox"></div>
+      <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
+      <script>commentBox('5680061592109056-proj')</script>
+
     </div>
 
 <br>
@@ -520,21 +587,24 @@
 <br>
 <br>
 
-    </div>
     <footer></footer>
     <script>
       // Dropdown toggle functionality
       const dropdown2 = document.querySelector('.dropdown2');
       const dropdown2Button = document.querySelector('.dropdown2-button');
-      dropdown2Button.addEventListener('click', () => {
-        dropdown2.classList.toggle('open');
-      });
-      // Close the dropdown if clicked outside
-      document.addEventListener('click', (event) => {
-        if (!dropdown2.contains(event.target)) {
-          dropdown2.classList.remove('open');
-        }
-      });
+      // Guard: some pages in this archive have no download dropdown, in which
+      // case both lookups return null and the next line would throw.
+      if (dropdown2 && dropdown2Button) {
+        dropdown2Button.addEventListener('click', () => {
+          dropdown2.classList.toggle('open');
+        });
+        // Close the dropdown if clicked outside
+        document.addEventListener('click', (event) => {
+          if (!dropdown2.contains(event.target)) {
+            dropdown2.classList.remove('open');
+          }
+        });
+      }
     </script>
     <script>
       const images = document.querySelectorAll('.screenshot-container img');
@@ -548,8 +618,74 @@
         // Add the "active" class to the next image
         images[currentIndex].classList.add('active');
       }
-      // Change images every 3 seconds
-      setInterval(showNextImage, 3000);
+      // Guard: skip the timer if this page has no <img> screenshots,
+      // which would otherwise throw a TypeError every 3 seconds.
+      if (images.length > 0) {
+        // Change images every 3 seconds
+        setInterval(showNextImage, 3000);
+      }
     </script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm HD",
+  "alternateName": ["Bookworm HD Pogo", "BookWorm Deluxe HD", "Bookworm on Pogo"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-hd",
+  "image": "https://warrobotdoge.com/bookworm/images/screenshots/bookworm_hd.jpg",
+  "description": "The widescreen remake of PopCap's BookWorm, released on EA's Pogo platform on 13 August 2019. Players link letter tiles to build words and feed Lex the bookworm, clearing burning letters before they reach the bottom of the board. Mechanically it follows BookWorm Deluxe closely, with the main additions being a badge system and progression up to level 100, alongside redrawn artwork and a redesigned Lex. It runs in the browser and requires a Pogo subscription to play. Its release date makes it a notable outlier in the series: it arrived three years after EA delisted every other BookWorm title in 2016, and it is the only entry in the franchise still officially available to play.",
+  "datePublished": "2019-08-13",
+  "genre": ["Puzzle", "Word Game", "Casual"],
+  "gamePlatform": ["Browser", "Web Browser", "Pogo"],
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": "en",
+  "keywords": "bookworm hd, bookworm pogo, play bookworm online, bookworm deluxe hd, bookworm subscription, ea pogo word games",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Electronic Arts",
+    "sameAs": "https://en.wikipedia.org/wiki/Electronic_Arts"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Jason Kapalka"
+  },
+  "character": {
+    "@type": "Person",
+    "name": "Lex",
+    "description": "The green bookworm mascot, redesigned for the HD release."
+  },
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_(video_game)"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  },
+  "gameTip": {
+    "@type": "CreativeWork",
+    "name": "Access",
+    "text": "BookWorm HD runs in the browser on Pogo and cannot be downloaded or played offline. A Pogo subscription is required, making it the only BookWorm title that is both currently available and paid."
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm HD",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-hd" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
   </body>
 </html>
