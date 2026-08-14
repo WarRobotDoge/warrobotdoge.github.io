@@ -15,6 +15,8 @@
 <link rel="shortcut icon" type="image/png" href="WarRobotDoge.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 <meta name="description" content="WarRobotDoge — personal site, HTML projects, and home of the BookWorm Games Archive." />
+<link rel="canonical" href="https://warrobotdoge.com/" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="WarRobotDoge" />
 <meta property="og:image" content="https://warrobotdoge.com/WarRobotDoge.png">
@@ -850,6 +852,69 @@ fetchMessages();
         audio.currentTime = pos * audio.duration;
     });
 </script>
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "WarRobotDoge",
+  "alternateName": "warrobotdoge.com",
+  "url": "https://warrobotdoge.com/",
+  "inLanguage": "en",
+  "description": "Personal site of WarRobotDoge. HTML projects, writing, and the BookWorm Games Archive — a preservation project documenting every release of PopCap's BookWorm.",
+  "author": { "@id": "https://warrobotdoge.com/#person" },
+  "publisher": { "@id": "https://warrobotdoge.com/#person" },
+  "hasPart": {
+    "@type": "CollectionPage",
+    "name": "BookWorm Games Archive",
+    "url": "https://warrobotdoge.com/bookworm",
+    "description": "An archive documenting and preserving every known release of PopCap's BookWorm."
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "https://warrobotdoge.com/#person",
+  "name": "WarRobotDoge",
+  "url": "https://warrobotdoge.com/",
+  "image": "https://warrobotdoge.com/WarRobotDoge.png",
+  "description": "Creator of the BookWorm Games Archive and assorted HTML projects.",
+  "nationality": "United States",
+  "knowsAbout": ["Video game preservation", "PopCap Games", "BookWorm", "Web development", "Medieval history"],
+  "sameAs": [
+    "https://github.com/warrobotdoge",
+    "https://twitter.com/warrobotdoge",
+    "https://twitch.tv/warrobotdoge",
+    "https://www.youtube.com/channel/UCruNWhrXnagUs3B7cc4OSMg",
+    "https://tiktok.com/warrobotdoge2",
+    "https://reddit.com/u/warrobotdoge",
+    "https://steamcommunity.com/profiles/76561197994066574",
+    "https://open.spotify.com/user/muv7t4gxv5jhvisw1zj980q16"
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SiteNavigationElement",
+  "name": ["Home", "About", "News", "Bookworm", "Games", "Time", "Spotify"],
+  "url": [
+    "https://warrobotdoge.com/",
+    "https://warrobotdoge.com/about",
+    "https://warrobotdoge.com/news",
+    "https://warrobotdoge.com/bookworm",
+    "https://warrobotdoge.com/games",
+    "https://warrobotdoge.com/time",
+    "https://warrobotdoge.com/spotify"
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
