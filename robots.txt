@@ -1,4 +1,44 @@
+# ============================================================
+#  warrobotdoge.com
+# ============================================================
+
+# Everything is open to everyone by default.
 User-agent: *
+Allow: /
+
+# --- AI search crawlers, named explicitly ---
+# These are already covered by the wildcard above. They are listed
+# separately so that if a "Disallow" rule is ever added to the
+# wildcard block, these do not get caught by it silently.
+
+# OpenAI's search indexer. If this is ever blocked, the site cannot
+# appear in ChatGPT search results at all, regardless of Bing rank.
+User-agent: OAI-SearchBot
+Allow: /
+
+# OpenAI's live fetcher, used mid-conversation to read a page.
+User-agent: ChatGPT-User
+Allow: /
+
+# OpenAI's training crawler. Remove this block if you would rather
+# your writing not be used as model training data - it is separate
+# from search visibility, and blocking it does not affect citations.
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
 Allow: /
 
 Sitemap: https://warrobotdoge.com/sitemap.xml
