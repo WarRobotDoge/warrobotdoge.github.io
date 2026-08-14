@@ -1,0 +1,166 @@
+&lt;!--
+  ============================================================
+  INDEXNOW SUBMITTER
+  ============================================================
+  You do NOT need Node, a terminal, or any install to use this.
+
+  1. Generate a key at https://www.bing.com/indexnow/getstarted
+     (or make your own: 8-128 characters, hex only - 0-9 and a-f)
+
+  2. Create a plain text file named <YOUR-KEY>.txt containing
+     nothing but the key itself, and upload it to your web root:
+         https://warrobotdoge.com/<YOUR-KEY>.txt
+
+  3. Open warrobotdoge.com in Chrome, press F12, click Console,
+     paste EVERYTHING below the line, and press Enter.
+
+  Running this from your own domain matters: the browser sends the
+  request with warrobotdoge.com as the origin, which avoids CORS
+  problems you would hit running it from a local file.
+  ============================================================
+--&gt;
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IndexNow submitter — warrobotdoge.com</title>
+<style>
+  body { font-family: monospace; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.6; }
+  h1 { font-size: 20px; }
+  input { width: 100%; padding: 8px; font-family: monospace; font-size: 14px; margin-bottom: 12px; }
+  button { padding: 10px 20px; font-size: 14px; cursor: pointer; }
+  #out { background: #111; color: #0f0; padding: 15px; margin-top: 20px; white-space: pre-wrap; min-height: 60px; }
+  .note { background: #ffe; border-left: 4px solid #cc0; padding: 10px; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<h1>IndexNow submitter</h1>
+
+<p class="note">
+  Before using this: generate a key at
+  <a href="https://www.bing.com/indexnow/getstarted">bing.com/indexnow/getstarted</a>,
+  then upload a file named <code>YOURKEY.txt</code> to
+  <code>https://warrobotdoge.com/</code> containing only that key.
+  Upload this page to your own domain and open it there — running it from a
+  local file will fail on CORS.
+</p>
+
+<label>Your IndexNow key:</label>
+<input id="key" placeholder="e.g. a1b2c3d4e5f6...">
+
+<button onclick="submitAll()">Submit all URLs</button>
+
+<div id="out">Waiting…</div>
+
+<script>
+const HOST = "warrobotdoge.com";
+
+// Every page in the sitemap.
+const URLS = [
+  "https://warrobotdoge.com/",
+  "https://warrobotdoge.com/about",
+  "https://warrobotdoge.com/news",
+  "https://warrobotdoge.com/games",
+  "https://warrobotdoge.com/time",
+  "https://warrobotdoge.com/spotify",
+  "https://warrobotdoge.com/bookworm",
+  "https://warrobotdoge.com/bookworm/bookworm",
+  "https://warrobotdoge.com/bookworm/bookworm-adventures",
+  "https://warrobotdoge.com/bookworm/bookworm-adventures-2",
+  "https://warrobotdoge.com/bookworm/bookworm-gameboy",
+  "https://warrobotdoge.com/bookworm/bookworm-ds",
+  "https://warrobotdoge.com/bookworm/bookworm-xbox",
+  "https://warrobotdoge.com/bookworm/bookworm-pocketpc",
+  "https://warrobotdoge.com/bookworm/bookworm-mobile",
+  "https://warrobotdoge.com/bookworm/bookworm-heroes",
+  "https://warrobotdoge.com/bookworm/bookworm-blackberry",
+  "https://warrobotdoge.com/bookworm/bookworm-tag",
+  "https://warrobotdoge.com/bookworm/bookworm-hd",
+  "https://warrobotdoge.com/bookworm/bookworm-android",
+  "https://warrobotdoge.com/bookworm/bookworm-ios",
+  "https://warrobotdoge.com/bookworm/bookworm-kindle",
+  "https://warrobotdoge.com/bookworm/bookworm-plane",
+  "https://warrobotdoge.com/bookworm/bespelled",
+  "https://warrobotdoge.com/bookworm/archives",
+  "https://warrobotdoge.com/bookworm/faq",
+  "https://warrobotdoge.com/bookwormapplet/"
+];
+
+function log(msg) {
+  document.getElementById("out").textContent += "\n" + msg;
+}
+
+async function submitAll() {
+  const key = document.getElementById("key").value.trim();
+  const out = document.getElementById("out");
+  out.textContent = "";
+
+  if (!/^[0-9a-fA-F]{8,128}$/.test(key)) {
+    log("ERROR: key must be 8-128 hexadecimal characters (0-9, a-f) only.");
+    return;
+  }
+
+  const keyLocation = "https://" + HOST + "/" + key + ".txt";
+
+  // Sanity check: make sure the key file is actually reachable first.
+  log("Checking " + keyLocation + " ...");
+  try {
+    const check = await fetch(keyLocation, { cache: "no-store" });
+    if (!check.ok) {
+      log("ERROR: key file returned HTTP " + check.status + ". Upload it first.");
+      return;
+    }
+    const body = (await check.text()).trim();
+    if (body !== key) {
+      log("ERROR: key file exists but its contents do not match the key.");
+      log("       File contains: " + body.slice(0, 60));
+      return;
+    }
+    log("Key file OK.");
+  } catch (e) {
+    log("ERROR: could not read the key file. Is it uploaded to the web root?");
+    return;
+  }
+
+  const payload = {
+    host: HOST,
+    key: key,
+    keyLocation: keyLocation,
+    urlList: URLS
+  };
+
+  log("Submitting " + URLS.length + " URLs to api.indexnow.org ...");
+
+  try {
+    const res = await fetch("https://api.indexnow.org/IndexNow", {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+
+    log("HTTP " + res.status + " " + res.statusText);
+
+    if (res.status === 200 || res.status === 202) {
+      log("SUCCESS — URLs accepted.");
+      log("202 means received and queued; that is the normal response.");
+      log("Check status at bing.com/webmasters > IndexNow in a few hours.");
+    } else if (res.status === 403) {
+      log("403 — key not valid for this host. Re-check the key file.");
+    } else if (res.status === 422) {
+      log("422 — URLs do not match the host, or key mismatch.");
+    } else if (res.status === 429) {
+      log("429 — too many requests. Wait and try again later.");
+    } else {
+      log("Unexpected status. See IndexNow docs for meaning.");
+    }
+  } catch (e) {
+    log("Request failed: " + e.message);
+    log("If this is a CORS error, upload this page to warrobotdoge.com and run it from there.");
+  }
+}
+</script>
+
+</body>
+</html>
