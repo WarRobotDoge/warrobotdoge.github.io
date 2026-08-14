@@ -12,21 +12,21 @@
     <meta charset="UTF-8">
     <title>WarRobotDoge</title>
     <base href="https://warrobotdoge.com/">
-<meta charset="UTF-8">
-<link rel="shortcut icon" type="x-icon" href="WarRobotDoge.png">
+<link rel="shortcut icon" type="image/png" href="WarRobotDoge.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-<meta name="description" content="the only one." />
+<meta name="description" content="WarRobotDoge — personal site, HTML projects, and home of the BookWorm Games Archive." />
 <meta property="og:type" content="website" />
-<meta property="twitter:type" content="website" />
+<meta property="og:site_name" content="WarRobotDoge" />
 <meta property="og:image" content="https://warrobotdoge.com/WarRobotDoge.png">
 <meta property="og:url" content="https://warrobotdoge.com" />
-<meta property="twitter:url" content="https://warrobotdoge.com" />
 <meta property="og:title" content="WarRobotDoge" />
-<meta property="twitter:title" content="WarRobotDoge" />
-<meta property="og:description" content="WarRobotDoge website" />
-<meta property="twitter:description" content="the only one." />
-<meta property="twitter:image" content="https://elegy.wtf/uploads/block_images/85b195836a24ea9d20d97f65da3b4d61.jpg" />
-<link href="poza" rel="shortcut icon" />
+<meta property="og:description" content="WarRobotDoge — personal site, HTML projects, and home of the BookWorm Games Archive." />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="WarRobotDoge" />
+<meta name="twitter:description" content="WarRobotDoge — personal site, HTML projects, and home of the BookWorm Games Archive." />
+<meta name="twitter:image" content="https://warrobotdoge.com/WarRobotDoge.png" />
+
 <link href="https://warrobotdoge.com/1/1.css" rel="stylesheet" media="screen,print">
 <link href="https://warrobotdoge.com/1/2.css" rel="stylesheet" media="screen,print">
 <link href="https://warrobotdoge.com/1/3.css" rel="stylesheet" media="screen,print">
@@ -220,6 +220,7 @@
         .comments-section table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed; /* stops a long image or URL from stretching the table */
         }
         
         .comments-section th {
@@ -250,6 +251,8 @@
             padding: 10px;
             vertical-align: top;
             font-size: 9pt;
+            word-wrap: break-word;      /* long URLs wrap instead of overflowing */
+            overflow-wrap: break-word;
         }
         
         .comment-date {
@@ -281,6 +284,21 @@
     color: #666;
     margin-bottom: 5px;
 }
+
+/* Images posted inside a comment.
+   - display:block puts the image on its own line below the text
+   - max-width:100% keeps it inside the comment column, never wider
+   - max-height caps absurdly tall images; aspect ratio is preserved
+     automatically because both dimensions are constraints, not sizes */
+.comment-image {
+    display: block;
+    margin-top: 1em;
+    max-width: 100%;
+    max-height: 400px;
+    height: auto;
+    border: 1px solid #ccc;
+    background-color: #f4f4f4;
+}
     </style>
 </head>
 <body>
@@ -294,7 +312,7 @@
     </header>
 
     <nav>
-        <a href="https://warrobotdoge.com">Home</a> | <a href="https://warrobotdoge.com/about">About</a> | <a href="https://warrobotdoge.com/news">News</a> | <a href="https://warrobotdoge.com/bookworm">Bookworm</a> | <a href="https://warrobotdoge.com/games">Games</a> | <a href="https://warrobotdoge.com/time">Time</a> | <a href="https://warrobotdoge.com/spotify">Spotify</a> <!--| <a href="#">Favorites</a> | <a href="#">Forum // -->
+        <a href="https://warrobotdoge.com">Home</a> | <a href="https://warrobotdoge.com/about">About</a> | <a href="https://warrobotdoge.com/news">News</a> | <a href="https://warrobotdoge.com/bookworm">Bookworm</a> | <a href="https://warrobotdoge.com/games">Games</a> | <a href="https://warrobotdoge.com/time">Time</a> | <a href="https://warrobotdoge.com/spotify">Spotify</a> <!--| <a href="#">Favorites</a> | <a href="#">Forum</a> -->
     </nav>
 
     <div class="main-layout">
@@ -326,16 +344,10 @@
   document.getElementById("lastLogin").textContent =
     "Last Login: " + formatted;
 </script>
-<script>
-const img = document.getElementById("pfp");
-
-const realImg = new Image();
-realImg.src = img.dataset.src;
-
-realImg.onload = () => {
-  img.src = realImg.src;
-};
-</script>
+<!-- REMOVED: a script here looked up document.getElementById("pfp") and then
+     read img.dataset.src. There is no element with id="pfp" on this page, so
+     it threw an uncaught TypeError on every single page load. The profile
+     picture above uses class="profile-pic" and loads normally without it. -->
             </div>
 
             <div class="contact-box">
@@ -456,7 +468,7 @@ Reddit
                 </tr>
                 <tr>
                     <td class="orange-text" valign="top">Games:</td>
-                    <td>BookWorm, Class of '09, Resident Evil,  Call of Duty, CS2, Silent Hill, Miku Project Diva, Skate, Read Dead Redemption 2, Rocket League</td>
+                    <td>BookWorm, Class of '09, Resident Evil,  Call of Duty, CS2, Silent Hill, Miku Project Diva, Skate, Red Dead Redemption 2, Rocket League</td>
                 </tr>
                 <tr>
                     <td class="orange-text" valign="top">Books:</td>
@@ -468,10 +480,10 @@ Reddit
             <h2>WarRobotDoge's Blurbs</h2>
             <div class="blurb">
                 <p class="orange-text">About me:</p>
-                <p>I like to make random html projects. I play games from time to time and I take lots of breaks. I love to analyze anything poltical. I am also obsessed with medieval history. </p>
+                <p>I like to make random html projects. I play games from time to time and I take lots of breaks. I love to analyze anything political. I am also obsessed with medieval history. </p>
                 
                 <p class="orange-text">Who I'd like to meet:</p>
-                <p>Anyone who isn't offended by the most insignificant little thing. I enjoy the company of like minded people and those with nostalgia for the 2000's. Also anyone who likes BookWorm or Jonathan Bowden lol</p>
+                <p>Anyone who isn't offended by the most insignificant little thing. I enjoy the company of like minded people and those with nostalgia for the 2000s. Also anyone who likes BookWorm or Jonathan Bowden lol</p>
                 
             <p class="orange-text">Quotes:</p>
                 <p>1 Peter 4:16 KJV - Yet if any man suffer as a Christian, let him not be ashamed; but let him glorify God on this behalf.<br><br> We will not be replaced. <br><br> Well, you can always be thinner... look better.<br><br>If at first you don’t succeed, try, try again.<br><br>"I saw God and He told me to burn it all down"<br><br>I long for what’s ahead, yet I fear tomorrow will betray today’s hope.<br><br>When you see a chance, sit a tight hold and don't let go until it's all you got.<br><br>You can't add days to your life, but you can add life to your days.<br><br>How can you call it a movement when you have no motion? You can't call it a movement cuz you have no motion.<br><br>If he were to get a glance of the future he died for, do you think he would do it again? - A tiktok comment about a WW2 soldier.<br><br>More is lost with indecision than wrong decision.<br><br>El hombre tiene que ser libre, pero no existe la libertad sino dentro de un orden.<br><br>You will never get to see fifty foot statues of warlords and emperors or feel the triumph of conquest. You will never see man live as the ancients dreamed he would, all because a couple of rats tunneled their way into positions of power. They said the past is wrong. They said invaders should have your land. They said its ok to embrace apathy. You are a victim of the technocracy, of an abuse named 'civility'. You have been robbed of a fulfilling earnest life. - Mike Ma<br><br>I believe in discrimination. Discrimination is a moral good and a moral law! It’s an aristocratic spirituality. Of course you discriminate. You discriminate over who’s your enemy and who’s your friend. You don’t treat people all as the same except in some universal ninnydom which only exists in the minds of people who’d like human nature to be different from what it is. - Jonathan Bowden</p>
@@ -527,6 +539,59 @@ function formatDate(rawDate) {
     });
 }
 
+/* ------------------------------------------------------------------
+   SECURITY: escape everything that came from a visitor before it is
+   put into innerHTML. Previously the comment body and the display
+   name were inserted raw, which meant anyone could post markup or a
+   <script> tag and have it run in every other visitor's browser.
+   ------------------------------------------------------------------ */
+function escapeHtml(value) {
+    return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+/* ------------------------------------------------------------------
+   IMAGE EMBEDS IN COMMENTS
+   Matches a direct image link, with or without curly braces around it:
+       https://example.com/cat.png
+       {https://example.com/cat.png}
+   The URL is pulled out of the text, and the image is rendered on its
+   own line underneath whatever text is left. Only http(s) links ending
+   in a known image extension are accepted, so a comment can never turn
+   into a javascript: or data: URL. Capped at 4 images per comment.
+   ------------------------------------------------------------------ */
+const IMAGE_URL_RE = /\{?\s*(https?:\/\/[^\s<>"'{}]+\.(?:png|jpe?g|gif|webp|bmp|avif)(?:\?[^\s<>"'{}]*)?)\s*\}?/gi;
+const MAX_IMAGES_PER_COMMENT = 4;
+
+function renderCommentBody(rawText) {
+    const text = String(rawText == null ? "" : rawText);
+    const images = [];
+
+    // Strip image URLs out of the text and collect them
+    const remaining = text.replace(IMAGE_URL_RE, (match, url) => {
+        if (images.length < MAX_IMAGES_PER_COMMENT) {
+            images.push(url);
+            return "";
+        }
+        return match; // over the limit: leave it as plain text
+    });
+
+    let html = escapeHtml(remaining).trim();
+
+    for (const url of images) {
+        const safeUrl = escapeHtml(url);
+        html += '<img class="comment-image" src="' + safeUrl +
+                '" alt="Image posted in a comment" loading="lazy"' +
+                ' referrerpolicy="no-referrer"' +
+                ' onerror="this.style.display=\'none\'">';
+    }
+
+    return html;
+}
 
 let currentPage = 1;
 const pageSize = 10;
@@ -581,7 +646,7 @@ async function fetchMessages() {
 function renderPage(page) {
     const table = document.getElementById("chatTable");
 
-    table.innerHTML = `
+    let html = `
         <tr>
             <th>Friend</th>
             <th>Comment</th>
@@ -593,36 +658,39 @@ function renderPage(page) {
 
     const pageData = globalData.slice(start, end);
 
-   pageData.forEach(row => {
-    if (row[0] && row[1]) {
+    pageData.forEach(row => {
+        if (row[0] && row[1]) {
 
-        const isAdmin = row[0].toLowerCase() === "warrobotdoge";
+            const isAdmin = row[0].toLowerCase() === "warrobotdoge";
 
-       const displayName = formatName(row[0]);
+            const displayName = escapeHtml(formatName(row[0]));
 
-const nameHTML = isAdmin
-    ? `<b style="color:red;">${displayName}</b>`
-    : `<b>${displayName}</b>`;
-    
-        const imgHTML = isAdmin
-            ? "https://github.com/WarRobotDoge.png"
-            : anonImg;
+            const nameHTML = isAdmin
+                ? `<b style="color:red;">${displayName}</b>`
+                : `<b>${displayName}</b>`;
 
-        table.innerHTML += `
-            <tr class="comment-row">
-                <td class="comment-user">
-                    <img src="${imgHTML}" />
-                    <div>${nameHTML}</div>
-                </td>
-                <td class="comment-text">
-                    <div class="comment-date">${formatDate(row[2])}</div>
+            const imgHTML = isAdmin
+                ? "https://github.com/WarRobotDoge.png"
+                : anonImg;
 
-                    ${row[1]}
-                </td>
-            </tr>
-        `;
-    }
-});
+            html += `
+                <tr class="comment-row">
+                    <td class="comment-user">
+                        <img src="${imgHTML}" alt="${displayName}" />
+                        <div>${nameHTML}</div>
+                    </td>
+                    <td class="comment-text">
+                        <div class="comment-date">${escapeHtml(formatDate(row[2]))}</div>
+
+                        ${renderCommentBody(row[1])}
+                    </td>
+                </tr>
+            `;
+        }
+    });
+
+    // Build the whole table once instead of reparsing it on every row
+    table.innerHTML = html;
 }
 
 function formatName(name) {
@@ -691,7 +759,10 @@ async function sendMessage() {
     }
 }
 
-setInterval(fetchMessages, 3000);
+// Poll for new comments. This was every 3 seconds, which is 1,200 requests
+// per hour per open tab and will run into Google Apps Script's daily quota
+// with only a handful of visitors. 30 seconds is still near-live.
+setInterval(fetchMessages, 30000);
 fetchMessages();
 </script>
         </section>
@@ -771,5 +842,6 @@ fetchMessages();
         audio.currentTime = pos * audio.duration;
     });
 </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
