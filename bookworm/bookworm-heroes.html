@@ -11,12 +11,31 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookWorm Heroes</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/mzl.ymyqbmeb.png" type="image/png">
-    <meta name="description" content="Download and Play BookWorm Heroes for iOS!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/base.jfif" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm Heroes — The Shut Down 2013 iOS Game, Documented</title>
+    <meta name="description" content="BookWorm Heroes ran for just 20 months before EA shut the servers down in 2014. Full history, screenshots and downloads, plus the 2009 BookWorm for iOS release." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-heroes" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm Heroes — The Shut Down 2013 iOS Game, Documented" />
+    <meta property="og:description" content="BookWorm Heroes ran for just 20 months before EA shut the servers down in 2014. Full history, screenshots and downloads." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-heroes" />
+    <!-- og:image switched from base.jfif to BWH.jpg — .jfif is JPEG data with an
+         extension most social crawlers refuse to render, so previews were blank -->
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/BWH.jpg" />
+    <meta property="og:image:alt" content="BookWorm Heroes gameplay on iOS" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm Heroes — The Shut Down 2013 iOS Game, Documented" />
+    <meta name="twitter:description" content="BookWorm Heroes ran for just 20 months before EA shut the servers down in 2014. Full history, screenshots and downloads." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/screenshots/BWH.jpg" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/mzl.ymyqbmeb.png" type="image/png">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -114,7 +133,7 @@
         background-color: white;
         width: 100%; /* Make the navbar take the full width */
         max-width: 931px; /* Match the width of the navbar */
-        height: 150vh;  /* Full viewport height to extend down to the footer */
+        min-height: 150vh;  /* ← grows with content instead of capping it */
         margin: 0 auto;
         position: relative;
         z-index: 1;
@@ -316,22 +335,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the file size in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -406,7 +468,8 @@
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/bookworm_heroes_logo.png" alt="Bookworm Heroes Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/bookworm_heroes_logo.png" alt="BookWorm Heroes logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -474,7 +537,7 @@
                 <button class="dropdown2-button">Download for iOS<span class="dropdown2-arrow"></span>
                 </button>
                 <div class="dropdown2-menu">
-                  <a href="https://archive.org/download/book-worm-ios/BookWorm_iOS.zip" target="_blank">BookWorm & BookWorm Heroes for iOS (59MB)</a>
+                  <a href="https://archive.org/download/book-worm-ios/BookWorm_iOS.zip" target="_blank" rel="noopener"><span>BookWorm + Heroes bundle</span><span class="dropdown2-size">59 MB</span></a>
                   </div>
               </div>
             </div>
@@ -485,37 +548,36 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/base.jfif" alt="BookWorm Heroes Home" class="active">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWH.jpg" alt="BookWorm Heroes Screenshot 1">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWH_2.jpg" alt="BookWorm Heroes Screenshot 2">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWH_3.jpg" alt="BookWorm Heroes Screenshot 3">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWH_4.jpg" alt="BookWorm Heroes Screenshot 4">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm1.jpg" alt="BookWorm iOS Screenshot 5"> 
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm2.jpg" alt="BookWorm iOS Screenshot 6">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm3.jpg" alt="BookWorm iOS Screenshot 7">
-            <picture src="https://warrobotdoge.com/bookworm/images/screenshots/nigger.webp" alt="BookWorm iOS Screenshot 8"></picture>
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/base.jfif" alt="BookWorm Heroes home screen" class="active">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWH.jpg" alt="BookWorm Heroes 4x4 letter board in a friend battle">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWH_2.jpg" alt="BookWorm Heroes hero selection screen">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWH_3.jpg" alt="BookWorm Heroes gem and power display">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/BWH_4.jpg" alt="BookWorm Heroes match results screen">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm1.jpg" alt="BookWorm for iOS gameplay showing Lex and the letter grid"> 
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm2.jpg" alt="BookWorm for iOS with burning tiles">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm3.jpg" alt="BookWorm for iOS score screen">
           </div>
         </div>
 
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-    <p>BookWorm Heroes was released on <a href="https://www.businesswire.com/news/home/20130418005404/en/PopCap-Games-Launches-Bookworm%E2%84%A2-Heroes-for-iPad-and-iPhone">April 18, 2013</a> for iPhone and IPads. The game supported facebook friends, which you could battle and fight eachother in. The game was basically a FaceBook shill. Despite it being free, it was shut down on <a href="https://www.ea.com/legal/service-updates/a-h">December 1, 2014</a>, shutting down all servers and removing it from the AppStore. The letter board was quite small compared to the other games, only being a 4x4 box. The game looked reletivly basic, and only a few videos of its gameplay exist.</p>
-    <p>On June 15, 2025, a <a href="https://www.ebay.com/itm/336003836382">BookWorm Heroes Journal</a> was sold on eBay for $29.99. PopCap once had a <a href="https://web.archive.org/web/20030810020656/http://www.cafeshops.com/popcapgames/98132">BookWorm merch shop</a> from 2003 to about 2005 (which still remains a mystery), but I couldn't find anything for sale for BookWorm Adventures in 2013, when the game was released. Perhaps an employee obtained this and just happened to sell it, nobody really knows.</p>
-    <p>Bookworm for iOS was released on <a href="https://gamefaqs.gamespot.com/iphone/961891-bookworm/data">March 8, 2009</a>. The game was compact and had look similar to <a href="https://warrobotdoge.com/bookworm/bookworm-mobile">BookWorm Mobile</a>, and <a href="https://warrobotdoge.com/bookworm/bookworm-kindle">BookWorm for Kindle</a>. The game was remove from the appstore on <a href="https://discussions.apple.com/thread/7248666?sortBy=rank">December 1, 2017</a>. It was probably removed when apple switched from a 32-bit architecture to a 64-bit architecture. There's very old videos online, including some <a href="https://youtu.be/G5hZu1tgvcQ?si=W24g6mPvc4t49g1t">gameplay</a>, and a funny video of someone spelling the <a href="https://www.youtube.com/shorts/aTcIFptG5hA">N-word</a> in late 2010.</p>
-    <p>You can download BookWorm Heroes and BookWorm for iOS above, but I'm not sure how to run them.</p>
-    </div>
-</div>
-</div>
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>BookWorm Heroes was released on <a href="https://www.businesswire.com/news/home/20130418005404/en/PopCap-Games-Launches-Bookworm%E2%84%A2-Heroes-for-iPad-and-iPhone" rel="noopener">April 18, 2013</a> for iPhone and iPads. The game supported Facebook friends, which you could battle and fight each other in. The game was basically a Facebook shill. Despite it being free, it was shut down on <a href="https://www.ea.com/legal/service-updates/a-h" rel="noopener">December 1, 2014</a>, shutting down all servers and removing it from the App Store. The letter board was quite small compared to the other games, only being a 4x4 box. The game looked relatively basic, and only a few videos of its gameplay exist.</p>
+            <p>On June 15, 2025, a <a href="https://www.ebay.com/itm/336003836382" rel="noopener">BookWorm Heroes Journal</a> was sold on eBay for $29.99. PopCap once had a <a href="https://web.archive.org/web/20030810020656/http://www.cafeshops.com/popcapgames/98132" rel="noopener">BookWorm merch shop</a> from 2003 to about 2005 (which still remains a mystery), but I couldn't find anything for sale for BookWorm Heroes in 2013, when the game was released. Perhaps an employee obtained this and just happened to sell it, nobody really knows.</p>
+            <p>Bookworm for iOS was released on <a href="https://gamefaqs.gamespot.com/iphone/961891-bookworm/data" rel="noopener">March 8, 2009</a>. The game was compact and had a look similar to <a href="https://warrobotdoge.com/bookworm/bookworm-mobile">BookWorm Mobile</a>, and <a href="https://warrobotdoge.com/bookworm/bookworm-kindle">BookWorm for Kindle</a>. The game was removed from the App Store on <a href="https://discussions.apple.com/thread/7248666?sortBy=rank" rel="noopener">December 1, 2017</a>. It was probably removed when Apple switched from a 32-bit architecture to a 64-bit architecture. There are very old videos online, including some <a href="https://youtu.be/G5hZu1tgvcQ?si=W24g6mPvc4t49g1t" rel="noopener">gameplay</a>.</p>
+            <p>You can download BookWorm Heroes and BookWorm for iOS above, but I'm not sure how to run them.</p>
+          </div>
+        </div>
+      </div>
 
       <div class="filler"></div>
+
       <div class="section">
         <h2>Gameplay Footage</h2>
-      <div class="text">
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/nxm-_3la3O0?si=hdyEO-1ANWn-28V1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-    </div>
-    </div>
-    </div>
+        <div class="text">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/nxm-_3la3O0?si=hdyEO-1ANWn-28V1" title="BookWorm Heroes iOS gameplay footage" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
     </div>
 
 <br>
@@ -524,7 +586,6 @@
 <br>
 <br>
 
-    </div>
     <footer></footer>
     <script>
       // Dropdown toggle functionality
@@ -552,8 +613,92 @@
         // Add the "active" class to the next image
         images[currentIndex].classList.add('active');
       }
-      // Change images every 3 seconds
-      setInterval(showNextImage, 3000);
+      if (images.length > 0) {
+        // Change images every 3 seconds
+        setInterval(showNextImage, 3000);
+      }
     </script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm Heroes",
+  "alternateName": ["Bookworm Heroes", "BookWorm Heroes iOS"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-heroes",
+  "image": "https://warrobotdoge.com/bookworm/images/screenshots/BWH.jpg",
+  "description": "BookWorm Heroes was a free-to-play competitive spin-off in PopCap's BookWorm series, launched for iPhone and iPad on 18 April 2013. Players built words from a compact 4x4 letter board to attack opponents, hiring literary Heroes with special powers and gems to increase damage. The game was built around Facebook integration, letting players challenge friends in asynchronous matches. It had one of the shortest lifespans of any BookWorm release: EA shut down the servers and removed the title from the App Store on 1 December 2014, roughly twenty months after launch, making the game permanently unplayable. Very little footage survives. In June 2025 a BookWorm Heroes branded journal surfaced on eBay and sold for $29.99, despite no known BookWorm merchandise line existing in 2013 — PopCap's only documented merchandise store ran from 2003 to around 2005. This archive preserves the application files, screenshots and surviving video.",
+  "datePublished": "2013-04-18",
+  "genre": ["Puzzle", "Word Game", "Casual"],
+  "gamePlatform": ["iOS", "iPhone", "iPad"],
+  "operatingSystem": "iOS",
+  "applicationCategory": "GameApplication",
+  "playMode": "MultiPlayer",
+  "inLanguage": "en",
+  "keywords": "bookworm heroes download, bookworm heroes shut down, popcap bookworm ios, bookworm heroes servers, dead mobile games",
+  "publisher": {
+    "@type": "Organization",
+    "name": "PopCap Games",
+    "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+  },
+  "character": {
+    "@type": "Person",
+    "name": "Lex",
+    "description": "The green bookworm mascot of the BookWorm series."
+  },
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_(video_game)"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm (iOS)",
+  "alternateName": ["Bookworm iPhone", "BookWorm for iOS"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-heroes",
+  "description": "The iPhone release of PopCap's BookWorm, published on 8 March 2009. It adapted the classic word-linking gameplay for touchscreens and added iPhone-specific features including Shake to Scramble and Bonus Books, with two play modes. Its compact presentation closely resembles the earlier Java ME mobile and Kindle builds. Apple removed the game from the App Store on 1 December 2017, most likely as a consequence of the transition from 32-bit to 64-bit application support, which rendered older unmaintained apps unlaunchable.",
+  "datePublished": "2009-03-08",
+  "genre": ["Puzzle", "Word Game"],
+  "gamePlatform": ["iOS", "iPhone"],
+  "operatingSystem": "iOS",
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": "en",
+  "publisher": {
+    "@type": "Organization",
+    "name": "PopCap Games",
+    "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+  },
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm Heroes",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-heroes" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
   </body>
 </html>
