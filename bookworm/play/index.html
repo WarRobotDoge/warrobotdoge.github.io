@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bookworm Adventures - JavaScript port</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: #0b0906;
+    font-family: Georgia, 'Times New Roman', serif;
+    color: #c9b892;
+  }
+  body {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px;
+  }
+  /* The canvas is 640x480. Scaling by anything other than a whole number
+     makes a 10px bitmap font ghost, so main.js picks an integer factor. */
+  #frame {
+    position: relative;
+    width: 640px; height: 480px;
+    transform-origin: top center;
+    box-shadow: 0 0 0 2px #4a3a1e, 0 18px 50px rgba(0,0,0,.7);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  #stage { display: flex; justify-content: center; }
+  canvas {
+    display: block; width: 640px; height: 480px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    background: #0b0906;
+  }
+  #status {
+    font-size: 13px; letter-spacing: .04em;
+    display: flex; gap: 14px; align-items: baseline;
+    min-height: 18px;
+  }
+  #status span { color: #7d6b4c; font-size: 12px; }
+  #keys { font-size: 11px; color: #6a5a3e; letter-spacing: .05em; }
+  kbd {
+    font-family: inherit; background: #241c12; border: 1px solid #4a3a1e;
+    border-radius: 3px; padding: 0 5px; color: #c9b892;
+  }
+</style>
+</head>
+<body>
+  <div id="stage">
+    <div id="frame">
+      <canvas id="screen" width="640" height="480"></canvas>
+    </div>
+  </div>
+  <div id="status">Starting</div>
+  <div id="keys">
+    type letters to spell &nbsp;·&nbsp; <kbd>Enter</kbd> attack &nbsp;·&nbsp;
+    <kbd>Backspace</kbd> undo &nbsp;·&nbsp; <kbd>Esc</kbd> clear &nbsp;·&nbsp;
+    <kbd>Space</kbd> scramble &nbsp;·&nbsp; <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> potions
+    &nbsp;·&nbsp; <kbd>Tab</kbd> difficulty &nbsp;·&nbsp; <kbd>M</kbd> mute
+  </div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

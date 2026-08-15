@@ -1,0 +1,1228 @@
+{
+ "_source": "extracted from the original Bookworm Adventures web demo",
+ "screen": {
+  "width": 640,
+  "height": 480
+ },
+ "difficulties": [
+  "Extreme",
+  "Master",
+  "Challenge",
+  "Casual"
+ ],
+ "letterValues": {
+  "a": 1,
+  "b": 2,
+  "c": 2,
+  "d": 1,
+  "e": 1,
+  "f": 2,
+  "g": 1,
+  "h": 2,
+  "i": 1,
+  "j": 3,
+  "k": 3,
+  "l": 1,
+  "m": 2,
+  "n": 1,
+  "o": 1,
+  "p": 2,
+  "q": 3,
+  "r": 1,
+  "s": 1,
+  "t": 1,
+  "u": 1,
+  "v": 2,
+  "w": 2,
+  "x": 3,
+  "y": 2,
+  "z": 3
+ },
+ "bonusChance": {
+  "bonusChanceTurn": -5,
+  "bonusChanceBase": 10,
+  "bonusChanceMax": 50,
+  "bonusChancePenalty": 5,
+  "bonusChanceUber": 75
+ },
+ "wordPowerTiers": [
+  "GOOD!",
+  "WOW!",
+  "NICE!",
+  "VERY GOOD!",
+  "AWESOME!",
+  "EXCELLENT!",
+  "FANTASTIC!",
+  "ASTONISHING!"
+ ],
+ "wordPowerSounds": [
+  "SOUND_LEX_GOOD",
+  "SOUND_LEX_WOW",
+  "SOUND_LEX_NICE",
+  "SOUND_LEX_VERYGOOD",
+  "SOUND_LEX_AWESOME",
+  "SOUND_LEX_EXCELLENT",
+  "SOUND_LEX_FANTASTIC",
+  "SOUND_LEX_ASTONISHING"
+ ],
+ "statusEffects": [
+  "bleeding",
+  "cursed",
+  "powered_up",
+  "burning",
+  "frozen",
+  "invincible",
+  "petrified",
+  "poisoned",
+  "stunned"
+ ],
+ "ranks": [
+  "Book Burner",
+  "Encyclopedia Salesman",
+  "Trainee",
+  "Scribbler",
+  "Pencil Pusher",
+  "Ink Slinger",
+  "Clerk",
+  "Scribe",
+  "Bookkeeper",
+  "Bookbinder",
+  "Proofreader",
+  "Stenographer",
+  "Assistant Librarian",
+  "Librarian",
+  "Senior Librarian",
+  "Archivist",
+  "Grand Archivist",
+  "Poet",
+  "Poet Laureate",
+  "Novelist",
+  "Best Seller",
+  "Literary Craftsman",
+  "Literary Savant",
+  "Litterateur",
+  "Editor",
+  "Editor in Chief",
+  "Publisher",
+  "Publisher Emeritus",
+  "Glossographer",
+  "Wordsmith",
+  "Wordstalker",
+  "Wordhoarder",
+  "Wordmaster",
+  "Vocabulist",
+  "Thesaurian",
+  "Thesaurus Rex",
+  "Lexographer",
+  "Lexographer 1st Class",
+  "Dictionarian",
+  "Super Dictionarian",
+  "Mega Bookworm",
+  "Ultra Bookworm",
+  "Bookworm Supreme"
+ ],
+ "xpThresholds": [
+  25,
+  60,
+  100,
+  175,
+  275,
+  400,
+  600,
+  850,
+  1175,
+  1625,
+  2225,
+  3025,
+  4075,
+  5475,
+  7325,
+  9825,
+  13150,
+  17575,
+  23475,
+  31325,
+  41725,
+  55525,
+  73875,
+  98275,
+  130725,
+  173875,
+  231275,
+  307575,
+  409075,
+  544075,
+  723575,
+  963575,
+  1288575,
+  1700000,
+  2250000,
+  3000000,
+  4000000,
+  5250000,
+  7000000,
+  9250000,
+  14376230
+ ],
+ "enemies": {
+  "BookishBanshee": {
+   "name": "Bookish Banshee",
+   "chapter": 2,
+   "hearts": [
+    8,
+    6,
+    5,
+    4
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Wail",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH2_ATTACK2",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/2BookishBanshee.pam",
+   "portrait": null
+  },
+  "Bottom": {
+   "name": "Bottom",
+   "chapter": 3,
+   "hearts": [
+    13,
+    8,
+    6,
+    5
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Braying Song",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH3_ATTACK2",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/3Bottom.pam",
+   "portrait": null
+  },
+  "CadaverousCustodian": {
+   "name": "Cadaverous Custodian",
+   "chapter": 2,
+   "hearts": [
+    9,
+    7,
+    5,
+    4
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Mopped",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH2_ATTACK1",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/2Custodian.pam",
+   "portrait": null
+  },
+  "Fenrir": {
+   "name": "Fenrir",
+   "chapter": 4,
+   "hearts": [
+    12,
+    10,
+    6,
+    5
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Hungry Snap",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH4_ATTACK1",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/4Fenrir.pam",
+   "portrait": null
+  },
+  "Hamlet": {
+   "name": "Hamlet (Boss)",
+   "chapter": 3,
+   "hearts": [
+    15,
+    10,
+    7,
+    6
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Laertes' Blade",
+     "tooltip": "Poisons Lex.",
+     "effects": [
+      "PoisonAilment"
+     ],
+     "sound": "SOUND_CH3_ATTACK3",
+     "power": 1.0
+    },
+    {
+     "id": "attack2",
+     "name": "Mad Laughter",
+     "tooltip": "Locks Tiles.",
+     "effects": [
+      "DamageEffect",
+      "LockTileEffect"
+     ],
+     "sound": "SOUND_TILELOCK",
+     "power": 1.0
+    }
+   ],
+   "boss": true,
+   "pam": "images/pam/3Hamlet.pam",
+   "portrait": "hamlet"
+  },
+  "InterredIntern": {
+   "name": "Interred Intern",
+   "chapter": 2,
+   "hearts": [
+    7,
+    4,
+    3,
+    3
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Slap",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH2_ATTACK1",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/2InterredIntern.pam",
+   "portrait": null
+  },
+  "Jorgamund": {
+   "name": "Jormungand",
+   "chapter": 4,
+   "hearts": [
+    16,
+    11,
+    7,
+    5
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Giant Fangs",
+     "tooltip": "Damages Lex",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH4_ATTACK2",
+     "power": 1.0
+    },
+    {
+     "id": "attack2",
+     "name": "Poison Spit",
+     "tooltip": "Poisons Lex.",
+     "effects": [
+      "PoisonAilment"
+     ],
+     "sound": "SOUND_POISON",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/4Jorgamund.pam",
+   "portrait": null
+  },
+  "LibrarianOfTheDead": {
+   "name": "Librarian of the Dead (Boss)",
+   "chapter": 2,
+   "hearts": [
+    10,
+    8,
+    6,
+    5
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack2",
+     "name": "Hard Cover",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH2_ATTACK1",
+     "power": 1.0
+    },
+    {
+     "id": "attack1",
+     "name": "Hush!",
+     "tooltip": "Locks Tiles.",
+     "effects": [
+      "LockTileEffect"
+     ],
+     "sound": "SOUND_TILELOCK",
+     "power": 1.0
+    }
+   ],
+   "boss": true,
+   "pam": "images/pam/2Librarian.pam",
+   "portrait": "librarian"
+  },
+  "Loki": {
+   "name": "Loki",
+   "chapter": 4,
+   "hearts": [
+    17,
+    14,
+    9,
+    6
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Trickster Blade",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH4_ATTACK3",
+     "power": 1.0
+    },
+    {
+     "id": "attack2",
+     "name": "Valholler",
+     "tooltip": "Poisons Lex.",
+     "effects": [
+      "PoisonAilment"
+     ],
+     "sound": "SOUND_POISON",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/4Loki.pam",
+   "portrait": null
+  },
+  "Odin": {
+   "name": "Odin (Boss)",
+   "chapter": 4,
+   "hearts": [
+    20,
+    15,
+    10,
+    8
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Gungnir",
+     "tooltip": "Heals opponent and Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH4_ATTACK3",
+     "power": 1.0
+    },
+    {
+     "id": "attack2",
+     "name": "For Asgard!",
+     "tooltip": "Locks Tiles.",
+     "effects": [
+      "HealEffect",
+      "LockTileEffect"
+     ],
+     "sound": "SOUND_TILELOCK",
+     "power": 1.0
+    },
+    {
+     "id": "attack3",
+     "name": "Healing Shout",
+     "tooltip": "Heals Opponent.",
+     "effects": [],
+     "sound": null,
+     "power": 1.0
+    }
+   ],
+   "boss": true,
+   "pam": "images/pam/4Odin.pam",
+   "portrait": "odin"
+  },
+  "Prospero": {
+   "name": "Prospero",
+   "chapter": 3,
+   "hearts": [
+    12,
+    9,
+    6,
+    5
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Magic Bolt",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH3_ATTACK4",
+     "power": 1.0
+    },
+    {
+     "id": "attack2",
+     "name": "Soothing Wave",
+     "tooltip": "Heals opponent.",
+     "effects": [
+      "HealEffect"
+     ],
+     "sound": "SOUND_HEAL",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/3Prospero.pam",
+   "portrait": null
+  },
+  "RatKing": {
+   "name": "Rat King (Boss)",
+   "chapter": 1,
+   "hearts": [
+    7,
+    6,
+    5,
+    4
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Masticate",
+     "tooltip": "Damages Lex",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH1_ATTACK1",
+     "power": 1.0
+    },
+    {
+     "id": "attack2",
+     "name": "Envenom",
+     "tooltip": "Poisons Lex.",
+     "effects": [
+      "PoisonAilment"
+     ],
+     "sound": "SOUND_POISON",
+     "power": 1.0
+    }
+   ],
+   "boss": true,
+   "pam": "images/pam/1RatKing.pam",
+   "portrait": "ratking"
+  },
+  "RavenousRat": {
+   "name": "Ravenous Rat",
+   "chapter": 1,
+   "hearts": [
+    6,
+    4,
+    3,
+    2
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Munch",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH1_ATTACK1",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/1RavenousRat.pam",
+   "portrait": null
+  },
+  "Romeo": {
+   "name": "Romeo",
+   "chapter": 3,
+   "hearts": [
+    14,
+    9,
+    7,
+    5
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Dagger Plunge",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH3_ATTACK3",
+     "power": 1.0
+    },
+    {
+     "id": "attack2",
+     "name": "Lover's Poison",
+     "tooltip": "Poisons Lex.",
+     "effects": [
+      "PoisonAilment"
+     ],
+     "sound": "SOUND_POISON",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/3Romeo.pam",
+   "portrait": null
+  },
+  "Shrew": {
+   "name": "The Shrew",
+   "chapter": 3,
+   "hearts": [
+    11,
+    7,
+    5,
+    4
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Rebuke",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH3_ATTACK1",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/3Shrew.pam",
+   "portrait": null
+  },
+  "SpiderQueen": {
+   "name": "Spider Queen",
+   "chapter": 1,
+   "hearts": [
+    6,
+    5,
+    3,
+    2
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Chomp",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH1_ATTACK1",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/1SpiderQueen.pam",
+   "portrait": null
+  },
+  "Spiderling": {
+   "name": "Spiderling",
+   "chapter": 1,
+   "hearts": [
+    5,
+    4,
+    3,
+    2
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Bite",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH1_ATTACK1",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/1Spiderling.pam",
+   "portrait": null
+  },
+  "SpookyStockBoy": {
+   "name": "Spooky Stockboy",
+   "chapter": 2,
+   "hearts": [
+    7,
+    5,
+    3,
+    3
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Pencil Toss",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH2_ATTACK1",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/2SpookyStockboy.pam",
+   "portrait": null
+  },
+  "StarvingRat": {
+   "name": "Starving Rat",
+   "chapter": 1,
+   "hearts": [
+    4,
+    3,
+    2,
+    1
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Nibble",
+     "tooltip": "Damages Lex.",
+     "effects": [
+      "DamageEffect"
+     ],
+     "sound": "SOUND_CH1_ATTACK1",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/1StarvingRat.pam",
+   "portrait": null
+  },
+  "Thor": {
+   "name": "Thor",
+   "chapter": 4,
+   "hearts": [
+    19,
+    13,
+    10,
+    8
+   ],
+   "armor": 0.25,
+   "attacks": [
+    {
+     "id": "attack1",
+     "name": "Mjolnir's Might",
+     "tooltip": "Locks tiles and damages Lex.",
+     "effects": [
+      "LockTileEffect"
+     ],
+     "sound": "SOUND_CH4_ATTACK4",
+     "power": 1.0
+    },
+    {
+     "id": "attack2",
+     "name": "Megingjord's Mercy",
+     "tooltip": "Heals opponent.",
+     "effects": [
+      "DamageEffect",
+      "HealEffect"
+     ],
+     "sound": "SOUND_HEAL",
+     "power": 1.0
+    }
+   ],
+   "boss": false,
+   "pam": "images/pam/4Thor.pam",
+   "portrait": null
+  }
+ },
+ "chapters": {
+  "1": [
+   "StarvingRat",
+   "Spiderling",
+   "RavenousRat",
+   "SpiderQueen",
+   "RatKing"
+  ],
+  "2": [
+   "InterredIntern",
+   "SpookyStockBoy",
+   "BookishBanshee",
+   "CadaverousCustodian",
+   "LibrarianOfTheDead"
+  ],
+  "3": [
+   "Shrew",
+   "Prospero",
+   "Bottom",
+   "Romeo",
+   "Hamlet"
+  ],
+  "4": [
+   "Fenrir",
+   "Jorgamund",
+   "Loki",
+   "Thor",
+   "Odin"
+  ]
+ },
+ "chapterWords": {
+  "1": [
+   "warrior",
+   "warriors",
+   "trojan",
+   "greece",
+   "greek",
+   "ancient",
+   "battle",
+   "troy",
+   "hero",
+   "heroes"
+  ],
+  "2": [
+   "island",
+   "islands",
+   "cyclops",
+   "cyclopes",
+   "cyclopian",
+   "sheep",
+   "herd",
+   "mutton",
+   "giant",
+   "giants",
+   "ogre",
+   "ogres",
+   "eye",
+   "eyes",
+   "monocular",
+   "legend",
+   "legends",
+   "myth",
+   "myths",
+   "mythology",
+   "mythological"
+  ],
+  "3": [
+   "ocean",
+   "oceans",
+   "port",
+   "starboard",
+   "aft",
+   "stern",
+   "sea",
+   "seas",
+   "ship",
+   "ships",
+   "bilge",
+   "boat",
+   "boats",
+   "nautical",
+   "water",
+   "waters",
+   "drown",
+   "drowns",
+   "wander",
+   "wandering",
+   "rock",
+   "rocks",
+   "watery",
+   "splash",
+   "splashes",
+   "sploosh",
+   "splooshes",
+   "wet",
+   "wets",
+   "damp",
+   "dampen",
+   "dampens",
+   "dampening",
+   "soak",
+   "soaks",
+   "soaked",
+   "drench",
+   "drenched",
+   "drenches",
+   "teeth",
+   "fang",
+   "fangs",
+   "awful"
+  ],
+  "4": [
+   "isle",
+   "isles",
+   "island",
+   "islands",
+   "circe",
+   "enchant",
+   "enchanted",
+   "enchanting",
+   "enchants",
+   "enchantment",
+   "spell",
+   "spells",
+   "magic",
+   "magics",
+   "magick",
+   "magicks",
+   "magical",
+   "magickal",
+   "hex",
+   "hexes",
+   "witch",
+   "witches",
+   "sorceress"
+  ],
+  "5": [
+   "shade",
+   "shades",
+   "soul",
+   "souls",
+   "death",
+   "dead",
+   "deathly",
+   "deadly",
+   "hereafter",
+   "hell",
+   "hells",
+   "underworld",
+   "underworlds",
+   "spirit",
+   "spirits",
+   "specter",
+   "specters",
+   "haunt",
+   "haunted",
+   "skeleton",
+   "burial",
+   "burials",
+   "funeral",
+   "funerals",
+   "phantom",
+   "phantoms",
+   "ghost",
+   "life",
+   "lives",
+   "living",
+   "breath",
+   "breathing",
+   "breaths",
+   "breathes"
+  ],
+  "6": [
+   "labyrinth",
+   "labyrinths",
+   "labyrinthine",
+   "maze",
+   "mazes",
+   "monster",
+   "monsters",
+   "creature",
+   "creatures",
+   "legend",
+   "legends",
+   "legendary",
+   "myth",
+   "mythological",
+   "mythical",
+   "myths",
+   "claw",
+   "claws"
+  ],
+  "7": [
+   "hydra",
+   "hydras",
+   "monster",
+   "monsters",
+   "serpent",
+   "serpents",
+   "head",
+   "heads",
+   "poison",
+   "poisons",
+   "poisonous",
+   "fire",
+   "fires",
+   "ice",
+   "freeze",
+   "freezes",
+   "frozen",
+   "freezing",
+   "lightning",
+   "swamp",
+   "swamps",
+   "teeth",
+   "bite",
+   "bites"
+  ],
+  "8": [
+   "forest",
+   "forests",
+   "twelve",
+   "task",
+   "tasks",
+   "labor",
+   "labors",
+   "labour",
+   "labours"
+  ],
+  "9": [
+   "river",
+   "stream",
+   "wet"
+  ],
+  "10": [
+   "deadly",
+   "deadlier",
+   "lethal",
+   "lethality",
+   "poison",
+   "poisonous",
+   "poisons",
+   "petrify",
+   "petrified",
+   "ugly",
+   "uglier",
+   "ugliest",
+   "stone",
+   "statue",
+   "fate",
+   "fates",
+   "fated",
+   "magic"
+  ]
+ },
+ "lex": {
+  "hearts": 9,
+  "heartsPerLevel": 0.4,
+  "startLevel": 1,
+  "itemSlots": 3
+ },
+ "lengthMultiplier": {
+  "3": 1.0,
+  "4": 1.2,
+  "5": 1.45,
+  "6": 1.75,
+  "7": 2.1,
+  "8": 2.5,
+  "9": 2.95,
+  "10": 3.45,
+  "11": 4.0,
+  "12": 4.6,
+  "13": 5.25,
+  "14": 5.95,
+  "15": 6.7,
+  "16": 7.5
+ },
+ "wordPowerThresholds": [
+  0,
+  8,
+  11,
+  15,
+  20,
+  26,
+  33,
+  42
+ ],
+ "gems": {
+  "amethyst": {
+   "bonus": 0.2,
+   "alchemy": 1,
+   "color": "#b07ad6"
+  },
+  "emerald": {
+   "bonus": 0.35,
+   "alchemy": 2,
+   "color": "#5fc46a"
+  },
+  "sapphire": {
+   "bonus": 0.55,
+   "alchemy": 3,
+   "color": "#5b9de0"
+  }
+ },
+ "gemSpawn": {
+  "maxWordLength": 9,
+  "byWordLength": {
+   "3": 0,
+   "4": 4,
+   "5": 9,
+   "6": 16,
+   "7": 26,
+   "8": 38,
+   "9": 52
+  }
+ },
+ "grid": {
+  "cols": 4,
+  "rows": 4,
+  "minVowels": 4,
+  "maxVowels": 7
+ },
+ "letterWeights": {
+  "a": 78,
+  "b": 20,
+  "c": 40,
+  "d": 38,
+  "e": 110,
+  "f": 14,
+  "g": 30,
+  "h": 23,
+  "i": 86,
+  "j": 2,
+  "k": 9,
+  "l": 53,
+  "m": 27,
+  "n": 72,
+  "o": 61,
+  "p": 28,
+  "q": 2,
+  "r": 73,
+  "s": 87,
+  "t": 67,
+  "u": 33,
+  "v": 10,
+  "w": 9,
+  "x": 3,
+  "y": 16,
+  "z": 3
+ },
+ "vowels": "aeiou",
+ "heartValue": 62,
+ "bonusWordMultiplier": 1.5,
+ "difficultyIndex": 3,
+ "potions": {
+  "health": {
+   "name": "Health Potion",
+   "heals": 2.0,
+   "tooltip": "Restores two hearts."
+  },
+  "attack": {
+   "name": "Attack Potion",
+   "multiplier": 2.0,
+   "turns": 1,
+   "tooltip": "Doubles the damage of your next word."
+  },
+  "purify": {
+   "name": "Purify Potion",
+   "tooltip": "Clears every ailment affecting Lex."
+  }
+ },
+ "potionDropChance": 0.3,
+ "ailments": {
+  "poisoned": {
+   "label": "Poisoned",
+   "damagePerTurn": 0.35,
+   "turns": 4,
+   "offensive": true
+  },
+  "burning": {
+   "label": "Burning",
+   "damagePerTurn": 0.55,
+   "turns": 3,
+   "offensive": true
+  },
+  "bleeding": {
+   "label": "Bleeding",
+   "damagePerTurn": 0.25,
+   "turns": 5,
+   "offensive": true
+  },
+  "frozen": {
+   "label": "Frozen",
+   "turns": 2,
+   "blocksTiles": true
+  },
+  "stunned": {
+   "label": "Stunned",
+   "turns": 1,
+   "skipsTurn": true
+  },
+  "petrified": {
+   "label": "Petrified",
+   "turns": 2,
+   "skipsTurn": true
+  },
+  "cursed": {
+   "label": "Cursed",
+   "turns": 3,
+   "damageTaken": 1.35
+  },
+  "shielded": {
+   "label": "Shielded",
+   "turns": 3,
+   "damageTaken": 0.5
+  },
+  "powered_up": {
+   "label": "Powered Up",
+   "turns": 2,
+   "damageDealt": 1.6
+  },
+  "invincible": {
+   "label": "Invincible",
+   "turns": 1,
+   "damageTaken": 0.0
+  }
+ },
+ "enemyDamage": {
+  "base": 0.18,
+  "perChapter": 0.085,
+  "variance": 0.15,
+  "bossMultiplier": 1.25
+ },
+ "enemyHeal": {
+  "base": 0.15,
+  "perChapter": 0.06
+ },
+ "victoryHeal": 0.18
+}
