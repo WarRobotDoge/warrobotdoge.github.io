@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bespelled Deluxe</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled4.png" type="image/png">
-    <meta name="description" content="Download and Play Bespelled Deluxe!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled2.png" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>Bespelled Deluxe Download — The Lost MSN BookWorm Reskin</title>
+    <meta name="description" content="Bespelled Deluxe was a PopCap reskin of BookWorm distributed through MSN, and is widely listed as lost media. Download versions 1.01 and 1.03, plus screenshots and the only known footage." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bespelled" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="Bespelled Deluxe Download — The Lost MSN BookWorm Reskin" />
+    <meta property="og:description" content="Bespelled Deluxe was a PopCap reskin of BookWorm distributed through MSN, and is widely listed as lost media. Download versions 1.01 and 1.03." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bespelled" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled2.png" />
+    <meta property="og:image:alt" content="Bespelled Deluxe gameplay showing the letter grid and grimoire" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bespelled Deluxe Download — The Lost MSN BookWorm Reskin" />
+    <meta name="twitter:description" content="Bespelled Deluxe was a PopCap reskin of BookWorm distributed through MSN, and is widely listed as lost media. Download versions 1.01 and 1.03." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled2.png" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled4.png" type="image/png">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -115,7 +131,7 @@
         background-color: white;
         width: 100%; /* Make the navbar take the full width */
         max-width: 931px; /* Match the width of the navbar */
-        height: 120vh;  /* Full viewport height to extend down to the footer */
+        min-height: 120vh;  /* ← grows with content instead of capping it */
         margin: 0 auto;
         position: relative;
         z-index: 1;
@@ -317,22 +333,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the file size in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -407,7 +466,8 @@
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/Bespelled.png" alt="Bespelled Deluxe Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/Bespelled.png" alt="Bespelled Deluxe logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -472,8 +532,8 @@
                 <button class="dropdown2-button">Download for Windows<span class="dropdown2-arrow"></span>
                 </button>
                 <div class="dropdown2-menu">
-                  <a href="https://downloads.warrobotdoge.com/BespelledDeluxe_v1.01.exe" target="_blank">Bespelled Deluxe 1.01 (4MB)</a>
-                  <a href="https://downloads.warrobotdoge.com/BespelledDeluxe_v1.03.exe" target="_blank">Bespelled Deluxe 1.03 (4MB)</a>
+                  <a href="https://downloads.warrobotdoge.com/BespelledDeluxe_v1.01.exe" target="_blank" rel="noopener"><span>Version 1.01</span><span class="dropdown2-size">4 MB</span></a>
+                  <a href="https://downloads.warrobotdoge.com/BespelledDeluxe_v1.03.exe" target="_blank" rel="noopener"><span>Version 1.03</span><span class="dropdown2-size">4 MB</span></a>
                   </div>
               </div>
             </div>
@@ -484,29 +544,35 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled.jpg" alt="Bespelled Screenshot" class="active">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled2.png" alt="Bespelled Screenshot">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled4.png" alt="Bespelled Screenshot">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled3.png" alt="Bespelled Screenshot">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled.jpg" alt="Bespelled Deluxe gameplay showing the letter tile grid" class="active">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled2.png" alt="Bespelled Deluxe with a word being linked in the grimoire">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled4.png" alt="Bespelled Deluxe title screen">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/Bespelled3.png" alt="Bespelled Deluxe showing burning letters on the board">
           </div>
         </div>
 
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-    <p>Bespelled is a unique one. It is a compete reskin of BookWorm. Bespelled was a game for <a href="https://forums.lostmediawiki.com/thread/10442/lost-pc-game-bespelled-deluxe">MSN</a>. It could almost be considered "lost media", seeing that all evidence of the game is barely nonexistant. I found a <a href="https://www.flickr.com/photos/bevcooperwright/3586889204">picture</a> on Flickr displaying the game. There isn't any footage for this game except for 1 YouTube video, which I'll leave below. I don't think there was a flash version of this game either.  </p>
-       </div>
-</div>
-</div>
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>Bespelled is a unique one. It is a complete reskin of BookWorm. Bespelled was a game for <a href="https://forums.lostmediawiki.com/thread/10442/lost-pc-game-bespelled-deluxe" rel="noopener">MSN</a>. It could almost be considered "lost media", seeing that evidence of the game is all but nonexistent. I found a <a href="https://www.flickr.com/photos/bevcooperwright/3586889204" rel="noopener">picture</a> on Flickr displaying the game. There isn't any footage for this game except for 1 YouTube video, which I'll leave below. I don't think there was a Flash version of this game either.</p>
+          </div>
+        </div>
+      </div>
 
       <div class="filler"></div>
+
       <div class="section">
         <h2>Only Bespelled Gameplay</h2>
-      <div class="text">
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/wjbEM7unEs8?si=RHp0f0m91zd7OjUp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-    </div>
-    </div>
-    </div>
+        <div class="text">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/wjbEM7unEs8?si=RHp0f0m91zd7OjUp" title="The only known gameplay footage of Bespelled Deluxe" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <div class="filler"></div>
+      <div class="commentbox"></div>
+      <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
+      <script>commentBox('5680061592109056-proj')</script>
+
     </div>
 
 <br>
@@ -515,21 +581,24 @@
 <br>
 <br>
 
-    </div>
     <footer></footer>
     <script>
       // Dropdown toggle functionality
       const dropdown2 = document.querySelector('.dropdown2');
       const dropdown2Button = document.querySelector('.dropdown2-button');
-      dropdown2Button.addEventListener('click', () => {
-        dropdown2.classList.toggle('open');
-      });
-      // Close the dropdown if clicked outside
-      document.addEventListener('click', (event) => {
-        if (!dropdown2.contains(event.target)) {
-          dropdown2.classList.remove('open');
-        }
-      });
+      // Guard: some pages in this archive have no download dropdown, in which
+      // case both lookups return null and the next line would throw.
+      if (dropdown2 && dropdown2Button) {
+        dropdown2Button.addEventListener('click', () => {
+          dropdown2.classList.toggle('open');
+        });
+        // Close the dropdown if clicked outside
+        document.addEventListener('click', (event) => {
+          if (!dropdown2.contains(event.target)) {
+            dropdown2.classList.remove('open');
+          }
+        });
+      }
     </script>
     <script>
       const images = document.querySelectorAll('.screenshot-container img');
@@ -543,9 +612,70 @@
         // Add the "active" class to the next image
         images[currentIndex].classList.add('active');
       }
-      // Change images every 3 seconds
-      setInterval(showNextImage, 3000);
+      // Guard: skip the timer if this page has no <img> screenshots,
+      // which would otherwise throw a TypeError every 3 seconds.
+      if (images.length > 0) {
+        // Change images every 3 seconds
+        setInterval(showNextImage, 3000);
+      }
     </script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Bespelled Deluxe",
+  "alternateName": ["Bespelled", "MSN Bespelled", "Bespelled Deluxe MSN"],
+  "url": "https://warrobotdoge.com/bookworm/bespelled",
+  "image": "https://warrobotdoge.com/bookworm/images/screenshots/Bespelled2.png",
+  "description": "Bespelled Deluxe is a complete reskin of PopCap's BookWorm, distributed through MSN's games service. Players link adjacent letter tiles to form words and inscribe them in a magical grimoire, in Classic and Action modes, while clearing burning letters before they set the library alight. Mechanically it is identical to BookWorm, with the bookworm mascot and library theme replaced by a wizardry and spellbook setting. The game is very poorly documented: it is listed as lost media on the Lost Media Wiki forums, a single photograph of it running survives on Flickr, and only one piece of gameplay footage is known to exist. No browser or Flash version appears to have been produced. This archive hosts working Windows installers for versions 1.01 and 1.03.",
+  "genre": ["Puzzle", "Word Game", "Casual"],
+  "gamePlatform": ["PC", "Windows"],
+  "operatingSystem": "Windows",
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": "en",
+  "softwareVersion": "1.03",
+  "keywords": "bespelled deluxe download, bespelled msn game, lost media pc game, bookworm reskin, popcap bespelled, msn games archive",
+  "publisher": {
+    "@type": "Organization",
+    "name": "PopCap Games",
+    "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+  },
+  "isBasedOn": {
+    "@type": "VideoGame",
+    "name": "BookWorm Deluxe",
+    "url": "https://warrobotdoge.com/bookworm/bookworm",
+    "sameAs": "https://en.wikipedia.org/wiki/Bookworm_(video_game)"
+  },
+  "isPartOf": {
+    "@type": "CollectionPage",
+    "name": "BookWorm Games Archive",
+    "url": "https://warrobotdoge.com/bookworm"
+  },
+  "gameTip": {
+    "@type": "CreativeWork",
+    "name": "Preservation status",
+    "text": "Bespelled Deluxe is catalogued as a lost PC game on the Lost Media Wiki forums. Working installers for versions 1.01 and 1.03 are hosted here. Anyone with additional builds, box art, MSN Games promotional material or further footage is asked to get in touch."
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "Bespelled Deluxe",
+      "item": "https://warrobotdoge.com/bookworm/bespelled" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
