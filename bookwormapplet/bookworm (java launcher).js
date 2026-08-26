@@ -1,0 +1,32 @@
+var _____WB$wombat$assign$function_____=function(name){return (globalThis._wb_wombat && globalThis._wb_wombat.local_init && globalThis._wb_wombat.local_init(name))||globalThis[name];};if(!globalThis.__WB_pmw){globalThis.__WB_pmw=function(obj){this.__WB_source=obj;return this;}}{
+let window = _____WB$wombat$assign$function_____("window");
+let self = _____WB$wombat$assign$function_____("self");
+let document = _____WB$wombat$assign$function_____("document");
+let location = _____WB$wombat$assign$function_____("location");
+let top = _____WB$wombat$assign$function_____("top");
+let parent = _____WB$wombat$assign$function_____("parent");
+let frames = _____WB$wombat$assign$function_____("frames");
+let opener = _____WB$wombat$assign$function_____("opener");
+document.write('		<applet archive="wordfall.jar" code="wordfall.WordFallApplet.class"');
+document.write('		        width="411" height="330" VIEWASTEXT MAYSCRIPT codebase="">');
+document.write('			<param name="cabbase" value="wordfall.cab">');
+document.write('			<param name="requiredgifzip" value="wordfall/images/bookworm.zip">');
+document.write('			<param name="resbase" value="wordfall/">');
+document.write('');
+document.write('			<param name="ShowAds" value="1">');
+document.write('			<param name="TellAFriend" value="on">');
+document.write('			<param name="ScoreUpload" value="1">');
+document.write('			<param name="LogUser" value="true">');
+document.write('			<param name="adUrl" value="https://warrobotdoge.com/bookworm">');
+document.write('');
+document.write('			<param name="StatsUpload" value="1">');
+document.write('			<param name="NoErrorPage" value="1">');
+document.write('');
+document.write('			<PARAM NAME="host1" VALUE="3808f09ee211ed1f863e0d31637e8f05"> <!-- *.warrobotdoge.com -->');
+document.write('			<PARAM NAME="host2" VALUE="3f424db4e57eadc4340644c2faa11732"> <!-- warrobotdoge.com-->');
+document.write('			<PARAM NAME="host3" VALUE="3e8b2625aa69efa2832a4a9ae7cd41000"> <!-- warrobotdoge.com-->');
+document.write('');
+document.write('			<PARAM NAME="hosterr" VALUE="about:blank">');
+document.write('			<PARAM NAME="hosterrhash" VALUE="362cf4af545aabb24ba0760c4d8735fd"> ');
+document.write('		</applet>');
+}
