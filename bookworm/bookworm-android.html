@@ -11,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookworm Adventures Android</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/BWA.ico" type="image/ico">
-    <meta name="description" content="Download and Play BookWorm Adventures on Android!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_1.png" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>Play BookWorm Adventures on Android — Winlator Setup Guide</title>
+    <meta name="description" content="Run BookWorm Adventures and any other BookWorm PC game on Android using Winlator. Step-by-step setup guide, container settings, and download links." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-android" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="Play BookWorm Adventures on Android — Winlator Setup Guide" />
+    <meta property="og:description" content="Run BookWorm Adventures and any other BookWorm PC game on Android using Winlator. Step-by-step setup guide and download links." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-android" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_1.png" />
+    <meta property="og:image:alt" content="BookWorm Adventures gameplay" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Play BookWorm Adventures on Android — Winlator Setup Guide" />
+    <meta name="twitter:description" content="Run BookWorm Adventures and any other BookWorm PC game on Android using Winlator. Step-by-step setup guide and download links." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/screenshots/BWA2_1.png" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/BWA.ico" type="image/x-icon">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -114,7 +131,7 @@
         background-color: white;
         width: 100%; /* Make the navbar take the full width */
         max-width: 931px; /* Match the width of the navbar */
-        height: 120vh;  /* Full viewport height to extend down to the footer */
+        min-height: 120vh;  /* ← grows with content instead of capping it */
         margin: 0 auto;
         position: relative;
         z-index: 1;
@@ -316,22 +333,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the file size in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -401,7 +461,8 @@
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Adventures_Logo.png" alt="Bookworm Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Adventures_Logo.png" alt="BookWorm Adventures logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -466,7 +527,7 @@
             <button class="dropdown2-button">Download for Android<span class="dropdown2-arrow"></span>
             </button>
             <div class="dropdown2-menu">
-              <a href="https://github.com/brunodev85/winlator/releases/download/v9.0.0/Winlator_9.0.apk" target="_blank">Winlator 9.0 APK (190 MB)</a>
+              <a href="https://github.com/brunodev85/winlator/releases/download/v9.0.0/Winlator_9.0.apk" target="_blank" rel="noopener"><span>Winlator 9.0 APK</span><span class="dropdown2-size">190 MB</span></a>
               </div>
           </div>
         </div>
@@ -491,7 +552,7 @@
    <ol>
     <li>Download the Winlator application for Android (Above)</li>
     <li>Download the BookWorm game you wish to play (You can see all games <a href="https://warrobotdoge.com/bookworm">here</a>)</li>
-    <li>Open the Winlator application on your Android device, and open a new Container. Make sure your Windows Version is set to Windows 10 or 7 under the "Advacned" section.</li>
+    <li>Open the Winlator application on your Android device, and open a new Container. Make sure your Windows Version is set to Windows 10 or 7 under the "Advanced" section.</li>
     <li>Copy the downloaded BookWorm game into the "Games" folder in the Winlator container. This may look different depending on your device.</li>
     <li>Run your Container and wait for it to load. After it loads, click on the application you imported.</li>
     <li>After opening the application you downloaded, click on the .exe of the game.</li>
@@ -504,8 +565,6 @@
 <div class="commentbox"></div>
 <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
 <script>commentBox('5680061592109056-proj')</script>
- </div>
-
 
     </div>
     
@@ -514,15 +573,19 @@
       // Dropdown toggle functionality
       const dropdown2 = document.querySelector('.dropdown2');
       const dropdown2Button = document.querySelector('.dropdown2-button');
-      dropdown2Button.addEventListener('click', () => {
-        dropdown2.classList.toggle('open');
-      });
-      // Close the dropdown if clicked outside
-      document.addEventListener('click', (event) => {
-        if (!dropdown2.contains(event.target)) {
-          dropdown2.classList.remove('open');
-        }
-      });
+      // Guard: some pages in this archive have no download dropdown, in which
+      // case both lookups return null and the next line would throw.
+      if (dropdown2 && dropdown2Button) {
+        dropdown2Button.addEventListener('click', () => {
+          dropdown2.classList.toggle('open');
+        });
+        // Close the dropdown if clicked outside
+        document.addEventListener('click', (event) => {
+          if (!dropdown2.contains(event.target)) {
+            dropdown2.classList.remove('open');
+          }
+        });
+      }
     </script>
     <script>
       const images = document.querySelectorAll('.screenshot-container img');
@@ -536,9 +599,80 @@
         // Add the "active" class to the next image
         images[currentIndex].classList.add('active');
       }
-      // Change images every 3 seconds
-      setInterval(showNextImage, 3000);
+      // Guard: the screenshot block on this page is commented out, so this
+      // selector matches nothing. Without the check, the interval threw an
+      // uncaught TypeError every 3 seconds for as long as the tab was open.
+      if (images.length > 0) {
+        // Change images every 3 seconds
+        setInterval(showNextImage, 3000);
+      }
     </script>
-    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to play BookWorm Adventures on Android with Winlator",
+  "description": "Run BookWorm Adventures, or any other BookWorm PC release, on an Android device using the Winlator Windows compatibility layer. No rooting required.",
+  "inLanguage": "en",
+  "totalTime": "PT20M",
+  "image": "https://warrobotdoge.com/bookworm/images/screenshots/BWA2_1.png",
+  "tool": [
+    { "@type": "HowToTool", "name": "An Android device" },
+    { "@type": "HowToTool", "name": "Winlator 9.0 APK" }
+  ],
+  "supply": [
+    { "@type": "HowToSupply", "name": "A BookWorm PC game installer from the BookWorm Games Archive" }
+  ],
+  "step": [
+    { "@type": "HowToStep", "position": 1, "name": "Install Winlator",
+      "text": "Download the Winlator application for Android from the download button on this page." },
+    { "@type": "HowToStep", "position": 2, "name": "Download a BookWorm game",
+      "text": "Download the BookWorm game you want to play. Every available release is listed in the BookWorm Games Archive.",
+      "url": "https://warrobotdoge.com/bookworm" },
+    { "@type": "HowToStep", "position": 3, "name": "Create a container",
+      "text": "Open Winlator on your Android device and create a new container. Set the Windows Version to Windows 10 or Windows 7 under the Advanced section." },
+    { "@type": "HowToStep", "position": 4, "name": "Copy the game across",
+      "text": "Copy the downloaded BookWorm game into the Games folder inside the Winlator container. The exact path may look different depending on your device." },
+    { "@type": "HowToStep", "position": 5, "name": "Run the container",
+      "text": "Start your container and wait for it to load, then open the application you imported." },
+    { "@type": "HowToStep", "position": 6, "name": "Launch the game",
+      "text": "Inside the container, run the .exe file for the game." },
+    { "@type": "HowToStep", "position": 7, "name": "Play",
+      "text": "The game will start. BookWorm Adventures is now running on Android." }
+  ],
+  "about": {
+    "@type": "VideoGame",
+    "name": "BookWorm Adventures",
+    "url": "https://warrobotdoge.com/bookworm/bookworm-adventures",
+    "publisher": {
+      "@type": "Organization",
+      "name": "PopCap Games",
+      "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+    }
+  },
+  "isPartOf": {
+    "@type": "CollectionPage",
+    "name": "BookWorm Games Archive",
+    "url": "https://warrobotdoge.com/bookworm"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm on Android",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-android" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
   </body>
 </html>
