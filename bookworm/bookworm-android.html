@@ -138,7 +138,12 @@
         top: -20px;   /* Moves the white section upward */
         padding-top: 20px;   /* Adds spacing above the content for a clean layout */
         flex-grow: 1;
-        padding-bottom: 200px;  /* Add space between content and footer */
+        /* The footer below has height:300px and margin-top:-300px, so it is
+           pulled up over the last 300px of this panel and paints on top of it
+           (same z-index, later in the DOM). Padding here has to clear that
+           full 300px or the bottom of the content — the comment box — ends up
+           underneath the footer graphic. 200px was 100px short. */
+        padding-bottom: 320px;
       }
 
       .navbar-links {
@@ -567,7 +572,7 @@
 <script>commentBox('5680061592109056-proj')</script>
 
     </div>
-    
+    <footer></footer>
     
     <script>
       // Dropdown toggle functionality
