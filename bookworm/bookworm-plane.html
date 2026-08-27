@@ -11,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookWorm Airplane</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/bw-40-b1.gif" type="image/png">
-    <meta name="description" content="BookWorm on Airplanes!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_plane_2.jpg" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm on Airplanes — The Undocumented In-Flight Version</title>
+    <meta name="description" content="BookWorm ran on airline in-flight entertainment systems around 2009. No official record of it exists. Three photographs are the only known evidence — here they are." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-plane" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm on Airplanes — The Undocumented In-Flight Version" />
+    <meta property="og:description" content="BookWorm ran on airline in-flight entertainment systems around 2009. No official record exists. Three photographs are the only known evidence." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-plane" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_plane_2.jpg" />
+    <meta property="og:image:alt" content="BookWorm running on an aircraft seatback in-flight entertainment screen" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm on Airplanes — The Undocumented In-Flight Version" />
+    <meta name="twitter:description" content="BookWorm ran on airline in-flight entertainment systems around 2009. No official record exists. Three photographs are the only known evidence." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_plane_2.jpg" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/bw-40-b1.gif" type="image/gif">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -114,14 +131,18 @@
         background-color: white;
         width: 100%; /* Make the navbar take the full width */
         max-width: 931px; /* Match the width of the navbar */
-        height: 85vh;  /* Full viewport height to extend down to the footer */
+        min-height: 85vh;  /* ← grows with content instead of capping it */
         margin: 0 auto;
         position: relative;
         z-index: 1;
         top: -20px;   /* Moves the white section upward */
         padding-top: 20px;   /* Adds spacing above the content for a clean layout */
         flex-grow: 1;
-        padding-bottom: 200px;  /* Add space between content and footer */
+        /* The footer below has height:300px and margin-top:-300px, so it is
+           pulled up over the last 300px of this panel and paints on top of it.
+           Padding here has to clear that full 300px or the bottom of the
+           content ends up underneath the footer graphic. 200px was short. */
+        padding-bottom: 320px;
       }
 
       .navbar-links {
@@ -346,7 +367,7 @@
        /* Make container responsive */
         max-width: 344px;   /* Limit max size */
         max-height: 456px;
-        aspect-ratio: 5 / 4;  /* Maintain 4:3 aspect ratio */
+        aspect-ratio: 5 / 4;  /* Suits the landscape seatback-screen photos */
         background-color: #e0e0e0;   /* Light gray background */
         border: 2px solid #ccc;   /* Subtle border */
         border-radius: 12px;  /* Rounded corners */
@@ -413,7 +434,8 @@
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="Bookworm Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="BookWorm logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -475,19 +497,18 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_plane_1.jpg" alt="Bookworm Plane Photo" class="active" > 
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_plane_2.jpg" alt="Bookworm Plane Photo" >
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_plane_3.jpg" alt="Bookworm Plane Photo" >
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_plane_1.jpg" alt="BookWorm running on an aircraft seatback entertainment screen" class="active" > 
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_plane_2.jpg" alt="BookWorm in-flight version showing the letter grid with point values" >
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_plane_3.jpg" alt="BookWorm in-flight version with the Scramble button below Lex" >
           </div>
         </div>
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-    <p>BookWorm was actually a game on a few plane's <a href="https://www.flickr.com/photos/anikarenina/5983868719/in/photostream/">in-flight entertainment systems</a>! There's no official info (at least that I can find) about BookWorm being in any planes, but all the proof we have is 3 pictures. One <a href="https://www.flickr.com/photos/30137542@N08/3838069136/">Flickr</a> post gives us a date from late 2009. Based on these few screenshots, I see tell that every letter was assigned each own number, which can be seen better up close. There was also a "Scramble" button under Lex, probably due to the game being touch screen. 
-
-    </div>
-</div>
-</div>
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>BookWorm was actually a game on a few planes' <a href="https://www.flickr.com/photos/anikarenina/5983868719/in/photostream/" rel="noopener">in-flight entertainment systems</a>! There's no official info (at least that I can find) about BookWorm being in any planes, but all the proof we have is 3 pictures. One <a href="https://www.flickr.com/photos/30137542@N08/3838069136/" rel="noopener">Flickr</a> post gives us a date from late 2009. Based on these few screenshots, I can tell that every letter was assigned its own number, which can be seen better up close. There was also a "Scramble" button under Lex, probably due to the game being touch screen.</p>
+          </div>
+        </div>
+      </div>
 
     </div>
     <footer></footer>
@@ -495,15 +516,20 @@
       // Dropdown toggle functionality
       const dropdown2 = document.querySelector('.dropdown2');
       const dropdown2Button = document.querySelector('.dropdown2-button');
-      dropdown2Button.addEventListener('click', () => {
-        dropdown2.classList.toggle('open');
-      });
-      // Close the dropdown if clicked outside
-      document.addEventListener('click', (event) => {
-        if (!dropdown2.contains(event.target)) {
-          dropdown2.classList.remove('open');
-        }
-      });
+      // Guard: this page has no download dropdown (no copy of this build is
+      // known to exist), so both lookups return null. Without this check the
+      // next line threw an uncaught TypeError on every page load.
+      if (dropdown2 && dropdown2Button) {
+        dropdown2Button.addEventListener('click', () => {
+          dropdown2.classList.toggle('open');
+        });
+        // Close the dropdown if clicked outside
+        document.addEventListener('click', (event) => {
+          if (!dropdown2.contains(event.target)) {
+            dropdown2.classList.remove('open');
+          }
+        });
+      }
     </script>
     <script>
       const images = document.querySelectorAll('.screenshot-container img');
@@ -517,8 +543,69 @@
         // Add the "active" class to the next image
         images[currentIndex].classList.add('active');
       }
-      // Change images every 3 seconds
-      setInterval(showNextImage, 3000);
+      // Guard: skip the timer if this page has no <img> screenshots,
+      // which would otherwise throw a TypeError every 3 seconds.
+      if (images.length > 0) {
+        // Change images every 3 seconds
+        setInterval(showNextImage, 3000);
+      }
     </script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm (In-Flight Entertainment)",
+  "alternateName": ["BookWorm Airplane", "BookWorm on planes", "BookWorm IFE"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-plane",
+  "image": "https://warrobotdoge.com/bookworm/images/screenshots/bookworm_plane_2.jpg",
+  "description": "A version of PopCap's BookWorm that ran on airline in-flight entertainment systems, playable from the seatback screen. No official documentation of this release is known to exist: neither PopCap, EA, nor any airline or IFE supplier appears to have published anything about it. The only surviving evidence is three photographs taken by passengers, one of which is dated to late 2009. Those images show two details that distinguish this build from other BookWorm releases: each letter tile displays its own individual point value, and a Scramble button sits directly beneath Lex, most likely because the seatback screens were touch operated. No copy of the software, no airline name, and no supplier attribution has been identified. This page collects the three known photographs and everything that can be inferred from them.",
+  "genre": ["Puzzle", "Word Game"],
+  "gamePlatform": ["In-flight entertainment system", "Seatback screen"],
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": "en",
+  "keywords": "bookworm airplane, bookworm in-flight entertainment, bookworm on a plane, popcap airline games, seatback games, undocumented bookworm version",
+  "publisher": {
+    "@type": "Organization",
+    "name": "PopCap Games",
+    "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+  },
+  "character": {
+    "@type": "Person",
+    "name": "Lex",
+    "description": "The green bookworm mascot, shown here above a Scramble button on the touchscreen build."
+  },
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_(video_game)"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  },
+  "gameTip": {
+    "@type": "CreativeWork",
+    "name": "Information wanted",
+    "text": "Nothing official has been found about BookWorm appearing on in-flight entertainment systems. Anyone who can identify the airline, the aircraft, the IFE supplier, or who has their own photographs or video of BookWorm running on a seatback screen is asked to get in touch. Photographs dated around 2009 to 2012 would be especially useful."
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm for Airplanes",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-plane" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
   </body>
 </html>
