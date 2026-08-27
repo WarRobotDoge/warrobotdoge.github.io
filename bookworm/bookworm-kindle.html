@@ -11,12 +11,29 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookWorm Kindle</title>
-    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/i.png" type="image/png">
-    <meta name="description" content="BookWorm for Amazon Kindle!" />
-    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle.webp" />
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm for Kindle — The Black-and-White E-Ink Version (2012)</title>
+    <meta name="description" content="BookWorm for Amazon Kindle launched in March 2012 and sold until around 2019. A greyscale e-ink build with Collections and Bonus Books. No copy is known to survive." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-kindle" />
-    <meta name="keywords" content="BookWorm,Download,Play" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm for Kindle — The Black-and-White E-Ink Version (2012)" />
+    <meta property="og:description" content="BookWorm for Amazon Kindle launched in March 2012 and sold until around 2019. A greyscale e-ink build. No copy is known to survive." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-kindle" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle.jpg" />
+    <meta property="og:image:alt" content="BookWorm running on an Amazon Kindle in black and white" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm for Kindle — The Black-and-White E-Ink Version (2012)" />
+    <meta name="twitter:description" content="BookWorm for Amazon Kindle launched in March 2012 and sold until around 2019. A greyscale e-ink build. No copy is known to survive." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle.jpg" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/i.png" type="image/png">
+    <!-- ========================================================= -->
+
     <style>
       body {
         margin: 0;
@@ -114,14 +131,18 @@
         background-color: white;
         width: 100%; /* Make the navbar take the full width */
         max-width: 931px; /* Match the width of the navbar */
-        height: 120vh;  /* Full viewport height to extend down to the footer */
+        min-height: 120vh;  /* ← grows with content instead of capping it */
         margin: 0 auto;
         position: relative;
         z-index: 1;
         top: -20px;   /* Moves the white section upward */
         padding-top: 20px;   /* Adds spacing above the content for a clean layout */
         flex-grow: 1;
-        padding-bottom: 200px;  /* Add space between content and footer */
+        /* The footer below has height:300px and margin-top:-300px, so it is
+           pulled up over the last 300px of this panel and paints on top of it.
+           Padding here has to clear that full 300px or the bottom of the
+           content ends up underneath the footer graphic. 200px was short. */
+        padding-bottom: 320px;
       }
 
       .navbar-links {
@@ -346,7 +367,7 @@
        /* Make container responsive */
         max-width: 344px;   /* Limit max size */
         max-height: 456px;
-        aspect-ratio: 3 / 4;  /* Maintain 4:3 aspect ratio */
+        aspect-ratio: 3 / 4;  /* Portrait, matching the Kindle screen */
         background-color: #e0e0e0;   /* Light gray background */
         border: 2px solid #ccc;   /* Subtle border */
         border-radius: 12px;  /* Rounded corners */
@@ -413,7 +434,8 @@
   <body>
     <div class="header">
       <a href="https://warrobotdoge.com/bookworm">
-        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="Bookworm Logo">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="BookWorm logo">
+      </a>
     </div>
     <div class="navbar">
       <span class="navbar-text"></span>
@@ -485,24 +507,24 @@
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle.webp" alt="Bookworm Kindle Photo" class="active" > 
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_2.webp" alt="Bookworm Kindle Photo 2" >
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_3.webp" alt="Bookworm Kindle Photo 3" >
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_4.webp" alt="Bookworm Kindle Photo 4" >
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle.jpg" alt="Bookworm Kindle Screenshot"  >
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_2.jpg" alt="Bookworm Kindle Screenshot 2" >
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_3.jpg" alt="Bookworm Kindle Screenshot 3" >
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_4.jpg" alt="Bookworm Kindle Screenshot 4" >
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_5.webp" alt="Bookworm Kindle Screenshot 5" >
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle.webp" alt="BookWorm on Kindle showing the greyscale letter grid" class="active" > 
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_2.webp" alt="BookWorm Kindle gameplay with a word being formed" >
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_3.webp" alt="BookWorm Kindle Collections page" >
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_4.webp" alt="BookWorm Kindle Help and Options menu" >
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle.jpg" alt="BookWorm Kindle home screen with Lex on a stack of books" >
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_2.jpg" alt="BookWorm Kindle Classic Mode in black and white" >
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_3.jpg" alt="BookWorm Kindle Bonus Book screen" >
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_4.jpg" alt="BookWorm Kindle Hall of Fame scores" >
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle_5.webp" alt="BookWorm Kindle burning letters warning" >
           </div>
         </div>
-<div class="section">
-  <h2>About</h2>
-  <div class="text">
-    <p>BookWorm for the Amazon Kindle was released on <a href="https://www.amazon.com/BOOKWORM/dp/B007OZX4K2">March 27, 2012</a>. It was sold from 2012 to about 2019. It featured a "Collections" page, and a page called "Help & Options". On the main homescreen, it appears that Lex is on a pile of books on a table, contrary to the typically library setting. The game had no color and was simply <a href="https://defythemajority.wordpress.com/2019/09/04/end-game-thoughts-bookworm/">black and white</a>. The Amazon page is still up for this game but you can't continue to buy it. There is no download for it, or any other information on it. <a href="https://web.archive.org/web/20120329191125/http://www.ea.com/bookworm-kindle">EA</a> had a page on BookWorm Kindle, but it wasn't updated and had very little info. </p>
-    </div>
-</div>
-</div>
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>BookWorm for the Amazon Kindle was released on <a href="https://www.amazon.com/BOOKWORM/dp/B007OZX4K2" rel="noopener">March 27, 2012</a>. It was sold from 2012 to about 2019. It featured a "Collections" page, and a page called "Help &amp; Options". On the main homescreen, it appears that Lex is on a pile of books on a table, contrary to the typical library setting. The game had no color and was simply <a href="https://defythemajority.wordpress.com/2019/09/04/end-game-thoughts-bookworm/" rel="noopener">black and white</a>. The Amazon page is still up for this game but you can't continue to buy it. There is no download for it, or any other information on it. <a href="https://web.archive.org/web/20120329191125/http://www.ea.com/bookworm-kindle" rel="noopener">EA</a> had a page on BookWorm Kindle, but it wasn't updated and had very little info. </p>
+          </div>
+        </div>
+      </div>
 
     </div>
     <footer></footer>
@@ -510,15 +532,20 @@
       // Dropdown toggle functionality
       const dropdown2 = document.querySelector('.dropdown2');
       const dropdown2Button = document.querySelector('.dropdown2-button');
-      dropdown2Button.addEventListener('click', () => {
-        dropdown2.classList.toggle('open');
-      });
-      // Close the dropdown if clicked outside
-      document.addEventListener('click', (event) => {
-        if (!dropdown2.contains(event.target)) {
-          dropdown2.classList.remove('open');
-        }
-      });
+      // Guard: this page has no download dropdown (no copy of the game is
+      // available), so both lookups return null. Without this check the next
+      // line threw an uncaught TypeError on every page load.
+      if (dropdown2 && dropdown2Button) {
+        dropdown2Button.addEventListener('click', () => {
+          dropdown2.classList.toggle('open');
+        });
+        // Close the dropdown if clicked outside
+        document.addEventListener('click', (event) => {
+          if (!dropdown2.contains(event.target)) {
+            dropdown2.classList.remove('open');
+          }
+        });
+      }
     </script>
     <script>
       const images = document.querySelectorAll('.screenshot-container img');
@@ -532,8 +559,77 @@
         // Add the "active" class to the next image
         images[currentIndex].classList.add('active');
       }
-      // Change images every 3 seconds
-      setInterval(showNextImage, 3000);
+      // Guard: skip the timer if this page has no <img> screenshots,
+      // which would otherwise throw a TypeError every 3 seconds.
+      if (images.length > 0) {
+        // Change images every 3 seconds
+        setInterval(showNextImage, 3000);
+      }
     </script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm (Amazon Kindle)",
+  "alternateName": ["Bookworm Kindle", "BookWorm for Kindle", "Bookworm e-ink"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-kindle",
+  "image": "https://warrobotdoge.com/bookworm/images/screenshots/bookworm_kindle.jpg",
+  "description": "The Amazon Kindle conversion of PopCap's BookWorm, released on 27 March 2012 and sold through the Kindle store until approximately 2019. Players link letter tiles up, down and in any direction to build words, level up and unlock hidden challenges, with bonus tiles raising the score and burning letters ending the game if left unchecked. It carries both Classic and Action modes, themed Bonus Books unlocked by spelling particular words, and a Hall of Fame tracking top scores alongside the player's best and longest words. Built for e-ink hardware, this is the only BookWorm release rendered entirely in black and white with no colour at all, and it uses a distinct home screen showing Lex on a stack of books on a table rather than the series' usual library setting. It also adds a Collections page and a Help and Options screen not present elsewhere. The Amazon product listing remains online but the game can no longer be purchased, EA's official page was archived without ever being properly maintained, and no copy of the build is known to have been preserved.",
+  "datePublished": "2012-03-27",
+  "genre": ["Puzzle", "Word Game", "Casual"],
+  "gamePlatform": ["Amazon Kindle", "E-reader"],
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": "en",
+  "keywords": "bookworm kindle, bookworm amazon kindle, bookworm e-ink, bookworm kindle download, popcap kindle games, delisted kindle games",
+  "publisher": [
+    {
+      "@type": "Organization",
+      "name": "PopCap Games",
+      "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+    },
+    {
+      "@type": "Organization",
+      "name": "Electronic Arts",
+      "sameAs": "https://en.wikipedia.org/wiki/Electronic_Arts"
+    }
+  ],
+  "character": {
+    "@type": "Person",
+    "name": "Lex",
+    "description": "The green bookworm mascot, rendered in greyscale on the Kindle and shown on a stack of books rather than in a library."
+  },
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_(video_game)"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  },
+  "gameTip": {
+    "@type": "CreativeWork",
+    "name": "Preservation status",
+    "text": "No download or archived copy of BookWorm for Kindle is known to exist. Anyone who purchased it before delisting and still has it installed on an older Kindle device, or who holds a backup of the application file, is asked to get in touch."
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm Kindle",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-kindle" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
   </body>
 </html>
