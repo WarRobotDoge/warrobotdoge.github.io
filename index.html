@@ -294,6 +294,36 @@
     border: 1px solid #ccc;
     background-color: #f4f4f4;
 }
+
+/* direct video file links (mp4/webm/etc), rendered with native controls */
+video.comment-video {
+    display: block;
+    margin-top: 1em;
+    max-width: min(100%, 400px);
+    height: auto;
+    border: 1px solid #ccc;
+    background-color: #000;
+}
+
+/* YouTube/Vimeo links get wrapped in a 16:9 box so the iframe can fill it responsively */
+.comment-video-embed {
+    position: relative;
+    margin-top: 1em;
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 16 / 9;
+    background-color: #000;
+    border: 1px solid #ccc;
+}
+
+.comment-video-embed iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
     </style>
 </head>
 <body>
@@ -556,12 +586,49 @@ function escapeHtml(value) {
 const IMAGE_URL_RE = /\{?\s*(https?:\/\/[^\s<>"'{}]+\.(?:png|jpe?g|gif|webp|bmp|avif)(?:\?[^\s<>"'{}]*)?)\s*\}?/gi;
 const MAX_IMAGES_PER_COMMENT = 4;
 
+// same idea, but for video: direct file links get a native <video> player,
+// YouTube/Vimeo links get turned into an embedded iframe. max 2/comment (heavier than images)
+const VIDEO_FILE_URL_RE = /\{?\s*(https?:\/\/[^\s<>"'{}]+\.(?:mp4|webm|ogv|ogg|mov|m4v)(?:\?[^\s<>"'{}]*)?)\s*\}?/gi;
+const YOUTUBE_URL_RE = /\{?\s*(https?:\/\/(?:www\.)?(?:youtube\.com\/(?:watch\?(?:[^\s<>"'{}]*&)?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11}))[^\s<>"'{}]*\s*\}?/gi;
+const VIMEO_URL_RE = /\{?\s*(https?:\/\/(?:www\.)?vimeo\.com\/(\d+))[^\s<>"'{}]*\s*\}?/gi;
+const MAX_VIDEOS_PER_COMMENT = 2;
+
 function renderCommentBody(rawText) {
     const text = String(rawText == null ? "" : rawText);
     const images = [];
+    const videos = []; // { type: 'file', url } or { type: 'youtube'|'vimeo', id }
+
+    let remaining = text;
+
+    // Strip direct video file links out first and collect them
+    remaining = remaining.replace(VIDEO_FILE_URL_RE, (match, url) => {
+        if (videos.length < MAX_VIDEOS_PER_COMMENT) {
+            videos.push({ type: "file", url });
+            return "";
+        }
+        return match; // over the limit: leave it as plain text
+    });
+
+    // Strip YouTube links and collect the video id
+    remaining = remaining.replace(YOUTUBE_URL_RE, (match, fullUrl, videoId) => {
+        if (videos.length < MAX_VIDEOS_PER_COMMENT) {
+            videos.push({ type: "youtube", id: videoId });
+            return "";
+        }
+        return match;
+    });
+
+    // Strip Vimeo links and collect the video id
+    remaining = remaining.replace(VIMEO_URL_RE, (match, fullUrl, videoId) => {
+        if (videos.length < MAX_VIDEOS_PER_COMMENT) {
+            videos.push({ type: "vimeo", id: videoId });
+            return "";
+        }
+        return match;
+    });
 
     // Strip image URLs out of the text and collect them
-    const remaining = text.replace(IMAGE_URL_RE, (match, url) => {
+    remaining = remaining.replace(IMAGE_URL_RE, (match, url) => {
         if (images.length < MAX_IMAGES_PER_COMMENT) {
             images.push(url);
             return "";
@@ -577,6 +644,31 @@ function renderCommentBody(rawText) {
                 '" alt="Image posted in a comment" loading="lazy"' +
                 ' referrerpolicy="no-referrer"' +
                 ' onerror="this.style.display=\'none\'">';
+    }
+
+    for (const video of videos) {
+        if (video.type === "file") {
+            const safeUrl = escapeHtml(video.url);
+            html += '<video class="comment-video" controls preload="metadata"' +
+                    ' src="' + safeUrl + '"' +
+                    ' onerror="this.style.display=\'none\'"></video>';
+        } else if (video.type === "youtube") {
+            const safeId = escapeHtml(video.id);
+            html += '<div class="comment-video-embed">' +
+                    '<iframe src="https://www.youtube-nocookie.com/embed/' + safeId + '"' +
+                    ' title="YouTube video posted in a comment" loading="lazy" allowfullscreen' +
+                    ' referrerpolicy="no-referrer"' +
+                    ' allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"></iframe>' +
+                    '</div>';
+        } else if (video.type === "vimeo") {
+            const safeId = escapeHtml(video.id);
+            html += '<div class="comment-video-embed">' +
+                    '<iframe src="https://player.vimeo.com/video/' + safeId + '"' +
+                    ' title="Vimeo video posted in a comment" loading="lazy" allowfullscreen' +
+                    ' referrerpolicy="no-referrer"' +
+                    ' allow="autoplay; fullscreen; picture-in-picture"></iframe>' +
+                    '</div>';
+        }
     }
 
     return html;
@@ -884,6 +976,7 @@ fetchMessages();
 <!-- =============================================================== -->
 
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1,"spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
