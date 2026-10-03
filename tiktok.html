@@ -1,0 +1,167 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>TikTok Data Explorer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#fff;--pn:#f5f5f7;--ln:#e4e4e8;--tx:#161823;--mu:#6b6d7b;--rd:#fe2c55;--cy:#1fb5b0;--th:#efeff2;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121212;--pn:#1b1b1f;--ln:#2c2c32;--tx:#f1f1f2;--mu:#9a9ba5;--cy:#25f4ee;--th:#2a2a30}}
+:root[data-theme="dark"]{--bg:#121212;--pn:#1b1b1f;--ln:#2c2c32;--tx:#f1f1f2;--mu:#9a9ba5;--cy:#25f4ee;--th:#2a2a30}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+#app{display:flex;height:100%}
+#side{width:280px;background:var(--pn);border-right:1px solid var(--ln);display:flex;flex-direction:column;flex-shrink:0}
+#mid{flex:1;display:flex;flex-direction:column;min-width:0}
+#stats{width:360px;background:var(--pn);border-left:1px solid var(--ln);overflow-y:auto;padding:14px;flex-shrink:0}
+.pad{padding:10px 12px}.mu{color:var(--mu);font-size:12px}
+.drop{display:block;padding:10px;border:2px dashed var(--rd);border-radius:10px;text-align:center;cursor:pointer;font-weight:600}
+input[type=text],select{width:100%;box-sizing:border-box;padding:7px 9px;margin-bottom:6px;border-radius:8px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);font:inherit}
+#list{flex:1;overflow-y:auto;padding:0 8px 8px}
+.item{display:flex;justify-content:space-between;gap:8px;padding:7px 9px;border-radius:8px;cursor:pointer}
+.item:hover{background:var(--th)}.item.on{background:var(--rd);color:#fff}
+.item span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.item span:last-child{opacity:.7;font-size:12px}
+#tabs{display:flex;gap:6px;padding:10px 14px 0}
+#tabs button{border:0;background:var(--th);color:var(--tx);padding:7px 14px;border-radius:20px;font:inherit;font-weight:600;cursor:pointer}
+#tabs button.on{background:var(--rd);color:#fff}
+#qm{margin:10px 14px 4px;width:calc(100% - 28px)}
+#view{flex:1;overflow-y:auto;padding:10px 14px}
+.empty{color:var(--mu);text-align:center;margin-top:60px}
+.chat{display:flex;flex-direction:column;gap:6px}
+.msg{max-width:min(460px,80%);padding:8px 12px;border-radius:16px;word-wrap:break-word;overflow-wrap:anywhere;white-space:pre-wrap}
+.mine{align-self:flex-end;background:var(--rd);color:#fff}.theirs{align-self:flex-start;background:var(--th)}
+.mine a{color:#fff}a{color:var(--cy)}
+.time{font-size:11px;opacity:.65;margin-top:3px}
+.more{align-self:center;border:1px solid var(--ln);background:var(--pn);color:var(--tx);padding:7px 14px;border-radius:20px;cursor:pointer;margin:6px 0}
+.row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--ln)}
+.row .rr{text-align:right;font-size:12px;color:var(--mu);flex-shrink:0}.rb{font-size:12px;color:var(--mu)}
+.sec{margin-bottom:18px}.sec h3{margin:0 0 8px;font-size:15px;border-bottom:2px solid var(--rd);padding-bottom:4px}
+canvas{max-width:100%;margin-top:8px}
+@media(max-width:900px){body{overflow:auto}#app{flex-direction:column;height:auto;min-height:100%}#side,#stats{width:auto;border:0}#side{max-height:42vh}#view{min-height:60vh;max-height:75vh;flex:none}}
+</style></head><body>
+<div id="app">
+<aside id="side">
+ <div class="pad"><label class="drop">📂 Choose user_data_tiktok.json<input type="file" id="file" accept=".json,application/json" hidden></label>
+ <p class="mu" id="status">Or drop the file anywhere. It's read locally in your browser; nothing is uploaded.</p></div>
+ <div class="pad" style="padding-top:0"><input type="text" id="qs" placeholder="Search list…">
+ <select id="sort"><option value="recent">Most recent</option><option value="oldest">Oldest</option><option value="count">Most messages</option><option value="alpha">Alphabetical</option><option value="span">Longest duration</option></select></div>
+ <div id="list"></div>
+</aside>
+<main id="mid">
+ <nav id="tabs"><button data-t="msg" class="on">💬 Messages</button><button data-t="act">📊 Activity</button></nav>
+ <input type="text" id="qm" placeholder="Search messages…">
+ <div id="view"><div class="empty">Choose your TikTok export (.json) to begin.</div></div>
+</main>
+<aside id="stats"></aside>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const P=s=>{const d=new Date(String(s).replace(' ','T')+'Z');return isNaN(d)?null:d}; // export times are UTC
+let chats=[],sets={},all=[],me='',tab='msg',cur=null,curSet=null,limit=400,charts=[],iv='hour';
+
+async function load(f){
+ $('#status').textContent='Reading '+(f.size/1048576).toFixed(1)+' MB…';
+ await new Promise(r=>setTimeout(r,30));
+ try{build(JSON.parse(await f.text()));$('#status').textContent=`Loaded ${chats.length} chats · ${all.length.toLocaleString()} messages`;render()}
+ catch(e){$('#status').textContent='Could not read file: '+e.message}
+}
+function build(D){
+ const ch=D['Direct Message']?.['Direct Messages']?.ChatHistory||{};
+ chats=Object.entries(ch).map(([k,v])=>({name:k.replace(/^Chat History with /,'').replace(/:$/,'')||'(unknown)',m:v.map(x=>({t:P(x.Date),u:x.From||'?',c:x.Content||''})).filter(x=>x.t).sort((a,b)=>a.t-b.t)})).filter(c=>c.m.length);
+ const cnt={},n={};
+ chats.forEach(c=>{new Set(c.m.map(x=>x.u)).forEach(u=>cnt[u]=(cnt[u]||0)+1);c.m.forEach(x=>n[x.u]=(n[x.u]||0)+1)});
+ me=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||n[b]-n[a])[0]||'';
+ all=chats.flatMap(c=>c.m).sort((a,b)=>a.t-b.t);
+ const A=D['Your Activity']||{},g=(k,s)=>A[k]?.[s]||[];
+ sets={
+  'Watch History':g('Watch History','VideoList').map(x=>({t:P(x.Date),a:x.Title||'TikTok video',l:x.Link})),
+  'Reposts':g('Reposts','RepostList').map(x=>({t:P(x.Date),a:'Reposted video',l:x.Link})),
+  'Searches':g('Searches','SearchList').map(x=>({t:P(x.Date),a:x.SearchTerm})),
+  'Shares':g('Share History','ShareHistoryList').map(x=>({t:P(x.Date),a:x.SharedContent,b:'via '+x.Method,l:x.Link})),
+  'Logins':g('Login History','LoginHistoryList').map(x=>({t:P(x.Date),a:x.DeviceModel+' · '+x.DeviceSystem,b:[x.NetworkType,x.Carrier,x.IP].filter(Boolean).join(' · ')})),
+  'Hashtags':g('Hashtag','HashtagList').map(x=>({a:'#'+x.HashtagName,l:x.HashtagLink})),
+  'Off-TikTok':g('Off TikTok Activity','OffTikTokActivityDataList').map(x=>({t:P(x.TimeStamp),a:x.Source,b:x.Event})),
+  'Ad visits':g('Ads Visit History','AdsVisitHistoryList').map(x=>({t:P(x.CreateTime),a:x.AdTitle,l:x.AdLink})),
+  'Mini dramas':g('Mini Drama Watch History','MiniDramaWatchHistoryData').flatMap(x=>(x.WatchHistory||[]).map(w=>({t:P(w.LastWatchedTime),a:x.CollectionName,l:w.MiniDramaLink})))
+ };
+ Object.values(sets).forEach(a=>a.sort((x,y)=>(y.t||0)-(x.t||0)));
+ curSet=sets['Watch History'].length?'Watch History':Object.keys(sets).find(k=>sets[k].length);cur=null;
+}
+function item(L,name,n,on,fn){const d=el('div','item'+(on?' on':''));d.append(el('span','',name),el('span','',n.toLocaleString()));d.onclick=fn;L.appendChild(d)}
+function renderSide(){
+ const L=$('#list');L.innerHTML='';const q=$('#qs').value.toLowerCase();
+ if(tab=='msg'){
+  const f=c=>c.m[0].t,l=c=>c.m[c.m.length-1].t;
+  const fn={recent:(a,b)=>l(b)-l(a),oldest:(a,b)=>f(a)-f(b),count:(a,b)=>b.m.length-a.m.length,alpha:(a,b)=>a.name.localeCompare(b.name),span:(a,b)=>(l(b)-f(b))-(l(a)-f(a))}[$('#sort').value];
+  chats.filter(c=>c.name.toLowerCase().includes(q)).sort(fn).forEach(c=>item(L,c.name,c.m.length,cur===c,()=>{cur=c;limit=400;render()}));
+ }else Object.entries(sets).filter(([k,v])=>v.length&&k.toLowerCase().includes(q)).forEach(([k,v])=>item(L,k,v.length,curSet==k,()=>{curSet=k;limit=300;render()}));
+}
+function linkify(s){const f=document.createDocumentFragment();
+ s.split(/(https?:\/\/\S+)/).forEach(p=>{if(/^https?:\/\//.test(p)){const a=el('a','',/tiktok/.test(p)?'📎 TikTok link':p.slice(0,60));a.href=p;a.target='_blank';a.rel='noopener noreferrer';f.appendChild(a)}else if(p)f.appendChild(document.createTextNode(p))});return f}
+function showChat(keep){
+ const V=$('#view');V.innerHTML='';
+ if(!cur){V.innerHTML='<div class="empty">Pick a chat on the left.</div>';return}
+ const q=$('#qm').value.toLowerCase(),ms=q?cur.m.filter(x=>x.c.toLowerCase().includes(q)):cur.m,w=el('div','chat'),s=Math.max(0,ms.length-limit);
+ if(s>0){const b=el('button','more',`Load 400 older (${s.toLocaleString()} hidden)`);b.onclick=()=>{limit+=400;showChat(V.scrollHeight)};w.appendChild(b)}
+ ms.slice(s).forEach(x=>{const b=el('div','msg '+(x.u==me?'mine':'theirs'));b.appendChild(linkify(x.c));b.appendChild(el('div','time',x.t.toLocaleString()));w.appendChild(b)});
+ if(!ms.length)w.appendChild(el('div','empty','No matching messages.'));
+ V.appendChild(w);V.scrollTop=keep?V.scrollHeight-keep:V.scrollHeight;
+}
+function showSet(){
+ const V=$('#view');V.innerHTML='';const a=sets[curSet];
+ if(!a){V.innerHTML='<div class="empty">Nothing to show.</div>';return}
+ const q=$('#qm').value.toLowerCase(),rows=q?a.filter(r=>((r.a||'')+(r.b||'')+(r.l||'')).toLowerCase().includes(q)):a;
+ rows.slice(0,limit).forEach(r=>{const d=el('div','row'),l=el('div'),rr=el('div','rr');
+  l.append(el('div','',r.a||'—'));if(r.b)l.append(el('div','rb',r.b));
+  if(r.t)rr.append(el('div','',r.t.toLocaleString()));
+  if(r.l){const k=el('a','','Open ↗');k.href=r.l;k.target='_blank';k.rel='noopener noreferrer';rr.append(k)}
+  d.append(l,rr);V.appendChild(d)});
+ if(rows.length>limit){const b=el('button','more',`Show more (${(rows.length-limit).toLocaleString()} left)`);b.style.display='block';b.style.margin='10px auto';b.onclick=()=>{limit+=300;showSet()};V.appendChild(b)}
+ if(!rows.length)V.innerHTML='<div class="empty">No matching rows.</div>';
+}
+/* ===== stats ===== */
+function span(ds){
+ if(!ds.length)return'<div class="mu">No dates in this section.</div>';
+ let a=ds[0],b=ds[0];const days={};
+ for(const d of ds){if(d<a)a=d;if(d>b)b=d;const k=d.toDateString();days[k]=(days[k]||0)+1}
+ const top=Object.entries(days).sort((x,y)=>y[1]-x[1])[0],n=Math.max(1,Math.round((b-a)/864e5));
+ return`<div>First: ${a.toLocaleString()}</div><div>Last: ${b.toLocaleString()}</div><div>Span: ${n.toLocaleString()} days · ${(ds.length/n).toFixed(1)}/day</div><div>Busiest day: ${top[0]} (${top[1].toLocaleString()})</div>`}
+function chatBlock(title,ms){
+ const n=ms.length,by={};ms.forEach(m=>by[m.u]=(by[m.u]||0)+1);
+ const links=ms.filter(m=>/https?:\/\//.test(m.c)).length,ds=ms.map(m=>m.t);
+ return{title,dates:ds,html:`<div>Messages: <b>${n.toLocaleString()}</b> (${(n/all.length*100).toFixed(1)}% of all)</div><div>Links / shared videos: ${links.toLocaleString()}</div>`+span(ds)+Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([u,c])=>`<div>${esc(u)}${u==me?' (you)':''}: ${c.toLocaleString()} (${(c/n*100).toFixed(1)}%)</div>`).join('')}}
+function bucket(ds,iv){
+ let key,labels;
+ if(iv=='hour'){labels=[...Array(24)].map((_,i)=>(i%12||12)+(i<12?'a':'p'));key=d=>d.getHours()}
+ else if(iv=='day'){labels=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];key=d=>d.getDay()}
+ else if(iv=='month'){labels='Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');key=d=>d.getMonth()}
+ else{let a=9999,b=0;for(const d of ds){const y=d.getFullYear();if(y<a)a=y;if(y>b)b=y}labels=[];for(let y=a;y<=b;y++)labels.push(String(y));key=d=>d.getFullYear()-a}
+ const data=labels.map(()=>0);for(const d of ds)data[key(d)]++;return{labels,data}}
+function showStats(blocks){
+ const S=$('#stats');S.innerHTML='';charts.forEach(c=>c.destroy());charts=[];
+ const sel=el('select');[['hour','By hour'],['day','By weekday'],['month','By month'],['year','By year']].forEach(([v,t])=>{const o=el('option','',t);o.value=v;sel.appendChild(o)});sel.value=iv;S.appendChild(sel);
+ const cv=[];
+ blocks.forEach((b,i)=>{const s=el('div','sec');s.innerHTML='<h3></h3>'+b.html;s.firstChild.textContent=b.title;
+  if(b.dates.length){const c=el('canvas');s.appendChild(c);cv.push([c,b.dates,i?'#25c4c0':'#fe2c55'])}S.appendChild(s)});
+ const draw=()=>{if(typeof Chart=='undefined')return;charts.forEach(c=>c.destroy());
+  Chart.defaults.color=getComputedStyle(document.documentElement).getPropertyValue('--mu').trim()||'#888';Chart.defaults.borderColor='rgba(128,128,128,.2)';
+  charts=cv.map(([c,d,col])=>{const{labels,data}=bucket(d,iv);return new Chart(c,{type:'bar',data:{labels,datasets:[{data,backgroundColor:col}]},options:{plugins:{legend:{display:false}},animation:false}})})};
+ sel.onchange=()=>{iv=sel.value;draw()};draw();
+}
+function stats(){
+ if(!all.length&&!Object.keys(sets).length)return;
+ if(tab=='msg')showStats(cur?[chatBlock(cur.name,cur.m),chatBlock('All chats',all)]:[chatBlock('All chats',all)]);
+ else{const a=sets[curSet]||[];showStats([{title:curSet,dates:a.map(r=>r.t).filter(Boolean),html:`<div>Entries: <b>${a.length.toLocaleString()}</b></div>`+span(a.map(r=>r.t).filter(Boolean))}])}
+}
+function render(){renderSide();tab=='msg'?showChat():showSet();stats()}
+
+/* ===== wiring ===== */
+$('#file').onchange=e=>e.target.files[0]&&load(e.target.files[0]);
+['dragover','drop'].forEach(n=>document.addEventListener(n,e=>{e.preventDefault();if(n=='drop'&&e.dataTransfer.files[0])load(e.dataTransfer.files[0])}));
+$('#qs').oninput=renderSide;$('#sort').onchange=renderSide;
+$('#qm').oninput=()=>{limit=tab=='msg'?400:300;tab=='msg'?showChat():showSet()};
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
+ tab=b.dataset.t;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x==b));
+ $('#qm').value='';$('#qs').value='';$('#qm').placeholder=tab=='msg'?'Search messages…':'Filter rows…';
+ $('#sort').style.display=tab=='msg'?'':'none';limit=tab=='msg'?400:300;if(all.length||Object.keys(sets).length)render()});
+</script></body></html>
