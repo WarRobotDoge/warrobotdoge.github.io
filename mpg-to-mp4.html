@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MPG to MP4 converter</title>
+<style>
+:root{color-scheme:light dark;--bg:#eef1f4;--panel:#fff;--ink:#14212b;--mut:#5d6b78;--line:#d5dbe1;--acc:#0f7b8a;--ok:#1b7f4b;--warn:#b45309}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1419;--panel:#161e25;--ink:#e6edf2;--mut:#8a98a5;--line:#2a343d;--acc:#4fc3d1;--ok:#5ad08f;--warn:#f0a35a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Avenir Next","Segoe UI",system-ui,sans-serif}
+main{max-width:720px;margin:0 auto;padding:40px 16px 64px}
+h1{font:600 2rem/1.15 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;margin:0 0 8px}
+p.lead{color:var(--mut);margin:0 0 28px;max-width:56ch}
+#drop{display:block;position:relative;padding:44px 56px;text-align:center;background:var(--panel);border:2px solid var(--ink);border-radius:4px;cursor:pointer;
+ background-image:repeating-linear-gradient(var(--bg) 0 14px,transparent 14px 28px),repeating-linear-gradient(var(--bg) 0 14px,transparent 14px 28px);
+ background-size:14px 100%,14px 100%;background-position:left 14px top 0,right 14px top 0;background-repeat:repeat-y,repeat-y}
+#drop:hover,#drop.over,#drop:focus-within{border-color:var(--acc)}
+#drop input{position:absolute;opacity:0;inset:0;cursor:pointer}
+#drop strong{display:block;font-size:1.1rem}
+#drop span{color:var(--mut);font-size:.9rem}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:20px 0}
+label.chk{display:flex;gap:8px;align-items:flex-start;font-size:.92rem;color:var(--mut)}
+button,a.dl{font:inherit;font-weight:600;padding:10px 20px;border-radius:4px;border:2px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer;text-decoration:none}
+button:disabled{opacity:.4;cursor:not-allowed}
+button:focus-visible,a.dl:focus-visible,#drop input:focus-visible+*{outline:3px solid var(--acc);outline-offset:2px}
+a.dl{background:var(--acc);border-color:var(--acc);color:#fff}
+progress{width:100%;height:10px;accent-color:var(--acc)}
+#status{margin:8px 0;min-height:1.5em;color:var(--mut);white-space:pre-wrap}
+#status.err{color:var(--warn)}
+video{width:100%;margin-top:16px;border-radius:4px;background:#000}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.9rem}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}
+th{color:var(--mut);font-weight:600}
+.ok{color:var(--ok)}.chg,.miss{color:var(--warn)}
+.wrap{overflow-x:auto}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>MPG to MP4</h1>
+<p class="lead">Convert in your browser. Your video never leaves your computer, and the file's metadata tags are carried over.</p>
+
+<label id="drop">
+  <input id="file" type="file" accept=".mpg,.mpeg,.m2v,video/mpeg">
+  <strong id="fname">Drop an MPG file here or click to choose one</strong>
+  <span id="fmeta">Files up to about 2 GB</span>
+</label>
+
+<div class="row">
+  <button id="go" disabled>Convert to MP4</button>
+  <label class="chk"><input type="checkbox" id="stamp" checked><span>If the file has no creation date, use the file's modified date</span></label>
+</div>
+
+<progress id="bar" value="0" max="100" hidden></progress>
+<div id="status" role="status"></div>
+
+<div id="result" hidden>
+  <a id="dl" class="dl" download>Download MP4</a>
+  <video id="vid" controls></video>
+  <h2 style="font-size:1.1rem;margin:28px 0 0">Metadata check</h2>
+  <div id="sum" style="color:var(--mut)"></div>
+  <div class="wrap"><table><thead><tr><th>Tag</th><th>Original</th><th>MP4</th></tr></thead><tbody id="rows"></tbody></table></div>
+</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+<script>
+const { FFmpeg } = FFmpegWASM, { fetchFile, toBlobURL } = FFmpegUtil;
+const CDN = 'https://cdn.jsdelivr.net/npm/';
+const CORE = CDN + '@ffmpeg/core@0.12.6/dist/umd/';
+const WORKER = CDN + '@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js';
+const $ = id => document.getElementById(id);
+const ff = new FFmpeg();
+let loaded = false, file = null, logs = [], outUrl = null;
+
+ff.on('log', ({ message }) => logs.push(message));
+ff.on('progress', ({ progress }) => {
+  const p = Math.max(0, Math.min(1, progress));
+  $('bar').value = p * 100;
+  $('status').textContent = 'Converting… ' + Math.round(p * 100) + '%';
+});
+
+function setFile(f) {
+  if (!f) return;
+  file = f;
+  $('fname').textContent = f.name;
+  $('fmeta').textContent = (f.size / 1048576).toFixed(1) + ' MB';
+  $('go').disabled = false;
+  $('result').hidden = true;
+  status('');
+}
+function status(msg, err) { const s = $('status'); s.textContent = msg; s.className = err ? 'err' : ''; }
+
+$('file').addEventListener('change', e => setFile(e.target.files[0]));
+['dragenter', 'dragover'].forEach(t => $('drop').addEventListener(t, e => { e.preventDefault(); $('drop').classList.add('over'); }));
+['dragleave', 'drop'].forEach(t => $('drop').addEventListener(t, e => { e.preventDefault(); $('drop').classList.remove('over'); }));
+$('drop').addEventListener('drop', e => setFile(e.dataTransfer.files[0]));
+
+async function load() {
+  if (loaded) return;
+  status('Loading the converter (about 30 MB, first time only)…');
+  const cfg = {
+    coreURL: await toBlobURL(CORE + 'ffmpeg-core.js', 'text/javascript'),
+    wasmURL: await toBlobURL(CORE + 'ffmpeg-core.wasm', 'application/wasm')
+  };
+  try { await ff.load({ ...cfg, classWorkerURL: await toBlobURL(WORKER, 'text/javascript') }); }
+  catch (e) { await ff.load(cfg); }
+  loaded = true;
+}
+
+async function readTags(name) {
+  try { await ff.exec(['-i', name, '-f', 'ffmetadata', 'meta.txt']); } catch (e) {}
+  let txt = '';
+  try { txt = await ff.readFile('meta.txt', 'utf8'); await ff.deleteFile('meta.txt'); } catch (e) {}
+  const tags = {};
+  for (const line of txt.split('\n').slice(1)) {
+    if (line.startsWith('[')) break;
+    const i = line.indexOf('=');
+    if (i > 0) tags[line.slice(0, i)] = line.slice(i + 1);
+  }
+  return tags;
+}
+
+function cell(tr, text, cls) { const td = document.createElement('td'); td.textContent = text; if (cls) td.className = cls; tr.appendChild(td); }
+
+async function convert() {
+  $('go').disabled = true; $('result').hidden = true; $('bar').hidden = false; $('bar').value = 0; logs = [];
+  try {
+    await load();
+    status('Reading file…');
+    await ff.writeFile('in.mpg', await fetchFile(file));
+    const before = await readTags('in.mpg');
+    const extra = [];
+    const stamped = $('stamp').checked && !Object.keys(before).some(k => k.toLowerCase() === 'creation_time');
+    if (stamped) {
+      const iso = new Date(file.lastModified).toISOString();
+      extra.push('-metadata', 'creation_time=' + iso);
+      before.creation_time = '';
+    }
+    const code = await ff.exec([
+      '-i', 'in.mpg', '-map', '0:v:0', '-map', '0:a?',
+      '-map_metadata', '0', '-map_chapters', '0',
+      '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p',
+      '-c:a', 'aac', '-b:a', '192k',
+      '-movflags', '+faststart+use_metadata_tags', ...extra, 'out.mp4'
+    ]);
+    if (code !== 0) throw new Error('Conversion failed. Is this a valid MPG file?\n' + logs.slice(-5).join('\n'));
+    const data = await ff.readFile('out.mp4');
+    const after = await readTags('out.mp4');
+    await ff.deleteFile('in.mpg'); await ff.deleteFile('out.mp4');
+
+    if (outUrl) URL.revokeObjectURL(outUrl);
+    outUrl = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+    $('dl').href = outUrl;
+    $('dl').download = file.name.replace(/\.[^.]+$/, '') + '.mp4';
+    $('vid').src = outUrl;
+
+    const rows = $('rows'); rows.replaceChildren();
+    const keys = Object.keys(before);
+    let kept = 0;
+    for (const k of keys) {
+      const tr = document.createElement('tr');
+      const was = before[k], now = after[k];
+      cell(tr, k);
+      cell(tr, k === 'creation_time' && stamped ? '(none, added from file date)' : was);
+      if (now === undefined) cell(tr, 'missing', 'miss');
+      else { const same = now === was || (k === 'creation_time' && stamped); if (same) kept++; cell(tr, now, same ? 'ok' : 'chg'); }
+      rows.appendChild(tr);
+    }
+    $('sum').textContent = keys.length
+      ? kept + ' of ' + keys.length + ' tags carried over.'
+      : 'The source file has no embedded tags, so there was nothing to copy. MPG files often carry none.';
+    $('result').hidden = false;
+    status('Done.');
+  } catch (e) {
+    status(String(e.message || e), true);
+  } finally {
+    $('go').disabled = false; $('bar').hidden = true;
+  }
+}
+$('go').addEventListener('click', convert);
+</script>
+</body>
+</html>
