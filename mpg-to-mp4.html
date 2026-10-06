@@ -70,7 +70,7 @@ th{color:var(--mut);font-weight:600}
 <script>
 const { FFmpeg } = FFmpegWASM, { fetchFile, toBlobURL } = FFmpegUtil;
 const CDN = 'https://cdn.jsdelivr.net/npm/';
-const CORE = CDN + '@ffmpeg/core@0.12.6/dist/umd/';
+const CORE = CDN + '@ffmpeg/core@0.12.6/dist/esm/';
 const WORKER = CDN + '@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js';
 const $ = id => document.getElementById(id);
 const ff = new FFmpeg();
