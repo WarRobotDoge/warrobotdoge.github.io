@@ -266,7 +266,7 @@
       .content-wrapper {
         display: flex;   /* Enables flexbox for the text and buttons */
         align-items: flex-start;   /* Align items to the top of the container */
-        justify-content: space-between;    /* Space between text and buttons */
+        justify-content: space-between;     /* Space between text and buttons */
         gap: 20px;   /* Optional: Adds spacing between text and buttons */
       }
 
@@ -333,22 +333,65 @@
         top: 100%;
         left: 0;
         background-color: #ED1C24;
-        min-width: 200px;
+        min-width: 240px;
         border-radius: 8px;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         z-index: 100;
-        padding: 10px 0;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
       }
 
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the note in its own right-hand column */
       .dropdown2-menu a {
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
-        display: block;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
       }
 
       .dropdown2-menu a:hover {
         background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
       }
 
       .dropdown2.open .dropdown2-menu {
@@ -419,9 +462,9 @@
 }
 
 /* The "Further Notes" block used to be an <ol> containing raw text and
-   <a> tags with no <li> children, which is invalid list markup. This
-   class reproduces an <ol>'s default indent and spacing exactly, so it
-   renders identically while being valid HTML. */
+    <a> tags with no <li> children, which is invalid list markup. This
+    class reproduces an <ol>'s default indent and spacing exactly, so it
+    renders identically while being valid HTML. */
 .further-notes {
   text-align: left;
   margin: 1em 0;
@@ -504,16 +547,23 @@
         <p>Bookworm - Words! Words! Words! This classic vocabulary challenge really knows how to spell f-u-n. Link letters and build words to feed Lex, the insatiable bookworm. Longer words earn Lex's gratitude as well as higher-scoring green, gold and crystal letter tiles. Complete the progressively harder levels to graduate from encyclopedia salesman all the way to bookworm supreme. But don't take too long, as the letters keep piling up ­ and watch out for the fiery red letters that will burn down your library! </p>
          </div>
         <div class="content-wrapper">
-            
+            <div class="dropdown2">
+                <button class="dropdown2-button">Download BookWorm BlackBerry<span class="dropdown2-arrow"></span>
+                </button>
+                <div class="dropdown2-menu">
+                  <span class="dropdown2-label">2009 Version</span>
+                  <a href="https://warrobotdoge.com/bookworm/downloads/Bookworm_BlackBerry_2009.cod" target="_blank" rel="noopener"><span>2009 Widescren</span><span class="dropdown2-size">1 MB</span></a>
+                </div>
             </div>
-          </div>
+            </div>
+         </div>
 
       <!-- Screenshot container -->
       <div class="parent">
         <div class="section">
           <h2>Screenshots</h2>
           <div class="screenshot-container">
-            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_blackberry.png" alt="BookWorm running on a BlackBerry with the letter grid visible" class="active" height="343"> 
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_blackberry.png" alt="BookWorm running on a BlackBerry with the letter grid visible" class="active" height="343">  
             <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_blackberry_2.png" alt="BookWorm BlackBerry gameplay with Lex and the Scramble button" height="343">
             <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_blackberry_3.png" alt="BookWorm BlackBerry settings menu" height="343">
             <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_blackberry_4.png" alt="BookWorm BlackBerry score display" height="343">
@@ -557,10 +607,10 @@
         <h2>Potential Download Found!</h2>
         <div class="text">
         <p>8/14/26 - I have been sent a wonderfull email from someone saying they have found a download for a version of Bookworm Blackberry! Unfortunately, when I download it, it fails to download all of the files. I think you need to download it directly from a BlackBerry itself. Here is photo provided of it working on the BlackBerry! It looks like the Java version which uses the new Lex model, so that means the other version is still lost...
-          You can try to download it at <a href="https://waptrick.com/es/juego/Book-Worm-Mobile-game_4O6/" Waptrick> Waptrick</a><a>!</a><br>
+          You can try to download it at <a href="https://waptrick.com/es/juego/Book-Worm-Mobile-game_4O6/" target="_blank" rel="noopener">Waptrick</a>!<br>
        <img src="https://warrobotdoge.com/bookworm/images/bookwormblackberry.jpg" height="343"><br>
-       <br><a>10/7/26 - ByteStorm404 was able to get the game extracted from his BlackBerry and sent it to me! Thanks to him, BookWorm is playable for the BlackBerry again! The version of this is the post-Bookworm Adventures version, which means that the original BlackBerry version (pictures in carousel) is still missing. Hopefuly, I'll be able to make them playable in browser in due time! Thanks for all the help!!</a>
-       <br><br><a>If anyone has any luck findine more, please let me know!</a>
+       <br>10/7/26 - ByteStorm404 was able to get the game extracted from his BlackBerry and sent it to me! Thanks to him, BookWorm is playable for the BlackBerry again! The version of this is the post-Bookworm Adventures version, which means that the original BlackBerry version (pictures in carousel) is still missing. Hopefuly, I'll be able to make them playable in browser in due time! Thanks for all the help!!
+       <br><br>If anyone has any luck finding more, please let me know!
        </div>
        </div>
 
@@ -675,8 +725,5 @@
 }
 </script>
 <!-- =============================================================== -->
-
-  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1}' crossorigin="anonymous"></script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
