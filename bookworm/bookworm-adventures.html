@@ -60,22 +60,30 @@
       }
 
       .game-container {
-        max-width: 800px;  /* Max width for the game */
-        aspect-ratio: 4 / 3;  /* Maintain the aspect ratio of the game */
-        display: flex;
-        justify-content: center;
-        position: relative; /* Places the footer at the bottom of the page flow */  /*alignf-items: center; */
-        margin-bottom: 20px;  /* Adds space below the embed */
-        margin-top: 20px;  /* Adds space below the embed */
-        z-index: 2;
-        margin: 0 auto;
-      }
+  width: 100%;
+  max-width: 1000px;        /* Controls how large the game player is overall (adjust as needed) */
+  aspect-ratio: 4 / 3;      /* Locks the container strictly to 4:3 */
+  margin: 40px auto;        /* 'auto' on left/right centers the container on the page */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.game-container iframe {
+  width: 100%;
+  height: 100%;             /* Fills the 4:3 container completely */
+  border: none;
+  border-radius: 12px;      /* Matches your site's rounded corners */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
 
       .game-container embed {
         width: 100%;    /* Make the embed width flexible */
         height: 100%;   /* Adjust height relative to width to maintain aspect ratio */
-        max-width: 800px;   /* Prevent the embed from exceeding its original size */
-        max-height: 600px;  /* Prevent the embed from exceeding its original size */
+        max-width: 1600px;   /* Prevent the embed from exceeding its original size */
+        max-height: 1200px;  /* Prevent the embed from exceeding its original size */
         position: relative;   /* Places the footer at the bottom of the page flow */
         margin: 0 auto;
       }
@@ -572,9 +580,17 @@
         <h2>BookWorm Adventures Web</h2>
         <div class="text">
           <p>The <a href="https://tcrf.net/images/2/2e/Bookworm_Adventures_PopCapLoader-title.png" rel="noopener">original</a> web version of BookWorm Adventures can no longer be locally played right now because of the way the PopCap framework was set up. <br><br> Though, I was fortunately able to recompile the web version of BookWorm Adventures, and can now be downloaded <a href="https://warrobotdoge.com/bookwormadventuresweb/BookwormAdventuresWebDemoSetup.exe" rel="noopener">here</a>! I am currently in the process of getting the .exe to run in browswer!  If you just want to download the normal Deluxe version of BookWorm Adventures, you can download it above!</p>
+       
         </div>
       </div>
-
+      <div class="game-container">
+  <iframe src="https://www.archive.play-games.com/games/archive/2026/10/bookwork-adventure-deluxe/index.html" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+</div>
+<script>
+  window.playgamaGameId = "Bookworm Adventures [Deluxe]";
+  // Add initialization callbacks here
+</script>
+<script async src="https://playgama.com/ads/v0.3.js?clid=your_client_id"></script>
       <div class="commentbox"></div>
       <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
       <script>commentBox('5680061592109056-proj')</script>
@@ -693,5 +709,6 @@
 <!-- =============================================================== -->
 
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
