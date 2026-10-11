@@ -60,22 +60,29 @@
       }
 
       .game-container {
-        max-width: 800px;  /* Max width for the game */
-        aspect-ratio: 4 / 3;  /* Maintain the aspect ratio of the game */
-        display: flex;
-        justify-content: center;
-        position: relative; /* Places the footer at the bottom of the page flow */  /*alignf-items: center; */
-        margin-bottom: 20px;  /* Adds space below the embed */
-        margin-top: 20px;  /* Adds space below the embed */
-        z-index: 2;
-        margin: 0 auto;
-      }
+  width: 100%;
+  max-width: 1000px;        /* Controls how large the game player is overall (adjust as needed) */
+  aspect-ratio: 4 / 3;      /* Locks the container strictly to 4:3 */
+  margin: 40px auto;        /* 'auto' on left/right centers the container on the page */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.game-container iframe {
+  width: 100%;
+  height: 100%;             /* Fills the 4:3 container completely */
+  border: none;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
 
       .game-container embed {
         width: 100%;    /* Make the embed width flexible */
         height: 100%;   /* Adjust height relative to width to maintain aspect ratio */
-        max-width: 800px;   /* Prevent the embed from exceeding its original size */
-        max-height: 600px;  /* Prevent the embed from exceeding its original size */
+        max-width: 1600px;   /* Prevent the embed from exceeding its original size */
+        max-height: 1200px;  /* Prevent the embed from exceeding its original size */
         position: relative;   /* Places the footer at the bottom of the page flow */
         margin: 0 auto;
       }
@@ -568,7 +575,9 @@
    </ol>
   </div>
 </div>
-
+ <div class="game-container">
+  <iframe src="https://www.archive.play-games.com/games/archive/2026/10/bookwork-adventure-deluxe/index.html" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+</div>
 
 <div class="commentbox"></div>
 <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
@@ -576,7 +585,7 @@
 
     </div>
     <footer></footer>
-    
+     
     <script>
       // Dropdown toggle functionality
       const dropdown2 = document.querySelector('.dropdown2');
@@ -682,5 +691,6 @@
 </script>
 <!-- =============================================================== -->
 
-  </body>
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
 </html>
