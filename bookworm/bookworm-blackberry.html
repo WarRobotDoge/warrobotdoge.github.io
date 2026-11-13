@@ -11,24 +11,26 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ED1C24">
 
     <!-- ============ SEO (all invisible to visitors) ============ -->
-    <title>BookWorm BlackBerry — PopCap's Lost Port (Help Us Find It)</title>
-    <meta name="description" content="BookWorm for BlackBerry launched in 2007 and no playable copy is known to survive. Twenty screenshots, release history, and every lead we have. Lost media — help us find it." />
+    <title>Play BookWorm BlackBerry Online — PopCap's Lost Port Recovered</title>
+    <meta name="description" content="Play BookWorm for BlackBerry (2009 version) free in your browser. Recovered from a real BlackBerry and run in a browser-based BlackBerry emulator. The 2007 original is still lost — help find it." />
     <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-blackberry" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="BookWorm Games Archive" />
-    <meta property="og:title" content="BookWorm BlackBerry — PopCap's Lost Port (Help Us Find It)" />
-    <meta property="og:description" content="BookWorm for BlackBerry launched in 2007 and no playable copy is known to survive. Twenty screenshots, release history, and every lead we have." />
+    <meta property="og:title" content="Play BookWorm BlackBerry Online — PopCap's Lost Port Recovered" />
+    <meta property="og:description" content="Play BookWorm for BlackBerry (2009 version) free in your browser. Recovered from a real BlackBerry and run in a browser-based BlackBerry emulator. The 2007 original is still lost — help find it." />
     <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-blackberry" />
     <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_blackberry.png" />
     <meta property="og:image:alt" content="BookWorm running on a BlackBerry handset" />
+    <meta property="article:modified_time" content="2026-11-12" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="BookWorm BlackBerry — PopCap's Lost Port (Help Us Find It)" />
-    <meta name="twitter:description" content="BookWorm for BlackBerry launched in 2007 and no playable copy is known to survive. Twenty screenshots and every lead we have." />
+    <meta name="twitter:title" content="Play BookWorm BlackBerry Online — PopCap's Lost Port Recovered" />
+    <meta name="twitter:description" content="Play BookWorm for BlackBerry (2009 version) free in your browser. The 2007 original is still lost — help find it." />
     <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_blackberry.png" />
 
     <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/i.png" type="image/png">
@@ -476,6 +478,33 @@
         border-radius: 20px;
         background: #FFFFFF;
       }
+          /* ===== Mobile / tablet (desktop layout above 900px is untouched) ===== */
+      @media (max-width: 900px) {
+        .content-wrapper { flex-direction: column; gap: 0; }
+        .texty { max-width: none; width: auto; margin: 20px 20px 0; text-align: left; line-height: 1.3; }
+        .content-wrapper .content-wrapper { margin-left: 20px; }
+        .dropdown2-button { margin-right: 0; margin-top: 12px; }
+        .parent { flex-direction: column; }
+        .section { width: 100%; }
+        h2 { margin-left: 20px; margin-right: 20px; }
+        .text { margin-left: 20px; margin-right: 20px; text-align: left; line-height: 1.3; }
+        .screenshot-container { margin-left: 20px; margin-right: 20px; }
+        .further-notes { padding-left: 20px; }
+        .game-frame { margin-bottom: 10px; }
+        footer { background-size: cover; }
+      }
+
+      @media (max-width: 600px) {
+        .header { margin-top: 10px; padding: 10px 12px; }
+        .navbar { height: auto; min-height: 64px; padding: 8px 6px; box-sizing: border-box; border-radius: 12px 12px 0 0; }
+        .navbar-links { flex-wrap: wrap; justify-content: center; }
+        .navbar-links li { margin: 0 8px; }
+        .navbar-links a { font-size: 13px; letter-spacing: 0.5px; }
+        .dropdown-menu { min-width: 190px; }
+        .white-section { padding-bottom: 160px; }
+        /* Let the game use the full screen width so it isn't squished */
+        .game-frame { width: calc(100% + 40px); margin-left: -20px; border-radius: 0; }
+      }
     </style>
    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   </head>
@@ -602,7 +631,7 @@
           </div>
         </div>
       </div>
-       <div class="section">
+       <div class="section" id="play">
         <h2>Potential Download Found!</h2>
         <div class="text">
         <p>Thanks to ByteStorm404 for giving me the files for this version of Bookworm BlackBerry!
@@ -1973,19 +2002,47 @@ startBundledBookworm();
   "@context": "https://schema.org",
   "@type": "VideoGame",
   "name": "BookWorm BlackBerry",
-  "alternateName": ["Bookworm BlackBerry", "BookWorm for BlackBerry", "Magmic Bookworm"],
+  "alternateName": [
+    "Bookworm BlackBerry",
+    "BookWorm for BlackBerry",
+    "Magmic Bookworm",
+    "Play BookWorm BlackBerry Online"
+  ],
   "url": "https://warrobotdoge.com/bookworm/bookworm-blackberry",
   "image": "https://warrobotdoge.com/bookworm/images/screenshots/bookworm_blackberry.png",
-  "description": "The BlackBerry conversion of PopCap's BookWorm, released on 5 April 2007 and published for BlackBerry handsets by Magmic. No playable copy is known to survive, making it lost media. Players link letter tiles to build words and feed Lex the bookworm, progressing through increasingly difficult levels from encyclopedia salesman up to bookworm supreme, while clearing fiery red letters before they burn the library down. The BlackBerry build had its own Settings menu and a Scramble button positioned below Lex, and at least one variant displayed the point value of each letter with an indicator, as BookWorm Deluxe does. Between two and three distinct versions existed, including one marketed for the BlackBerry Pearl and a smaller-screen port closer to the Pocket PC release, sold through Bplay at $6.99 and also distributed by Handmark. The game ranked among the top ten BlackBerry-enabled games for at least two months after launch. Every surviving download link dates to 2007 and is dead. This archive holds twenty screenshots documenting the game's existence and is actively seeking a surviving .cod or .jad build, installer, or any further documentation.",
+  "description": "The BlackBerry conversion of PopCap's BookWorm, released on 5 April 2007 and published for BlackBerry handsets by Magmic. The 2009 widescreen version was recovered from a real BlackBerry thanks to ByteStorm404 and can now be played free in any web browser through a browser-based BlackBerry emulator that runs .cod files. The original 2007 versions, including the BlackBerry Pearl build and the smaller-screen port sold through Bplay and distributed by Handmark, are still lost media. Players link letter tiles to build words and feed Lex the bookworm, progressing through increasingly difficult levels from encyclopedia salesman up to bookworm supreme, while clearing fiery red letters before they burn the library down. The BlackBerry build had its own Settings menu and a Scramble button positioned below Lex, and at least one variant displayed the point value of each letter with an indicator, as BookWorm Deluxe does. The game ranked among the top ten BlackBerry-enabled games for at least two months after launch. This archive holds twenty screenshots of the original versions and is actively seeking a surviving .cod or .jad build, installer, or any further documentation.",
   "datePublished": "2007-04-05",
-  "genre": ["Puzzle", "Word Game"],
-  "gamePlatform": ["BlackBerry", "BlackBerry Pearl", "Mobile Phone"],
-  "operatingSystem": "BlackBerry OS",
+  "dateModified": "2026-11-12",
+  "genre": [
+    "Puzzle",
+    "Word Game"
+  ],
+  "gamePlatform": [
+    "BlackBerry",
+    "BlackBerry Pearl",
+    "Mobile Phone",
+    "Web Browser"
+  ],
+  "operatingSystem": "BlackBerry OS (playable in a web browser via emulation)",
   "applicationCategory": "GameApplication",
   "playMode": "SinglePlayer",
   "inLanguage": "en",
-  "keywords": "bookworm blackberry, bookworm blackberry download, lost media video game, magmic bookworm, bplay bookworm, blackberry pearl games, popcap blackberry, bookworm cod jad",
-  "creativeWorkStatus": "Lost",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/OnlineOnly",
+    "url": "https://warrobotdoge.com/bookworm/bookworm-blackberry#play"
+  },
+  "potentialAction": {
+    "@type": "PlayAction",
+    "name": "Play BookWorm BlackBerry in your browser",
+    "target": "https://warrobotdoge.com/bookworm/bookworm-blackberry#play"
+  },
+  "downloadUrl": "https://warrobotdoge.com/bookworm/downloads/Bookworm_BlackBerry_2009.cod",
+  "keywords": "play bookworm blackberry online, bookworm blackberry, bookworm blackberry download, bookworm blackberry emulator, play blackberry games in browser, lost media video game, recovered lost media, magmic bookworm, bplay bookworm, blackberry pearl games, popcap blackberry, bookworm cod jad",
+  "creativeWorkStatus": "2009 version recovered and playable; original 2007 versions still lost",
   "publisher": [
     {
       "@type": "Organization",
@@ -1997,6 +2054,11 @@ startBundledBookworm();
       "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
     }
   ],
+  "contributor": {
+    "@type": "Person",
+    "name": "ByteStorm404",
+    "description": "Extracted the game files from a real BlackBerry."
+  },
   "character": {
     "@type": "Person",
     "name": "Lex",
@@ -2014,7 +2076,7 @@ startBundledBookworm();
   "gameTip": {
     "@type": "CreativeWork",
     "name": "Lost media appeal",
-    "text": "No playable copy of BookWorm for BlackBerry is known to survive. Anyone holding an original .cod or .jad build, a Bplay or Handmark installer, an old BlackBerry with the game still installed, or a backup archive from 2007 to 2010 is asked to get in touch."
+    "text": "The 2009 widescreen version of BookWorm for BlackBerry is recovered and playable in the browser. The original 2007 builds, including the BlackBerry Pearl version and the smaller-screen Bplay and Handmark port, are still missing. Anyone holding an original .cod or .jad build, a Bplay or Handmark installer, an old BlackBerry with those versions still installed, or a backup archive from 2007 to 2010 is asked to get in touch."
   }
 }
 </script>
