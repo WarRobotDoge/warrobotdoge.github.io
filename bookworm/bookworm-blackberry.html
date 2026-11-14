@@ -744,7 +744,7 @@ function brick(){let c,raf,p,b,br,sc,live;const W=320,H=220;
  br.forEach(k=>{if(k.on&amp;&amp;b.x>k.x&amp;&amp;b.x<k.x+36&amp;&amp;b.y>k.y&amp;&amp;b.y<k.y+12){k.on=0;b.vy*=-1;sc+=10}});if(b.y>H)live=0;if(!br.some(k=>k.on))init()}
  const g=c.getContext('2d');g.fillStyle='#050a14';g.fillRect(0,0,W,H);br.forEach((k,i)=>{if(k.on){g.fillStyle='hsl('+(i*9+190)+' 70% 55%)';g.fillRect(k.x,k.y,36,12)}});g.fillStyle='#fff';g.fillRect(p,H-12,60,6);g.beginPath();g.arc(b.x,b.y,4,0,7);g.fill();g.font='12px sans-serif';g.fillText('Score '+sc+(live?'':'   Game over: press ●'),6,14);raf=requestAnimationFrame(step)};
  return{title:'BrickBreaker',render(e){e.innerHTML='<canvas width=&quot;320&quot; height=&quot;220&quot; style=&quot;width:100%;height:100%;display:block&quot;></canvas>';c=e.firstChild;init();cancelAnimationFrame(raf);step()},
- key(k,ch){if(k=='left'||ch=='a')p=Math.max(0,p-18);if(k=='right'||ch=='d')p=Math.min(W-60,p+18);if(k=='enter'&amp;&amp;!live)init()},stop(){cancelAnimationFrame(raf)}}}
+ key(k,ch){if(k=='left'||ch=='a')p=Math.max(0,p-18);if(k=='right'||ch=='d')p=Math.min(W-60,p+18);if(k=='enter'&amp;&amp;!live)init()},stop(){cancelAnimationFrame(raf);bwSaveStores(rt)}}}
 const keyMap={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',Enter:'enter',Escape:'rightsoft',Backspace:'delete',Numpad8:'up',Numpad2:'down',Numpad4:'left',Numpad6:'right',Numpad5:'enter',NumpadEnter:'enter',Digit2:'up',Digit4:'left',Digit6:'right',Digit8:'down',Digit5:'enter','2':'up','4':'left','6':'right','8':'down','5':'enter'};
 const heldKeys=new Set(), activePointers=new Map();
 function unlockAudio(){try{const a=window.__bwAudio||(typeof audioContext==='function'?audioContext():null);if(a&amp;&amp;a.state==='suspended')a.resume().catch(()=>{})}catch{}}
@@ -1891,12 +1891,21 @@ function bwCanRun(m){if(m._bw!==undefined)return m._bw;try{const rt=new BBRT.Run
 function bwText(surf,s,x,y,color,font,clip){if(typeof document==='undefined')return;const c=bwText.c||(bwText.c=document.createElement('canvas'));const ctx=c.getContext&amp;&amp;c.getContext('2d',{willReadFrequently:true});if(!ctx)return;
  const h=font.h||12,f=(h>=16?'bold ':'')+Math.max(8,h-3)+'px sans-serif';ctx.font=f;const w=Math.ceil(ctx.measureText(s).width)+2;c.width=Math.max(1,w);c.height=h;ctx.font=f;ctx.fillStyle='#fff';ctx.textBaseline='top';ctx.fillText(s,0,0);
  const d=ctx.getImageData(0,0,c.width,h).data,r=(color>>16)&amp;255,g=(color>>8)&amp;255,b=color&amp;255;for(let j=0;j<h;j++)for(let i=0;i<c.width;i++){const a=d[(j*c.width+i)*4+3];if(a>8)surf.put(x+i,y+j,r,g,b,a,clip)}}
-async function bwBoot(m,log){const rt=new BBRT.Runtime(bwFiles(m),{log});rt.drawText=bwText;
+const BW_SAVE_KEY='berryweb_bookworm_rms_v1';
+function bwLoadStores(rt){
+ try{const raw=localStorage.getItem(BW_SAVE_KEY);if(raw){const data=JSON.parse(raw);rt.stores=new Map(Object.entries(data).map(([k,v])=>[k,Array.isArray(v)?v:[]]));}}
+ catch(e){console.warn('[Bookworm] Could not load saved data:',e)}
+}
+function bwSaveStores(rt){
+ try{if(!rt||!rt.stores)return;localStorage.setItem(BW_SAVE_KEY,JSON.stringify(Object.fromEntries(rt.stores)));}catch(e){console.warn('[Bookworm] Could not save data:',e)}
+}
+window.addEventListener('pagehide',()=>bwSaveStores(window.__bookwormRuntime));
+async function bwBoot(m,log){const rt=new BBRT.Runtime(bwFiles(m),{log});bwLoadStores(rt);rt.drawText=bwText;
  const rc=[...rt.parts.values()].flatMap(p=>p.classInfos).find(c=>c.virtualByName&amp;&amp;c.virtualByName.has('instantiateMIDlet'));if(!rc)throw new Error('no MIDlet launcher class found');
  const rr=rt.newLocal(rc);rt.callStatic(rc.name,'<init>',[rr]);
  const mid=rt.callVirtual(rr,'instantiateMIDlet',[BBRT.newString(bwMidletClass(rt))]).s[0];await rt.preloadImages();rt.callVirtual(mid,'startApp');rt.midlet=mid;return rt}
 function bwErrText(x){return x.notImplemented?'Not implemented yet:\n'+x.notImplemented:(x.vm?x.vm+': ':'')+x.message}
-function bwView(m){let rt=null,raf=0,err='',cv=null,ctx=null;const logs=[];
+function bwView(m){let rt=null,raf=0,err='',cv=null,ctx=null,lastSave=0;const logs=[];
  const send=(code,kind='special')=>{if(!rt||err)return;try{rt.keyEvent(true,code,kind);rt.keyEvent(false,code,kind)}catch(x){err=bwErrText(x)}};
  const fail=(e,x)=>{err=bwErrText(x)+(x.frame?'\n(in '+x.frame.mod.name+' @0x'+x.frame.pc.toString(16)+')':'');e.innerHTML='<div class=&quot;txt&quot; style=&quot;color:#fff;padding:12px&quot;>'+esc('Game stopped: '+err)+'</div>'};
  return{title:'Bookworm (JS VM)',
@@ -1906,7 +1915,7 @@ function bwView(m){let rt=null,raf=0,err='',cv=null,ctx=null;const logs=[];
    cv.addEventListener('pointerup',ev=>{if(!rt||err)return;ev.preventDefault();try{const p=point(ev);rt.pointerEvent(false,p.x,p.y)}catch(x){fail(e,x)}},{passive:false});
    cv.addEventListener('pointercancel',ev=>{if(!rt||err)return;try{const p=point(ev);rt.pointerEvent(false,p.x,p.y)}catch(x){fail(e,x)}});
    const loop=()=>{if(!rt&amp;&amp;!err){if(!window.__bookwormBooting){window.__bookwormBooting=true;bwBoot(m,x=>logs.push(x)).then(r=>{rt=r;window.__bookwormRuntime=r;window.__bookwormBooting=false}).catch(x=>{window.__bookwormBooting=false;err=bwErrText(x);fail(e,x)})}else rt=window.__bookwormRuntime||null}
-    if(rt&amp;&amp;!err){try{rt.tick()}catch(x){fail(e,x);return}if(ctx&amp;&amp;typeof ImageData!=='undefined')ctx.putImageData(new ImageData(rt.screen.px,rt.screen.w,rt.screen.h),0,0)}
+    if(rt&amp;&amp;!err){try{rt.tick();if(Date.now()-lastSave>1000){bwSaveStores(rt);lastSave=Date.now()}}catch(x){fail(e,x);return}if(ctx&amp;&amp;typeof ImageData!=='undefined')ctx.putImageData(new ImageData(rt.screen.px,rt.screen.w,rt.screen.h),0,0)}
     if(!err)raf=requestAnimationFrame(loop)};loop()},
   gameInput:true,
   back(){send(0x50,'special');return true},
