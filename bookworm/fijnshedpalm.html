@@ -522,19 +522,6 @@
 
       .pe-off.hide { display: none; }
 
-      .pe-off button {
-        padding: 10px 20px;
-        font-size: 14px;
-        color: white;
-        border: none;
-        border-radius: 15px;
-        cursor: pointer;
-        background: linear-gradient(to bottom, #f16d00 60%, #e24300 100%);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-      }
-
-      .pe-off button:hover { transform: translateY(-2px); }
-
       #pe-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
 
     </style>
@@ -652,14 +639,13 @@
       <div class="section">
         <h2>BookWorm for Palm OS Emulator</h2>
         <div class="text">
-          <p>I was able to get a Palm OS emulated in the browser, so here you go!</p>
+          <p>I was able to get a Palm OS emulator in the browser, so here you go!</p>
         </div>
         <div class="pe-palm" aria-label="Palm OS emulator">
           <div class="pe-glass">
             <canvas id="pe-screen" width="428" height="720.42" tabindex="0" aria-label="Palm OS screen"></canvas>
             <div class="pe-off" id="pe-off">
-              <button type="button" id="pe-start">▶ Start Palm OS</button>
-              <span id="pe-msg">Downloads the Palm OS ROM on first run, then caches it.</span>
+              <span id="pe-msg">Starting Palm OS…</span>
             </div>
           </div>
         </div>
@@ -704,7 +690,7 @@
       setInterval(showNextImage, 3000);
     </script>
 
-    <!-- Palm OS emulator: only downloads when the visitor clicks Start -->
+    <!-- Palm OS emulator: starts automatically on page load -->
     <script>
     (function () {
       const BASE = 'https://warrobotdoge.com/bookworm/';
@@ -763,13 +749,11 @@
         });
       }
 
-      const btn = $('#pe-start');
       let starting = false;
 
       async function start() {
         if (starting) return;
         starting = true;
-        btn.style.display = 'none';
         try {
           say('Preparing Palm OS…');
           await loadScript(BASE + 'emu/cloudpilot-emu.js');
@@ -782,7 +766,7 @@
           const [rom, game] = await Promise.all([getFile('rom'), getFile('game')]);
           const emu = await emuPromise;
 
-          // The click on Start counts as a user gesture, so audio can usually start
+          // Some browsers block audio until the visitor interacts with the page; boot continues either way
           try { await emu.initializeAudio(); } catch (_) {}
 
           say('Starting Palm OS…');
@@ -801,12 +785,11 @@
         } catch (e) {
           console.error(e);
           $('#pe-off').classList.remove('hide');
-          say('Could not start: ' + ((e && e.message) || e));
-          btn.style.display = '';
+          say('Could not start: ' + ((e && e.message) || e) + ' (refresh to try again)');
           starting = false;
         }
       }
-      btn.addEventListener('click', start);
+      start(); // autostart on page load
     })();
     </script>
 
