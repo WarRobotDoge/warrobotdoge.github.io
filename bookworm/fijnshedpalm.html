@@ -1,172 +1,884 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Book Worm — Palm OS</title>
-<style>
-* { box-sizing: border-box; }
-html, body { margin: 0; min-height: 100%; background: #171b20; }
-body { min-height: 100vh; display: grid; place-items: center; padding: 18px; }
-
-.palm {
-  width: min(428px, 96vw);
-  height: min(720px, 96vh);
-  padding: clamp(15px, 4vw, 28px);
-  border-radius: 34px 34px 42px 42px;
-  background: linear-gradient(155deg, #dce0e5 0%, #bfc4cb 48%, #9299a3 100%);
-  box-shadow: 0 2px 0 #fff9 inset, 0 -4px 0 #0003 inset, 0 24px 65px #0009;
-  display: flex;
-  flex-direction: column;
-}
-
-.glass {
-  position: relative;
-  flex: 1; /* Makes the screen area fill the 720px Palm body */
-  padding: 10px;
-  border-radius: 11px;
-  background: #090b0e;
-  box-shadow: 0 0 0 3px #252a31, 0 3px 8px #0009 inset;
-}
-
-canvas {
-  display: block;
-  width: 100%;
-  height: 100%; /* Fills the .glass container cleanly */
-  background: #000;
-  border-radius: 3px;
-  touch-action: none;
-  outline: none;
-}
-
-.off {
-  position: absolute;
-  inset: 10px;
-  display: grid;
-  place-items: center;
-  background: #000;
-  color: #68737c;
-  text-align: center;
-  font: 14px/1.5 system-ui, sans-serif;
-  pointer-events: none;
-}
-
-.off.hide { display: none; }
-#status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
-
-@media (max-width: 428px) {
-  body { padding: 8px; }
-  .palm { border-radius: 25px; padding: 14px; }
-}
-</style>
-
-
-
-</head>
-<script src="https://warrobotdoge.com/bookworm/emu/cloudpilot-emu.js"></script>
-<body>
-<main class="palm" aria-label="Palm OS emulator">
-  <div class="glass">
-    <canvas id="screen" width="428" height="720.42" tabindex="0" aria-label="Palm OS screen"></canvas>
-    <div class="off" id="off">Starting Palm OS…</div>
-  </div>
-</main>
-<div id="status" role="status" aria-live="polite">Loading emulator…</div>
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EYCEXST1XQ"></script>
 <script>
-const SOURCES = {
-  rom: 'https://warrobotdoge.com/bookworm/downloads/repalm-paravirtualized-09282026.bin',
-  game: 'https://warrobotdoge.com/bookworm/downloads/BookWorm-HiRes.prc'
-};
-const $ = s => document.querySelector(s);
-const say = m => { $('#status').textContent = m; console.log('[Book Worm]', m); };
-const idb = () => new Promise((res, rej) => {
-  const r = indexedDB.open('bookworm-palm', 1);
-  r.onupgradeneeded = () => r.result.createObjectStore('kv');
-  r.onsuccess = () => res(r.result);
-  r.onerror = () => rej(r.error);
-});
-async function kv(mode, key, val) {
-  try {
-    const db = await idb();
-    return await new Promise((res, rej) => {
-      const st = db.transaction('kv', mode === 'get' ? 'readonly' : 'readwrite').objectStore('kv');
-      const q = mode === 'get' ? st.get(key) : mode === 'set' ? st.put(val, key) : st.delete(key);
-      q.onsuccess = () => res(q.result);
-      q.onerror = () => rej(q.error);
-    });
-  } catch (e) { console.warn('Browser storage unavailable', e); }
-}
-async function download(url) {
-  const r = await fetch(url);
-  if (!r.ok) throw new Error('Download failed: HTTP ' + r.status + ' (' + url + ')');
-  return new Uint8Array(await r.arrayBuffer());
-}
-async function getFile(key) {
-  const url = SOURCES[key];
-  const cached = await kv('get', 'file:' + url);
-  if (cached?.data) { say('Using cached ' + key + ' file…'); return cached.data; }
-  say('Downloading ' + key + '…');
-  const data = await download(url);
-  await kv('set', 'file:' + url, {data});
-  return data;
-}
-const emuPromise = cloudpilot.createEmulator({
-  cloudpilotModuleUrl: 'emu/cloudpilot_web.wasm',
-  uarmModuleUrl: 'emu/uarm_web.wasm',
-  uarmWorkerUrl: 'emu/uarm-worker.js',
-  pcmWorkletUrl: 'emu/pcm-worklet.js'
-});
-let emu;
-let starting = false;
-function waitForUi(instance) {
-  return new Promise(resolve => {
-    let done = false;
-    const finish = () => { if (!done) { done = true; clearInterval(timer); resolve(); } };
-    instance.isUiInitializedChangeEvent.addHandler(v => { if (v) finish(); });
-    const timer = setInterval(async () => {
-      try { if (await instance.isUiInitialized()) finish(); } catch (_) {}
-    }, 400);
-  });
-}
-async function boot(rom, game) {
-  if (starting) return;
-  starting = true;
-  try {
-    emu = await emuPromise;
-    // Audio may require a user gesture in some browsers; boot continues if blocked.
-    try { await emu.initializeAudio(); } catch (_) {}
-    say('Starting Palm OS…');
-    await emu.loadRom(rom, undefined, cloudpilot.DeviceId.repalmPV, undefined,
-      cloudpilot.ScreenSize.screen320x320);
-    emu.setCanvas($('#screen'));
-    emu.bindInput();
-    $('#off').classList.add('hide');
-    await emu.resume();
-    await waitForUi(emu);
-    say('Launching Book Worm…');
-    await emu.installAndLaunchDatabase(game);
-    say('Book Worm is running.');
-    $('#screen').focus();
-  } catch (e) {
-    console.error(e);
-    say('Emulator could not start: ' + (e?.message || e));
-    $('#off').classList.remove('hide');
-    $('#off').textContent = 'Unable to start. Check the browser console.';
-    starting = false;
-  }
-}
-(async function autoStart() {
-  try {
-    say('Preparing Palm OS…');
-    const [rom, game] = await Promise.all([getFile('rom'), getFile('game')]);
-    await emuPromise;
-    await boot(rom, game);
-  } catch (e) {
-    console.error(e);
-    say('Loading failed: ' + (e?.message || e));
-    $('#off').textContent = 'Could not load emulator files. Check your connection and refresh.';
-  }
-})();
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EYCEXST1XQ');
 </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ============ SEO (all invisible to visitors) ============ -->
+    <title>BookWorm Palm OS &amp; Pocket PC Download — The 2002 Original</title>
+    <meta name="description" content="Download BookWorm for Palm OS and Pocket PC, released November 2002 — months before the PC version. Includes the Palm OS simulator, screenshots, and the idle Easter egg." />
+    <link rel="canonical" href="https://warrobotdoge.com/bookworm/bookworm-pocketpc" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="BookWorm Games Archive" />
+    <meta property="og:title" content="BookWorm Palm OS &amp; Pocket PC Download — The 2002 Original" />
+    <meta property="og:description" content="Download BookWorm for Palm OS and Pocket PC, released November 2002 — months before the PC version. Includes the Palm OS simulator and the idle Easter egg." />
+    <meta property="og:url" content="https://warrobotdoge.com/bookworm/bookworm-pocketpc" />
+    <meta property="og:image" content="https://warrobotdoge.com/bookworm/images/coverart/BookWorm_PPC_Cover.jpg" />
+    <meta property="og:image:alt" content="BookWorm for Palm OS and Pocket PC cover art" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BookWorm Palm OS &amp; Pocket PC Download — The 2002 Original" />
+    <meta name="twitter:description" content="Download BookWorm for Palm OS and Pocket PC, released November 2002 — months before the PC version." />
+    <meta name="twitter:image" content="https://warrobotdoge.com/bookworm/images/coverart/BookWorm_PPC_Cover.jpg" />
+
+    <link rel="icon" href="https://warrobotdoge.com/bookworm/images/icon/i.png" type="image/png">
+    <!-- ========================================================= -->
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: url('https://warrobotdoge.com/bookworm/images/site/bkgd.jpg') no-repeat top center;
+        background-size: cover; /* Ensures the background stretches to fill the screen */
+        background-attachment: scroll; /* Makes the background scroll with the page */
+        min-height: 100vh; /* Ensures body fills the screen height */
+        font-family: 'Arial', sans-serif;  /* Apply Arial font to the body */
+        flex-direction: column;
+      }
+
+      /* Add some dummy content for scrolling */
+      .content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        padding: 20px;  /* Adds padding for better spacing */
+        z-index: 1;
+        position: relative;  /* Ensures the content can be positioned on top of the white section */
+        margin-top: -20px;  /* Pulls content upward to connect with the white section */
+        flex-grow: 1;  /* Makes the content section grow to take up available space */
+      }
+
+      .game-container {
+        max-width: 800px;  /* Max width for the game */
+        aspect-ratio: 4 / 3;  /* Maintain the aspect ratio of the game */
+        display: flex;
+        justify-content: center;
+        position: relative; /* Places the footer at the bottom of the page flow */  /*alignf-items: center; */
+        margin-bottom: 20px;  /* Adds space below the embed */
+        margin-top: 20px;  /* Adds space below the embed */
+        z-index: 2;
+        margin: 0 auto;
+      }
+
+      .game-container embed {
+        width: 100%;    /* Make the embed width flexible */
+        height: 100%;   /* Adjust height relative to width to maintain aspect ratio */
+        max-width: 800px;   /* Prevent the embed from exceeding its original size */
+        max-height: 600px;  /* Prevent the embed from exceeding its original size */
+        position: relative;   /* Places the footer at the bottom of the page flow */
+        margin: 0 auto;
+      }
+
+      footer {
+        background: url('https://warrobotdoge.com/bookworm/images/site/BFooter.png') no-repeat center bottom;
+        background-size: cover;   /* Ensures the background covers the entire footer without stretching */
+        height: 300px;  /* Adjust to match your footer image height */
+        position: relative;   /* Places the footer at the bottom of the page flow */
+        margin-top: -300px;   /* Overlaps the background slightly */
+        z-index: 1;   /* Ensures it's above the background */
+        flex-shrink: 0;
+      }
+
+      .header {
+        display: flex;
+        margin-top: 20px;
+        justify-content: center;
+        align-items: center;
+        padding: 15px 0;  /* Space around the logo */
+      }
+
+      .header img {
+        max-width: 100%; /* Makes image responsive */
+        height: auto;
+        max-height: 100px;  /* Adjust the logo size */
+      }
+
+      .navbar {
+        background-color: #ED1C24; /* Red background */
+        width: 100%; /* Make the navbar take the full width */
+        max-width: 931px; /* Set the width of the navbar */
+        height: 80px; /* Set the height of the navbar */
+        border-radius: 15px 15px 0 0; /* Rounded top corners, unrounded bottom */
+        margin: 0 auto; /* Centers the navbar */
+        display: flex;
+        justify-content: center;
+        position: relative; /* Places the footer at the bottom of the page flow */
+        align-items: center;
+        z-index: 2;
+        box-shadow: inset 0 10px 10px -8px white; /* Inner white shadow */
+        /* NOTE: every other page also has this line here — it's missing on this
+           page only, so the navbar renders flat red with no white fade:
+           background: linear-gradient(to bottom, #ED1C24 90%, white 100%); */
+      }
+
+      .navbar-text {
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      .white-section {
+        background-color: white;
+        width: 100%; /* Make the navbar take the full width */
+        max-width: 931px; /* Match the width of the navbar */
+        min-height: 120vh;  /* ← grows with content instead of capping it */
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+        top: -20px;   /* Moves the white section upward */
+        padding-top: 20px;   /* Adds spacing above the content for a clean layout */
+        flex-grow: 1;
+        padding-bottom: 200px;  /* Add space between content and footer */
+      }
+
+      .navbar-links {
+        list-style-type: none;
+        justify-content: space-around;
+        display: flex;
+        list-style: none;  /* Removes default list bullets */
+        margin: 0;
+        padding: 0;
+      }
+
+      .navbar-links li {
+        margin: 0 20px; /* Increased space between each link */
+        position: relative;  /* For positioning the fancy hover effects */
+      }
+
+      .navbar-links a {
+        color: white; /* Link color */
+        text-decoration: none;  /* Remove underline from links */
+        font-size: 18px; /* Adjust font size */
+        font-weight: bold;  /* Make the text bold */
+        text-transform: uppercase; /* Transform the text to uppercase */
+        letter-spacing: 1px; /* Adds spacing between letters */
+        transition: all 0.3s ease;  /* Smooth transition for hover effects */
+        position: relative;
+        z-index: 1;
+      }
+
+      .navbar-links a::after {
+        content: "";
+        position: absolute;
+        width: 0%;
+        height: 3px;
+        background-color: #ffffff; /* Underline color */
+        bottom: -5px; /* Position the underline slightly below the text */
+        left: 50%;
+        transition: all 0.3s ease;  /* Smooth transition for the underline effect */
+        z-index: -1;  /* Place the underline behind the text */
+        transform: translateX(-50%);
+      }
+
+      .navbar-links a:hover {
+        color: #fff;  /* Keep the color white */
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);  /* Glowing effect on hover */
+      }
+
+      .navbar-links a:hover::after {
+        width: 100%; /* Expand the underline on hover */
+      }
+
+      .navbar-links a:active {
+        transform: scale(0.98);  /* Slight shrink effect when clicking */
+      }
+
+      .navbar-links li:hover a {
+        color: #d3d3d3;  /* Change the text color to red on hover */
+      }
+
+      .navbar-links a:focus {
+        outline: none;  /* Removes the outline on focus */
+      }
+
+      /* Dropdown menu container */
+      .dropdown-menu {
+        display: none; /* Hide the dropdown menu by default */
+        position: absolute;
+        top: 100%;  /* Position it below the parent link */
+        left: 0;
+        margin-top: 5px;
+        background-color: #ED1C24;  /* Dark background for dropdown */
+        min-width: 160px;
+        border-radius: 5px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+      }
+
+      /* Show dropdown when hovering over the parent link */
+      .dropdown:hover .dropdown-menu {
+        display: block;
+      }
+
+      /* Style for the dropdown items */
+      .dropdown-menu li {
+        padding: 10px;
+      }
+
+      .dropdown-menu a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        padding: 5px 10px;
+      }
+
+      .dropdown-menu a:hover {
+        background-color: #ed1c24; /* Hover effect for dropdown items */
+      }
+
+      .texty {
+        font-family: Arial, Helvetica, sans-serif;
+        flex: 1;
+        max-width: 60%;  /* Limits the width of the text */
+        width: 594px;
+        margin: 20px auto; /* Center the text horizontally and add spacing above/below */
+        margin-left: 30px;
+        display: block; /* Ensures the text section behaves like a block */
+        text-align: justify;  /* Makes the text align evenly on both sides */
+        line-height: 1.1; /* Improves readability with better line spacing */
+      }
+
+      .text {
+        font-family: Arial, Helvetica, sans-serif;
+        flex: 1;
+        margin-left: 35px;
+        display: block; /* Ensures the text section behaves like a block */
+        text-align: justify;  /* Makes the text align evenly on both sides */
+        line-height: 1.1; /* Improves readability with better line spacing */
+      }
+
+      #cusdis_thread {
+        margin: 20px auto;  /* Centers the comment section horizontally and adds spacing */
+        max-width: 800px;  /* Optional: Set a max width for better layout */
+        padding: 10px;  /* Optional: Add padding around the comments section */
+      }
+
+      .content-wrapper {
+        display: flex;   /* Enables flexbox for the text and buttons */
+        align-items: flex-start;   /* Align items to the top of the container */
+        justify-content: space-between;    /* Space between text and buttons */
+        gap: 20px;   /* Optional: Adds spacing between text and buttons */
+      }
+
+      .filler {
+        margin-top: 25px;
+        margin-bottom: 25px;
+      }
+
+      #versionOptions a:hover {
+        background-color: #d91b21;
+      }
+
+      #versionOptions a {
+        display: block;
+        padding: 10px 20px;
+        background-color: #ED1C24;
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        border: 1px solid white;
+        margin-top: -1px;  /* Prevents borders from stacking */
+      }
+
+      .dropdown2 {
+        position: relative;
+        display: inline-block;
+      }
+
+      .dropdown2-button {
+        padding: 10px 20px;
+        font-size: 14px;
+        background: linear-gradient(to bottom, #f16d00 60%, #e24300 100%);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-right: 60px;
+        margin-top: 20px;
+      }
+
+      .dropdown2-button:hover {
+        background-color: #d91b21;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .dropdown2-arrow {
+        border: solid white;
+        border-width: 0 4px 4px 0;
+        display: inline-block;
+        padding: 5px;
+        transform: rotate(45deg);
+        transition: transform 0.3s ease;
+      }
+
+      .dropdown2-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: #ED1C24;
+        min-width: 240px;
+        border-radius: 8px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+        padding: 6px 0;
+        max-height: 380px;   /* keeps a long list from running off the page */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+      }
+
+      /* subtle scrollbar so it doesn't look grey-on-red */
+      .dropdown2-menu::-webkit-scrollbar { width: 8px; }
+      .dropdown2-menu::-webkit-scrollbar-track { background: transparent; }
+      .dropdown2-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 4px;
+      }
+      .dropdown2-menu::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* flex row puts the file size in its own right-hand column */
+      .dropdown2-menu a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 18px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        white-space: nowrap;
+      }
+
+      .dropdown2-menu a:hover {
+        background-color: #d91b21;
+      }
+
+      .dropdown2-size {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      /* non-clickable group headings */
+      .dropdown2-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        padding: 10px 18px 5px;
+        margin-top: 5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .dropdown2-label:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 5px;
+      }
+
+      .dropdown2.open .dropdown2-menu {
+        display: block;
+      }
+
+      .dropdown2.open .dropdown2-arrow {
+        transform: rotate(-135deg);
+      }
+
+      .screenshot-container {
+       /* Make container responsive */
+        max-width: 344px;   /* Limit max size */
+        max-height: 456px;
+        aspect-ratio: 1 / 1;  /* Square, to suit the portrait handheld screenshots */
+        background-color: #e0e0e0;   /* Light gray background */
+        border: 2px solid #ccc;   /* Subtle border */
+        border-radius: 12px;  /* Rounded corners */
+        padding: 20px; /* Padding ensures box is larger than the image */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);   /* Shadow for depth */
+        position: relative;
+        overflow: hidden;  /* Hide images outside the box */
+        margin-left: 30px;
+        justify-content: center;
+      }
+
+      /* Centered image styling */
+      .screenshot-container img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);  /* Center image */
+        max-width: calc(100% - 40px); /* Ensure the image fits within padding */
+        max-height: calc(100% - 40px); /* Ensure the image respects padding */
+        object-fit: contain; /* Entire image fits without cutting off */
+        opacity: 0;   /* Hidden initially */
+        transition: opacity 1s ease-in-out;
+      }
+
+      /* Show the active image */
+      .screenshot-container img.active {
+        opacity: 1;
+      }
+
+      h2 {
+        color: #ea5e00;
+        border-bottom: 2px solid #D8D8D8;
+        font-size: 1.125em;
+        font-weight: bold;
+        padding-bottom: 5px;
+        margin-bottom: 0;
+        margin-left: 35px;
+        margin-bottom: 10px;
+      }
+
+      .parent {
+  display: flex;  /* Use flexbox for horizontal layout */
+  flex-wrap: nowrap;  /* Prevent items from wrapping to a new line */
+}
+
+      .section {
+        width: 45%;
+        box-sizing: border-box;
+      }
+
+      ol {
+    text-align: left;
+}
+
+.ad {
+  width: 931px;
+  max-width: 100%;
+
+}
+
+      /* ============ Palm OS emulator (replaces the gameplay video) ============ */
+      .pe-palm {
+        width: calc(100% - 35px);
+        max-width: 380px;
+        aspect-ratio: 428 / 720;
+        margin: 0 0 0 35px;
+        padding: 20px;
+        box-sizing: border-box;
+        border-radius: 30px 30px 38px 38px;
+        background: linear-gradient(155deg, #dce0e5 0%, #bfc4cb 48%, #9299a3 100%);
+        box-shadow: 0 2px 0 #fff9 inset, 0 -4px 0 #0003 inset, 0 14px 36px #0006;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .pe-glass {
+        position: relative;
+        flex: 1;
+        min-height: 0;
+        padding: 10px;
+        box-sizing: border-box;
+        border-radius: 11px;
+        background: #090b0e;
+        box-shadow: 0 0 0 3px #252a31, 0 3px 8px #0009 inset;
+      }
+
+      .pe-glass canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        border-radius: 3px;
+        touch-action: none;
+        outline: none;
+      }
+
+      .pe-off {
+        position: absolute;
+        inset: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 20px;
+        background: #000;
+        color: #8a959e;
+        text-align: center;
+        font: 14px/1.5 Arial, Helvetica, sans-serif;
+      }
+
+      .pe-off.hide { display: none; }
+
+      .pe-off button {
+        padding: 10px 20px;
+        font-size: 14px;
+        color: white;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        background: linear-gradient(to bottom, #f16d00 60%, #e24300 100%);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      .pe-off button:hover { transform: translateY(-2px); }
+
+      #pe-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+
+    </style>
+   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="header">
+      <a href="https://warrobotdoge.com/bookworm">
+        <img src="https://warrobotdoge.com/bookworm/images/logo/BookWorm_Logo.png" alt="BookWorm logo">
+      </a>
+    </div>
+    <div class="navbar">
+      <span class="navbar-text"></span>
+      <ul class="navbar-links">
+        <li>
+          <a href="https://warrobotdoge.com/bookworm">Home</a>
+        </li>
+        <li class="dropdown">
+          <a href="https://warrobotdoge.com/bookworm">Games</a> <!-- Dropdown menu -->
+          <ul class="dropdown-menu">
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm">BookWorm Deluxe</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-adventures">BookWorm Adventures</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-adventures-2">BookWorm Adventures 2</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-gameboy">BookWorm GameBoy</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-ds">BookWorm DS</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-xbox">BookWorm Xbox</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-pocketpc">BookWorm Pocket PC</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-mobile">BookWorm Mobile</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-heroes">BookWorm Heroes</a>
+            </li>
+            <li>
+              <a href="https://warrobotdoge.com/bookworm/bookworm-blackberry">BookWorm BlackBerry</a>
+            </li>
+            <li>
+            <a href="https://warrobotdoge.com/bookworm/bookworm-tag">BookWorm TAG</a>
+            </li>
+            <li>
+            <a href="https://warrobotdoge.com/bookworm/bookworm-hd">BookWorm HD</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="https://warrobotdoge.com/bookworm/archives">Archives</a>
+        </li>
+        <li>
+          <a href="https://discord.gg/fR4cSkK">Bookworm Discord</a>
+        </li>
+      </ul>
+    </div>
+    <div class="white-section">
+      <img src="https://warrobotdoge.com/bookworm/images/site/banner.jpg" class="ad" alt="2004 BookWorm Advertisement Banner">
+      <div class="content-wrapper">
+        <div class="texty">
+        <p>Feed the Bookworm's endless appetite by joining letters on the library wall! Use up burning letters before they reach the bottom and set the library on fire! A superb word game for beginners and experts alike and a great way to increase your word power!</p>
+        </div>
+        <div class="content-wrapper">
+            <div class="dropdown2">
+                <button class="dropdown2-button">Download for Palm &amp; Pocket PC<span class="dropdown2-arrow"></span>
+                </button>
+                <div class="dropdown2-menu">
+                  <a href="https://archive.org/download/bookworm-ppc/BookWorm_PPC.zip" target="_blank" rel="noopener"><span>Palm OS + Pocket PC bundle</span><span class="dropdown2-size">50 MB</span></a>
+                  </div>
+              </div>
+            </div>
+          </div>
+
+      <!-- Screenshot container -->
+      <div class="parent">
+        <div class="section">
+          <h2>Screenshots</h2>
+          <div class="screenshot-container">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc.jpg" alt="BookWorm on Palm OS showing the letter grid and Lex" height="642" class="active"> 
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_2.jpg" alt="BookWorm Palm OS gameplay with a word being formed" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_3.jpg" alt="BookWorm Palm OS title screen" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_4.jpg" alt="BookWorm Palm OS score display" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_9.jpg" alt="BookWorm Palm OS menu screen" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_10.jpg" alt="BookWorm Palm OS burning tiles" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_easteregg.jpg" alt="BookWorm Palm OS Easter egg with Lex wearing a disguise while idle" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/worm2.gif" alt="Animated BookWorm Palm OS gameplay" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_6.jpg" alt="BookWorm Pocket PC gameplay" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_7.jpg" alt="BookWorm Pocket PC bonus word" height="642">
+            <img src="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_8.jpg" alt="BookWorm Pocket PC high score screen" height="642">
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>About</h2>
+          <div class="text">
+            <p>BookWorm was released on <a href="https://www.mobygames.com/game/8639/bookworm-deluxe/releases/" rel="noopener">Nov 29, 2002</a> for Palm OS devices and Pocket PCs. It was originally sold for <a href="https://www.palminfocenter.com/news/7285/astraware-releases-bookworm-v20/" rel="noopener">$14.95</a>. The game is nice and compact and has a very similar look to the Java version. BookWorm for Palm OS had an <a href="https://youtube.com/shorts/w0RazqqZJcI?si=T1wirAWK6ZLr3HCV" rel="noopener">Easter Egg</a>, where if you're AFK for a few moments, Lex will put on a mask, or a mustache. It seems to be that there are a few varieties of this version, but I'm unable to track them down (See: <a href="https://warrobotdoge.com/bookworm/images/screenshots/bookworm_ppc_5.jpg">Screenshot 5</a>). I was able to play the Palm OS version via a Palm OS Simulator, which I have included in the download. Perhaps it was the Deluxe version for these devices, as you needed to register them after <a href="https://palmarchive.com/files/Aliosa27%27s%20Archive/Astraware%20Bookworm.html" rel="noopener">10</a> plays. Despite this, there are only a <a href="https://youtu.be/xF8ByVIyiQo?si=BQnXmnEk_43oLMGL" rel="noopener">few</a> videos of this game, and <a href="https://youtu.be/nKNP7VuZ-BU?si=V-Ty5HhPdTOxp6Fg" rel="noopener">1</a> of the Pocket PC version. I also included an .exe for the <a href="http://www.114pda.com/ppc/game/text/bookworm.htm" rel="noopener">Pocket PC</a> in the download. <a href="https://warrobotdoge.com/bookworm/bookworm-blackberry">BookWorm Blackberry</a> is very similar to this port.</p>
+            <p>I found a <a href="https://web.archive.org/web/20100410064523/http://www.starlitskies.co.uk/games.asp" rel="noopener">site</a> where someone who helped develop BookWorm talked about what they did. They rewrote the game to use the new framework and dictionary system for the game.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="filler"></div>
+
+      <!-- Palm OS emulator (replaces the old YouTube gameplay embed) -->
+      <div class="section">
+        <h2>BookWorm for Palm OS Emulator</h2>
+        <div class="text">
+          <p>I was able to get a Palm OS emulated in the browser, so here you go!</p>
+        </div>
+        <div class="pe-palm" aria-label="Palm OS emulator">
+          <div class="pe-glass">
+            <canvas id="pe-screen" width="428" height="720.42" tabindex="0" aria-label="Palm OS screen"></canvas>
+            <div class="pe-off" id="pe-off">
+              <button type="button" id="pe-start">▶ Start Palm OS</button>
+              <span id="pe-msg">Downloads the Palm OS ROM on first run, then caches it.</span>
+            </div>
+          </div>
+        </div>
+        <div id="pe-status" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+    <footer></footer>
+    <script>
+      // Dropdown toggle functionality
+      const dropdown2 = document.querySelector('.dropdown2');
+      const dropdown2Button = document.querySelector('.dropdown2-button');
+      dropdown2Button.addEventListener('click', () => {
+        dropdown2.classList.toggle('open');
+      });
+      // Close the dropdown if clicked outside
+      document.addEventListener('click', (event) => {
+        if (!dropdown2.contains(event.target)) {
+          dropdown2.classList.remove('open');
+        }
+      });
+    </script>
+    <script>
+      const images = document.querySelectorAll('.screenshot-container img');
+      let currentIndex = 0;
+
+      function showNextImage() {
+        // Remove the "active" class from the current image
+        images[currentIndex].classList.remove('active');
+        // Increment the index, looping back to 0 if at the last image
+        currentIndex = (currentIndex + 1) % images.length;
+        // Add the "active" class to the next image
+        images[currentIndex].classList.add('active');
+      }
+      // Change images every 3 seconds
+      setInterval(showNextImage, 3000);
+    </script>
+
+    <!-- Palm OS emulator: only downloads when the visitor clicks Start -->
+    <script>
+    (function () {
+      const BASE = 'https://warrobotdoge.com/bookworm/';
+      const SOURCES = {
+        rom:  BASE + 'downloads/repalm-paravirtualized-09282026.bin',
+        game: BASE + 'downloads/BookWorm-HiRes.prc'
+      };
+      const $ = s => document.querySelector(s);
+      const say = m => { $('#pe-status').textContent = m; $('#pe-msg').textContent = m; console.log('[Book Worm]', m); };
+
+      // Cache the ROM and game in IndexedDB so repeat visits skip the download
+      const idb = () => new Promise((res, rej) => {
+        const r = indexedDB.open('bookworm-palm', 1);
+        r.onupgradeneeded = () => r.result.createObjectStore('kv');
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      });
+      async function kv(mode, key, val) {
+        try {
+          const db = await idb();
+          return await new Promise((res, rej) => {
+            const st = db.transaction('kv', mode === 'get' ? 'readonly' : 'readwrite').objectStore('kv');
+            const q = mode === 'get' ? st.get(key) : mode === 'set' ? st.put(val, key) : st.delete(key);
+            q.onsuccess = () => res(q.result);
+            q.onerror = () => rej(q.error);
+          });
+        } catch (e) { console.warn('Browser storage unavailable', e); }
+      }
+      async function getFile(key) {
+        const url = SOURCES[key];
+        const cached = await kv('get', 'file:' + url);
+        if (cached && cached.data) { say('Using cached ' + key + ' file…'); return cached.data; }
+        say('Downloading ' + key + '…');
+        const r = await fetch(url);
+        if (!r.ok) throw new Error('Download failed: HTTP ' + r.status + ' (' + url + ')');
+        const data = new Uint8Array(await r.arrayBuffer());
+        await kv('set', 'file:' + url, { data });
+        return data;
+      }
+      const loadScript = src => new Promise((res, rej) => {
+        if (window.cloudpilot) return res();
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = res;
+        s.onerror = () => rej(new Error('Could not load the emulator script'));
+        document.head.appendChild(s);
+      });
+      function waitForUi(instance) {
+        return new Promise(resolve => {
+          let done = false;
+          const finish = () => { if (!done) { done = true; clearInterval(timer); resolve(); } };
+          instance.isUiInitializedChangeEvent.addHandler(v => { if (v) finish(); });
+          const timer = setInterval(async () => {
+            try { if (await instance.isUiInitialized()) finish(); } catch (_) {}
+          }, 400);
+        });
+      }
+
+      const btn = $('#pe-start');
+      let starting = false;
+
+      async function start() {
+        if (starting) return;
+        starting = true;
+        btn.style.display = 'none';
+        try {
+          say('Preparing Palm OS…');
+          await loadScript(BASE + 'emu/cloudpilot-emu.js');
+          const emuPromise = cloudpilot.createEmulator({
+            cloudpilotModuleUrl: BASE + 'emu/cloudpilot_web.wasm',
+            uarmModuleUrl:       BASE + 'emu/uarm_web.wasm',
+            uarmWorkerUrl:       BASE + 'emu/uarm-worker.js',
+            pcmWorkletUrl:       BASE + 'emu/pcm-worklet.js'
+          });
+          const [rom, game] = await Promise.all([getFile('rom'), getFile('game')]);
+          const emu = await emuPromise;
+
+          // The click on Start counts as a user gesture, so audio can usually start
+          try { await emu.initializeAudio(); } catch (_) {}
+
+          say('Starting Palm OS…');
+          await emu.loadRom(rom, undefined, cloudpilot.DeviceId.repalmPV, undefined,
+            cloudpilot.ScreenSize.screen320x320);
+          emu.setCanvas($('#pe-screen'));
+          emu.bindInput();
+          $('#pe-off').classList.add('hide');
+          await emu.resume();
+          await waitForUi(emu);
+
+          say('Launching Book Worm…');
+          await emu.installAndLaunchDatabase(game);
+          say('Book Worm is running.');
+          $('#pe-screen').focus();
+        } catch (e) {
+          console.error(e);
+          $('#pe-off').classList.remove('hide');
+          say('Could not start: ' + ((e && e.message) || e));
+          btn.style.display = '';
+          starting = false;
+        }
+      }
+      btn.addEventListener('click', start);
+    })();
+    </script>
+
+<!-- ============ STRUCTURED DATA (invisible to visitors) ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "BookWorm (Palm OS and Pocket PC)",
+  "alternateName": ["Astraware Bookworm", "BookWorm Palm OS", "BookWorm Pocket PC", "Bookworm PPC"],
+  "url": "https://warrobotdoge.com/bookworm/bookworm-pocketpc",
+  "image": "https://warrobotdoge.com/bookworm/images/coverart/BookWorm_PPC_Cover.jpg",
+  "description": "The handheld release of PopCap's BookWorm for Palm OS devices and Pocket PC, published by Astraware on 29 November 2002 at $14.95. Notably, this predates the Windows release of BookWorm Deluxe by roughly three months, making the Palm OS build one of the earliest commercially released versions of the game. Players link adjacent letter tiles on the library wall to form words and feed Lex the bookworm, clearing burning letters before they reach the bottom and set the library alight. The visual design closely resembles the original Java applet version. The port contains an Easter egg not present elsewhere in the series: leaving the game idle for a few moments causes Lex to put on a disguise such as a mask or a moustache. The build required registration after ten plays, suggesting it corresponds to the Deluxe edition. Very little footage of either version survives online. This archive hosts the game together with a Palm OS Simulator and a Pocket PC executable so both can be run on modern hardware.",
+  "datePublished": "2002-11-29",
+  "genre": ["Puzzle", "Word Game"],
+  "gamePlatform": ["Palm OS", "Pocket PC", "Windows Mobile", "PDA"],
+  "operatingSystem": ["Palm OS", "Windows Mobile"],
+  "applicationCategory": "GameApplication",
+  "playMode": "SinglePlayer",
+  "inLanguage": "en",
+  "keywords": "bookworm palm os download, bookworm pocket pc, astraware bookworm, bookworm pda game, bookworm palm simulator, bookworm easter egg",
+  "publisher": [
+    {
+      "@type": "Organization",
+      "name": "Astraware"
+    },
+    {
+      "@type": "Organization",
+      "name": "PopCap Games",
+      "sameAs": "https://en.wikipedia.org/wiki/PopCap_Games"
+    }
+  ],
+  "author": {
+    "@type": "Person",
+    "name": "Jason Kapalka"
+  },
+  "character": {
+    "@type": "Person",
+    "name": "Lex",
+    "description": "The green bookworm mascot, who dons a mask or moustache when the Palm OS version is left idle."
+  },
+  "sameAs": [
+    "https://en.wikipedia.org/wiki/Bookworm_(video_game)",
+    "https://www.mobygames.com/game/8639/bookworm-deluxe/"
+  ],
+  "isPartOf": {
+    "@type": "VideoGameSeries",
+    "name": "Bookworm",
+    "url": "https://warrobotdoge.com/bookworm"
+  },
+  "gameTip": {
+    "@type": "CreativeWork",
+    "name": "Idle Easter egg",
+    "text": "Leave BookWorm for Palm OS running without input for a few moments and Lex will put on a disguise, such as a mask or a moustache."
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "BookWorm Games Archive",
+      "item": "https://warrobotdoge.com/bookworm" },
+    { "@type": "ListItem", "position": 2, "name": "BookWorm Palm OS and Pocket PC",
+      "item": "https://warrobotdoge.com/bookworm/bookworm-pocketpc" }
+  ]
+}
+</script>
+<!-- =============================================================== -->
+
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"a23ca0678be14f55a3e514a3cb0b5199","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
