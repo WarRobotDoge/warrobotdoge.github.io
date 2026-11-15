@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book Worm on Palm OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --desk:#1f2b33; --desk-2:#17212a; --ink:#e8ecee; --muted:#9fb0ba;
+  --pewter:#c7cbd1; --pewter-lo:#a7acb4; --graphite:#262a31; --glass:#0b0e11;
+  --led:#9be15d; --warn:#ffb86b; --err:#ff8f8f; --line:#35444f;
+  --ui:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(1200px 700px at 30% 0%,var(--desk),var(--desk-2));color:var(--ink);
+  font:16px/1.55 var(--ui);min-height:100vh}
+.desk{display:grid;grid-template-columns:minmax(300px,500px) minmax(280px,440px);gap:56px;
+  justify-content:center;align-items:start;padding:48px 24px 64px;max-width:1100px;margin:0 auto}
+@media(max-width:900px){.desk{grid-template-columns:minmax(0,500px);gap:32px;padding-top:24px}}
+
+/* ---- the handheld ---- */
+.palm{background:linear-gradient(160deg,#d6d9de 0%,var(--pewter) 40%,var(--pewter-lo) 100%);
+  border-radius:38px 38px 46px 46px;padding:30px 26px 22px;
+  box-shadow:0 1px 0 #fff8 inset,0 -3px 0 #0003 inset,0 30px 60px -20px #000c,0 8px 14px #0006}
+.glass{background:var(--glass);border-radius:10px;padding:10px;position:relative;
+  box-shadow:0 0 0 3px var(--graphite),0 2px 6px 3px #0007 inset}
+canvas{display:block;width:100%;height:auto;background:#000;border-radius:3px;
+  touch-action:none;outline:none;image-rendering:auto}
+.off{position:absolute;inset:10px;display:grid;place-items:center;text-align:center;
+  background:#000;color:#56626b;border-radius:3px;padding:24px;font-size:15px;pointer-events:none}
+.off.hide{display:none}
+.led{position:absolute;top:-17px;right:14px;width:9px;height:9px;border-radius:50%;background:#51585f;
+  box-shadow:0 0 0 2px #0003 inset}
+.led.on{background:var(--led);box-shadow:0 0 10px 2px #9be15d99}
+.hw{display:grid;grid-template-columns:repeat(4,1fr) 1.1fr;gap:10px;margin-top:20px}
+.hw button{font:700 13px/1 var(--ui);color:#2b3138;background:linear-gradient(#eceef1,#c3c7cd);
+  border:0;border-radius:18px;padding:13px 4px;cursor:pointer;box-shadow:0 2px 0 #7e848c,0 3px 5px #0004;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.hw button:active{transform:translateY(2px);box-shadow:0 0 0 #7e848c}
+.hw .scroll{display:grid;grid-template-rows:1fr 1fr;gap:6px}
+.hw .scroll button{padding:6px 4px;border-radius:12px}
+.hw button:focus-visible,.panel button:focus-visible,.pick:focus-within{outline:3px solid #7cc4ff;outline-offset:2px}
+
+/* ---- setup panel ---- */
+h1{font:600 clamp(40px,6vw,60px)/1 var(--display);margin:6px 0 10px;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 28px;max-width:46ch}
+.panel section{border-top:1px solid var(--line);padding:18px 0 20px}
+.panel h2{font:700 17px/1.3 var(--ui);margin:0 0 4px}
+.panel p{margin:0 0 12px;color:var(--muted);font-size:15px;max-width:52ch}
+.panel p b{color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn,.pick{font:700 15px/1 var(--ui);color:var(--ink);background:#2c3b46;border:1px solid #475a68;
+  border-radius:10px;padding:12px 16px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.btn:hover,.pick:hover{background:#36495a}
+.btn.primary{background:#e8ecee;color:#17212a;border-color:#e8ecee}
+.btn.primary:hover{background:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.pick input{position:absolute;opacity:0;width:1px;height:1px}
+.file{font-size:14px;color:var(--muted);margin-top:8px;min-height:1.3em;word-break:break-all}
+.file.ok{color:var(--led)}
+#status{margin:6px 0 0;padding:12px 14px;border-radius:10px;background:#0e161c;border:1px solid var(--line);
+  font-size:15px;min-height:46px}
+#status[data-kind=err]{border-color:#7a3a3a;color:var(--err)}
+#status[data-kind=warn]{color:var(--warn)}
+#status[data-kind=ok]{color:var(--led)}
+.small{font-size:13px;color:var(--muted);margin-top:22px}
+.small a{color:#9ccfff}
+.sr{position:absolute;left:-9999px}
+.lib{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:8px}
+.lib li{display:flex;gap:12px;align-items:center;justify-content:space-between;background:#0e161c;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.lib li.sel{border-color:var(--led)}.lib .meta{font-size:13px;color:var(--muted)}
+.btn.sm{padding:8px 12px;font-size:13px}
+.opts{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:14px;font-size:14px;color:var(--muted)}
+.opts select{font:inherit;background:#2c3b46;color:var(--ink);border:1px solid #475a68;border-radius:6px;padding:3px 6px}
+body.drag::after{content:"Drop ROM, NAND or game files";position:fixed;inset:12px;border:3px dashed var(--led);border-radius:20px;
+  background:#0b1117cc;display:grid;place-items:center;font:600 28px var(--display);z-index:9;pointer-events:none}
+progress{width:100%;height:8px;accent-color:var(--led);margin-top:6px;display:block}
+.src{margin:0 0 16px}.src b{margin-right:8px}.src .file{display:inline;margin:0}
+@media(prefers-reduced-motion:no-preference){.hw button{transition:transform .06s}}
+</style>
+</head>
+<body>
+<main class="desk">
+
+  <div class="palm" aria-label="Emulated Palm handheld">
+    <div class="glass">
+      <span class="led" id="led" aria-hidden="true"></span>
+      <canvas id="screen" width="320" height="320" tabindex="0" aria-label="Palm OS screen"></canvas>
+      <div class="off" id="off">Powered off.<br>Press Start Book Worm<br>once the files are ready.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h1>Book Worm</h1>
+    <p class="lede">Book Worm HiRes for Palm OS, running on a software Palm in your browser. The system image and the game download automatically the first time you open this page.</p>
+
+    <section>
+      <h2>Files</h2>
+      <div class="src"><b>System image</b> <span class="file" id="romText">Waiting…</span><progress id="romBar" max="1" value="0"></progress></div>
+      <div class="src"><b>Book Worm HiRes</b> <span class="file" id="gameText">Waiting…</span><progress id="gameBar" max="1" value="0"></progress></div>
+      <div class="row"><button class="btn sm" id="redl">Download again</button></div>
+    </section>
+
+    <section>
+      <h2>Play</h2>
+      <p>Click the screen with your mouse as the stylus. The first boot can take a minute.</p>
+      <div class="row">
+        <button class="btn primary" id="start" disabled>Start Book Worm</button>
+        <button class="btn" id="pause" disabled>Pause</button>
+        <button class="btn" id="reset" disabled>Reset</button>
+        <button class="btn" id="launch" disabled>Reopen game</button>
+      </div>
+      <div id="status" role="status" aria-live="polite">Loading emulator…</div>
+    </section>
+
+    <section>
+      <h2>Tools</h2>
+      <div class="row">
+        <button class="btn sm" id="full">Fullscreen</button>
+        <button class="btn sm" id="shot">Save screenshot</button>
+        <button class="btn sm" id="rot">Rotate</button>
+        <button class="btn sm" id="sound">Sound: on</button>
+        <label class="pick btn sm"><input type="file" id="prcIn" accept=".prc,.pdb,.zip"> Install another app</label>
+      </div>
+      <div class="opts">
+        <label>Speed <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
+        <label><input type="checkbox" id="gm"> Game mode (keys act as buttons)</label>
+        <label><input type="checkbox" id="pcm"> Faster, no PCM audio</label>
+      </div>
+      <div class="file" id="stats"></div>
+    </section>
+
+    <p class="small">Emulation by <a href="https://github.com/cloudpilot-emu/cloudpilot-emu">CloudpilotEmu</a> (GPLv3, license in <code>emu/</code>). The system image is rePalm by Dmitry Grinberg. Downloaded files are cached in this browser.</p>
+  </div>
+
+</main>
+
+<script src="emu/cloudpilot-emu.js"></script>
+<script>
+/* ===== where the files come from ===== */
+const SOURCES = {
+  rom:  { url: 'https://warrobotdoge.com/bookworm/downloads/repalm-paravirtualized-09282026.bin', name: 'System image' },
+  game: { url: 'https://warrobotdoge.com/bookworm/downloads/BookWorm-HiRes.prc', name: 'Book Worm HiRes' }
+};
+
+const $ = s => document.querySelector(s);
+const statusEl = $('#status');
+const say = (m, kind = '') => { statusEl.textContent = m; statusEl.dataset.kind = kind; };
+const mb = n => (n / 1048576).toFixed(1) + ' MB';
+
+/* ---------- IndexedDB cache ---------- */
+const idb = () => new Promise((res, rej) => {
+  const r = indexedDB.open('bookworm-palm', 1);
+  r.onupgradeneeded = () => r.result.createObjectStore('kv');
+  r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+});
+async function kv(mode, key, val) {
+  try {
+    const db = await idb();
+    return await new Promise((res, rej) => {
+      const st = db.transaction('kv', mode === 'get' ? 'readonly' : 'readwrite').objectStore('kv');
+      const q = mode === 'get' ? st.get(key) : mode === 'set' ? st.put(val, key) : st.delete(key);
+      q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
+    });
+  } catch (e) { console.warn('storage unavailable', e); return undefined; }
+}
+
+const S = { emu: null, rom: null, game: null, running: false, booted: false, orient: 0 };
+const BTN = { cal: 0, phone: 1, todo: 2, notes: 3, up: 4, down: 5, power: 6 };
+const ORIENT = ['portrait', 'landscape90', 'portrait180', 'landscape270'];
+
+const emuPromise = cloudpilot.createEmulator({
+  cloudpilotModuleUrl: 'emu/cloudpilot_web.wasm', uarmModuleUrl: 'emu/uarm_web.wasm',
+  uarmWorkerUrl: 'emu/uarm-worker.js', pcmWorkletUrl: 'emu/pcm-worklet.js'
+});
+
+/* ---------- download with progress, cached ---------- */
+async function download(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const total = +r.headers.get('content-length') || 0, rd = r.body.getReader(), parts = [];
+  let got = 0;
+  for (;;) {
+    const { done, value } = await rd.read(); if (done) break;
+    parts.push(value); got += value.length; download.onprogress?.(got, total);
+  }
+  const out = new Uint8Array(got); let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+async function getFile(key, force) {
+  const { url, name } = SOURCES[key], bar = $('#' + key + 'Bar'), txt = $('#' + key + 'Text');
+  if (!force) {
+    const c = await kv('get', 'file:' + url);
+    if (c && c.data) { bar.value = bar.max = 1; txt.textContent = `${mb(c.data.length)}, saved in this browser`; return c.data; }
+  }
+  txt.textContent = 'Downloading…'; bar.removeAttribute('value');
+  download.onprogress = (g, t) => { if (t) { bar.max = t; bar.value = g; } txt.textContent = `Downloading… ${mb(g)}${t ? ' of ' + mb(t) : ''}`; };
+  try {
+    const data = await download(url);
+    await kv('set', 'file:' + url, { data });
+    bar.value = bar.max = 1; txt.textContent = `${mb(data.length)}, downloaded`;
+    return data;
+  } catch (e) {
+    bar.max = 1; bar.value = 0; txt.textContent = 'Download failed';
+    const net = e instanceof TypeError;
+    throw new Error(`Could not download ${name} from ${new URL(url).host}. ` +
+      (net ? 'Check your connection. If this page is not served from that site, the server must also allow cross-origin requests.' : e.message));
+  }
+}
+async function loadAll(force) {
+  $('#start').disabled = true; $('#redl').disabled = true; say('Downloading files…');
+  try {
+    [S.rom, S.game] = await Promise.all([getFile('rom', force), getFile('game', force)]);
+    await emuPromise;
+    $('#start').disabled = S.booted; say('Ready. Press Start Book Worm.', 'ok');
+  } catch (e) { console.error(e); say(e.message, 'err'); }
+  $('#redl').disabled = false;
+}
+$('#redl').onclick = async () => {
+  if (S.booted) return say('Reload the page first, then download again.', 'warn');
+  await kv('del', 'file:' + SOURCES.rom.url); await kv('del', 'file:' + SOURCES.game.url); loadAll(true);
+};
+
+function refresh() {
+  for (const id of ['pause', 'reset', 'launch', 'sound']) $('#' + id).disabled = !S.booted;
+  $('#pause').textContent = (S.booted && !S.running) ? 'Resume' : 'Pause';
+  $('#led').classList.toggle('on', S.running);
+}
+function waitForUi(emu) {
+  return new Promise(res => {
+    let done = false;
+    const fin = () => { if (!done) { done = true; clearInterval(t); res(); } };
+    emu.isUiInitializedChangeEvent.addHandler(v => v && fin());
+    const t = setInterval(async () => { if (await emu.isUiInitialized()) fin(); }, 400);
+  });
+}
+function applyTuning() {
+  const e = S.emu; if (!e) return;
+  e.setSpeed(+$('#speed').value); e.setGameMode($('#gm').checked); e.setDisablePcmAudio($('#pcm').checked);
+}
+
+async function start() {
+  $('#start').disabled = true;
+  try {
+    const emu = S.emu = await emuPromise;
+    emu.initializeAudio().catch(() => {});          // needs the click gesture
+    say('Reading system image…');
+    // rePalm paravirtualized device, 320x320 screen for Book Worm HiRes
+    await emu.loadRom(S.rom, undefined, cloudpilot.DeviceId.repalmPV, undefined, cloudpilot.ScreenSize.screen320x320);
+    emu.setCanvas($('#screen')); emu.bindInput();
+    emu.powerOffChangeEvent.addHandler(off => $('#off').classList.toggle('hide', !off));
+    $('#off').classList.add('hide');
+    applyTuning(); await emu.resume();
+    S.running = S.booted = true; refresh();
+    say('Booting Palm OS… follow any setup screens by clicking.', 'warn');
+    await waitForUi(emu);
+    say('Installing Book Worm…');
+    await emu.installAndLaunchDatabase(S.game);
+    say('Book Worm is running. Click the screen to play.', 'ok');
+    $('#screen').focus();
+  } catch (e) { console.error(e); say('Could not start: ' + (e.message || e), 'err'); S.booted = false; $('#start').disabled = false; refresh(); }
+}
+$('#start').onclick = start;
+$('#pause').onclick = async () => { S.running ? await S.emu.pause() : await S.emu.resume(); S.running = !S.running; refresh(); };
+$('#reset').onclick = async () => { await S.emu.reset(); say('Reset sent. Press Reopen game to launch Book Worm again.'); };
+$('#launch').onclick = async () => { try { await S.emu.launchDatabase(S.game); say('Opened Book Worm.', 'ok'); } catch (e) { say('Could not open it: ' + e.message, 'err'); } };
+
+/* ---------- tools ---------- */
+$('#full').onclick = () => document.querySelector('.palm').requestFullscreen?.();
+$('#shot').onclick = () => $('#screen').toBlob(b => {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b);
+  a.download = 'palm-screenshot.png'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+$('#rot').onclick = () => { if (!S.emu) return; S.orient = (S.orient + 1) % 4; S.emu.setOrientation(ORIENT[S.orient]); };
+let vol = 1;
+$('#sound').onclick = () => { vol = vol ? 0 : 1; S.emu.setVolume(vol); $('#sound').textContent = 'Sound: ' + (vol ? 'on' : 'off'); };
+['speed', 'gm', 'pcm'].forEach(id => $('#' + id).addEventListener('change', applyTuning));
+$('#prcIn').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  if (!S.booted) return say('Press Start first, then install apps.', 'warn');
+  try {
+    const d = new Uint8Array(await f.arrayBuffer());
+    await (/\.zip$/i.test(f.name) ? S.emu.installFromZipfile(d) : S.emu.installDatabase(d));
+    say(`Installed ${f.name}.`, 'ok');
+  } catch (err) { say('Install failed: ' + err.message, 'err'); }
+};
+setInterval(() => {
+  const s = S.booted && S.emu && S.emu.getStatistics();
+  $('#stats').textContent = !s ? '' : s.type === 'uarm' ? `Speed: ${Math.round(s.currentSpeedMips)} MIPS` : `${Math.round(s.averageFps)} fps · ${s.emulationSpeed.toFixed(1)}× real time`;
+}, 1000);
+document.querySelectorAll('#hw button').forEach(b => {
+  const n = BTN[b.dataset.b];
+  b.addEventListener('pointerdown', ev => { ev.preventDefault(); S.emu && S.emu.buttonDown(n); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(t => b.addEventListener(t, () => S.emu && S.emu.buttonUp(n)));
+});
+
+refresh();
+emuPromise.catch(() => say('Could not load the emulator. Open this page through a web server (python3 serve.py), not by double-clicking the file.', 'err'));
+loadAll(false);
+</script>
+</body>
+</html>
