@@ -522,6 +522,21 @@
 
       #pe-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
 
+      /* ============ Mobile responsiveness for emulator ============ */
+      @media (max-width: 768px) {
+        .section {
+          width: 100%;
+        }
+        .pe-palm {
+          width: 100%;
+          max-width: 100%;
+          margin: 0 auto;
+        }
+        .text, h2 {
+          margin-left: 0;
+        }
+      }
+
     </style>
    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   </head>
@@ -649,6 +664,9 @@
         </div>
         <div id="pe-status" role="status" aria-live="polite"></div>
       </div>
+<div class="commentbox"></div>
+      <script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
+      <script>commentBox('5680061592109056-proj')</script>
     </div>
 
 <br>
